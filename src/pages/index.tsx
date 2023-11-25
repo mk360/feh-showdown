@@ -10,6 +10,10 @@ export default function Home() {
   const [searchInput, setSearchInput] = useState("");
   const [filteredWeapon, setFilteredWeapon] = useState("");
   const [filteredColor, setFilteredColor] = useState("");
+  const [currentTab, setCurrentTab] = useState<"hero" | "hero-details">("hero-details");
+  const [hero, setHero] = useState<Partial<{ name: string; skills: any[]; boon: ""; bane: "", resplendent: boolean }>>({
+    name: "Chrom: Exalted Prince"
+  });
 
   return (
     <>
@@ -36,58 +40,127 @@ export default function Home() {
             </li>
           </ol>
         </div>
-        <form style={{ width: "100%" }}>
-          <fieldset>
-            <legend>Hero Filters</legend>
-            <dl>
-              <dt><label id="name" htmlFor="name-input">Hero Name</label></dt>
-              <dd><input id="name-input" aria-labelledby='name' value={searchInput} onChange={(e) => {
-                setSearchInput(e.target.value);
-              }} /></dd>
-              <dt><label id="hero-color" htmlFor='color-selector'>
-                Hero Color
-              </label></dt>
-              <dd><select onChange={(e) => {
-                setFilteredColor(e.target.value);
-              }} value={filteredColor} aria-describedby='color-warning' id="color-selector" aria-labelledby='hero-color'>
-                <option></option>
-                <option>Red</option>
-                <option>Blue</option>
-                <option>Green</option>
-                <option>Colorless</option>
-              </select></dd>
-              <dt><label id="hero-weapon" htmlFor='weapon-selector'>
-                Hero Weapon
-              </label></dt>
-              <dd><select onChange={(e) => {
-                setFilteredWeapon(e.target.value);
-              }} value={filteredWeapon} aria-describedby='hero-weapon' id="weapon-selector">
-                <option></option>
-                <optgroup label="Close Range">
-                  <option>Sword</option>
-                  <option>Lance</option>
-                  <option>Axe</option>
-                  <option>Beast</option>
-                  <option>Breath</option>
-                </optgroup>
-                <optgroup label="Long Range">
-                  <option>Bow</option>
-                  <option>Tome</option>
-                  <option>Dagger</option>
-                </optgroup>
-              </select></dd>
-              <dt><label id="hero-movement" htmlFor=''>Movement</label></dt>
-              <dd><select id="movement-selector" aria-labelledby='hero-movement'>
-                <option></option>
-                <option>Infantry</option>
-                <option>Armored</option>
-                <option>Flier</option>
-                <option>Cavalry</option>
-              </select></dd>
-            </dl>
-            <p id="color-warning">Color selection can be overriden by weapon choice, if only one color of that weapon exists (ex. Swords are always Red).</p>
-          </fieldset>
-        </form>
+        <div style={{ display: currentTab !== "hero" ? "none" : "block" }}>
+          <form style={{ width: "100%" }}>
+            <fieldset>
+              <legend>Filters</legend>
+              <dl>
+                <dt><label id="name" htmlFor="name-input">Hero Name</label></dt>
+                <dd><input id="name-input" autoComplete="off" aria-labelledby='name' value={searchInput} onChange={(e) => {
+                  setSearchInput(e.target.value);
+                }} /></dd>
+                <dt><label id="hero-color" htmlFor='color-selector'>
+                  Hero Color
+                </label></dt>
+                <dd><select onChange={(e) => {
+                  setFilteredColor(e.target.value);
+                }} value={filteredColor} aria-describedby='color-warning' id="color-selector" aria-labelledby='hero-color'>
+                  <option></option>
+                  <option>Red</option>
+                  <option>Blue</option>
+                  <option>Green</option>
+                  <option>Colorless</option>
+                </select></dd>
+                <dt><label id="hero-weapon" htmlFor='weapon-selector'>
+                  Hero Weapon
+                </label></dt>
+                <dd><select onChange={(e) => {
+                  setFilteredWeapon(e.target.value);
+                }} value={filteredWeapon} aria-describedby='hero-weapon' id="weapon-selector">
+                  <option></option>
+                  <optgroup label="Close Range">
+                    <option>Sword</option>
+                    <option>Lance</option>
+                    <option>Axe</option>
+                    <option>Beast</option>
+                    <option>Breath</option>
+                  </optgroup>
+                  <optgroup label="Long Range">
+                    <option>Bow</option>
+                    <option>Tome</option>
+                    <option>Dagger</option>
+                  </optgroup>
+                </select></dd>
+                <dt><label id="hero-movement" htmlFor='movement-selector'>Movement</label></dt>
+                <dd><select id="movement-selector" aria-labelledby='hero-movement'>
+                  <option></option>
+                  <option>Infantry</option>
+                  <option>Armored</option>
+                  <option>Flier</option>
+                  <option>Cavalry</option>
+                </select></dd>
+              </dl>
+              <p id="color-warning">Color selection can be overriden by weapon choice, if only one color of that weapon exists (ex. Swords are always Red).</p>
+            </fieldset>
+          </form>
+          <div aria-relevant="all" aria-live="polite">
+            Found 100 results.
+          </div>
+          <table>
+            <thead onClick={(e) => {
+              // @ts-ignore
+              console.log(e.target)
+            }}>
+              <tr>
+                <th><button>Hero</button></th>
+                <th><button>Movement</button></th>
+                <th><button>Color</button></th>
+                <th><button>Weapon</button></th>
+                <th><button>HP</button></th>
+                <th><button>Atk</button></th>
+                <th><button>Spd</button></th>
+                <th><button>Def</button></th>
+                <th><button>Res</button></th>
+                <th><button>BST</button></th>
+              </tr>
+            </thead>
+            <tbody onClick={console.log}>
+              <tr>
+                <td><p>Chrom</p><p>Exalted Prince</p></td>
+                <td>Infantry</td>
+                <td>Red</td>
+                <td>Sword</td>
+                <td>60</td>
+                <td>70</td>
+                <td>36</td>
+                <td>41</td>
+                <td>30</td>
+                <td>237</td>
+              </tr>
+              <tr>
+                <td>
+                  <p>Chrom</p>
+                  <p>Exalted Prince</p>
+                </td>
+                <td>Armored</td>
+                <td>Green</td>
+                <td>Axe</td>
+                <td>60</td>
+                <td>70</td>
+                <td>36</td>
+                <td>41</td>
+                <td>30</td>
+                <td>237</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style={{ display: currentTab !== "hero-details" ? "none" : "block" }}>
+          <div style={{ display: "flex" }}>
+            <div style={{ flex: 1 }}>
+              <p aria-label="Hero name">{hero.name}</p>
+              <Image src="" loading="lazy" alt="" height={40} width={40} style={{ backgroundColor: "red" }} />
+            </div>
+            <div style={{ flex: 2 }}>
+              <div>
+                <label htmlFor='details'>Details</label>
+                <div id="details" role="button" aria-description="Edit the hero's level, rarity, and if applicable, if it's resplendent"></div>
+              </div>
+              <div></div>
+            </div>
+            <div style={{ flex: 1 }}></div>
+          </div>
+        </div>
       </main>
     </>
   )
