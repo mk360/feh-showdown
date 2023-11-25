@@ -11,15 +11,19 @@ export default function Home() {
   const [filteredWeapon, setFilteredWeapon] = useState("");
   const [filteredColor, setFilteredColor] = useState("");
   const [currentTab, setCurrentTab] = useState<"hero" | "hero-details">("hero-details");
-  const [hero, setHero] = useState<Partial<{ name: string; skills: any[]; boon: ""; bane: "", resplendent: boolean; merges: number; level: number; rarity: number; stats: {
-    hp: number;
-    atk: number;
-    spd: number;
-    def: number;
-    res: number;
-  } }>>({
+  const [hero, setHero] = useState<Partial<{
+    name: string; skills: any[]; boon: ""; bane: "", resplendent: boolean; merges: number; level: number; rarity: number; stats: {
+      hp: number;
+      atk: number;
+      spd: number;
+      def: number;
+      res: number;
+    }
+  }>>({
     name: "Chrom: Exalted Prince"
   });
+
+  const [currentSubpanel, setCurrentSubpanel] = useState<"details" | "weapon" | "a-skill" | "b-skill" | "c-skill" | "sacred seal">("details");
 
   return (
     <>
@@ -157,10 +161,10 @@ export default function Home() {
               <h4 aria-label="Hero Details">Details</h4>
               <button aria-description="Edit the hero's level, merges, rarity, and if applicable, if they are resplendent">
                 <span style={{ display: "block" }}>Rarity: 5 stars.</span>
-                <span>Level: 40.</span>
-                <span>Merges: 10.</span>
-                <span>Resplendent: No.</span>
-                <span>Boon / Bane: None.</span>
+                <span style={{ display: "block" }}>Level: 40.</span>
+                <span style={{ display: "block" }}>Merges: 10.</span>
+                <span style={{ display: "block" }}>Resplendent: No.</span>
+                <span style={{ display: "block" }}>Boon / Bane: None.</span>
               </button>
             </div>
             <div style={{ flex: 1 }}>
@@ -182,11 +186,34 @@ export default function Home() {
               <h4>Stats</h4>
               <table aria-label={`Stats for ${hero.name}`} aria-atomic aria-live="polite">
                 <tbody>
-                  <tr><td></td><td scope="row">HP</td><td>59</td></tr>
+                  <tr><td scope="row" style={{ textAlign: "right" }} colSpan={2}>HP</td><td colSpan={2}>59</td></tr>
                   <tr><td scope='row'>Atk</td><td>70</td><td scope="row">Def</td><td>46</td></tr>
                   <tr><td scope="row">Spd</td><td>37</td><td scope="row">Res</td><td>32</td></tr>
                 </tbody>
               </table>
+            </div>
+          </div>
+          <div>
+            <form style={{ display: currentSubpanel === "details" ? "block" : "none" }}>
+              <fieldset>
+                <legend>Level</legend>
+                <div><label htmlFor='level-1'>Level 1</label> <input id="level-1" type="radio" name="level" value={1} /> <label htmlFor='level-40'>Level 40</label> <input type="radio" id="level-40" name="level" value={40} /></div>
+              </fieldset>
+              <ul>
+                <li><label htmlFor="merges-count">Merges</label> <input id="merges-count" type="number" aria-valuemin={0} aria-valuemax={10} max={10} step={1} min={0} /></li>
+                <li><label htmlFor='resplendence'>Resplendent</label> <input type="checkbox" id="resplendence" /></li>
+                <li><label htmlFor='boon-selection'>Boon</label> <select id="boon-selection"><option></option><option>HP</option><option>Atk</option><option>Spd</option><option>Def</option><option>Res</option></select> <label htmlFor='bane-selection'>Bane</label> <select id="bane-selection"><option></option><option>HP</option><option>Atk</option><option>Spd</option><option>Def</option><option>Res</option></select></li>
+                <li><label htmlFor='summoner-support'>Summoner Support</label></li>
+              </ul>
+            </form>
+            <div style={{ display: currentSubpanel !== "details" ? "block" : "none" }}>
+              <ul onClick={(e) => {
+              }}>
+                <li>Akuma</li>
+                <li>Ryu</li>
+                <li>Chun-Li</li>
+                <li>Zangief</li>
+              </ul>
             </div>
           </div>
         </div>
