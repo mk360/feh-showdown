@@ -11,7 +11,13 @@ export default function Home() {
   const [filteredWeapon, setFilteredWeapon] = useState("");
   const [filteredColor, setFilteredColor] = useState("");
   const [currentTab, setCurrentTab] = useState<"hero" | "hero-details">("hero-details");
-  const [hero, setHero] = useState<Partial<{ name: string; skills: any[]; boon: ""; bane: "", resplendent: boolean }>>({
+  const [hero, setHero] = useState<Partial<{ name: string; skills: any[]; boon: ""; bane: "", resplendent: boolean; merges: number; level: number; rarity: number; stats: {
+    hp: number;
+    atk: number;
+    spd: number;
+    def: number;
+    res: number;
+  } }>>({
     name: "Chrom: Exalted Prince"
   });
 
@@ -24,22 +30,16 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={`${styles.main} ${inter.className}`}>
-        <div style={{ width: "100%" }}>
-          <ol style={{ display: "flex" }}>
+        <nav style={{ width: "100%" }}>
+          <ul style={{ display: "flex", listStyleType: "none" }}>
             <li style={{ flex: 1 }}>
-              bonjour
+              <button style={{ width: "100%" }}>Chrom: Exalted Prince</button>
             </li>
             <li style={{ flex: 1 }}>
-              bonjour
+              <button style={{ width: "100%" }}>New Hero</button>
             </li>
-            <li style={{ flex: 1 }}>
-              bonjour
-            </li>
-            <li style={{ flex: 1 }}>
-              bonjour
-            </li>
-          </ol>
-        </div>
+          </ul>
+        </nav>
         <div style={{ display: currentTab !== "hero" ? "none" : "block" }}>
           <form style={{ width: "100%" }}>
             <fieldset>
@@ -148,17 +148,46 @@ export default function Home() {
         <div style={{ display: currentTab !== "hero-details" ? "none" : "block" }}>
           <div style={{ display: "flex" }}>
             <div style={{ flex: 1 }}>
-              <p aria-label="Hero name">{hero.name}</p>
-              <Image src="" loading="lazy" alt="" height={40} width={40} style={{ backgroundColor: "red" }} />
-            </div>
-            <div style={{ flex: 2 }}>
-              <div>
-                <label htmlFor='details'>Details</label>
-                <div id="details" role="button" aria-description="Edit the hero's level, rarity, and if applicable, if it's resplendent"></div>
+              <div style={{ textAlign: "center" }}>
+                <Image src="" loading="lazy" alt="" height={40} width={40} style={{ margin: "auto", backgroundColor: "red" }} />
               </div>
-              <div></div>
+              <p style={{ textAlign: "center" }} aria-label="Hero name">{hero.name}</p>
             </div>
-            <div style={{ flex: 1 }}></div>
+            <div style={{ flex: 1 }}>
+              <h4 aria-label="Hero Details">Details</h4>
+              <button aria-description="Edit the hero's level, merges, rarity, and if applicable, if they are resplendent">
+                <span style={{ display: "block" }}>Rarity: 5 stars.</span>
+                <span>Level: 40.</span>
+                <span>Merges: 10.</span>
+                <span>Resplendent: No.</span>
+                <span>Boon / Bane: None.</span>
+              </button>
+            </div>
+            <div style={{ flex: 1 }}>
+              <h4 id="moveset-section-title">Moveset</h4>
+              <dl>
+                <dt><label htmlFor='weapon-slot'>Weapon</label></dt>
+                <dd><input id="weapon-slot" autoComplete='off' value="Sealed Falchion" /></dd>
+                <dt><label htmlFor='passive-a'>A Passive</label></dt>
+                <dd><input id="passive-a" autoComplete='off' value="HP+5" /></dd>
+                <dt><label htmlFor='passive-b'>B Passive</label></dt>
+                <dd><input id="passive-b" autoComplete='off' value="Vantage 3" /></dd>
+                <dt><label htmlFor='passive-c'>C Passive</label></dt>
+                <dd><input autoComplete='off' id="passive-c" value="Atk Smoke 3" /></dd>
+                <dt><label htmlFor='sacred-seal'>Sacred Seal</label></dt>
+                <dd><input id="sacred-seal" autoComplete="off" value="Poison Strike 3" /></dd>
+              </dl>
+            </div>
+            <div style={{ flex: 1 }}>
+              <h4>Stats</h4>
+              <table aria-label={`Stats for ${hero.name}`} aria-atomic aria-live="polite">
+                <tbody>
+                  <tr><td></td><td scope="row">HP</td><td>59</td></tr>
+                  <tr><td scope='row'>Atk</td><td>70</td><td scope="row">Def</td><td>46</td></tr>
+                  <tr><td scope="row">Spd</td><td>37</td><td scope="row">Res</td><td>32</td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </main>
