@@ -139,7 +139,7 @@ export default function Home() {
                 <td>Armored</td>
                 <td>Green</td>
                 <td>Axe</td>
-                <td>60</td>
+                <td>50</td>
                 <td>70</td>
                 <td>36</td>
                 <td>41</td>
@@ -171,15 +171,17 @@ export default function Home() {
               <h4 id="moveset-section-title">Moveset</h4>
               <dl>
                 <dt><label htmlFor='weapon-slot'>Weapon</label></dt>
-                <dd><input id="weapon-slot" autoComplete='off' value="Sealed Falchion" /></dd>
+                <dd><input onFocus={() => {
+                  setCurrentSubpanel("weapon");
+                }} disabled id="weapon-slot" autoComplete='off' value="Sealed Falchion" /></dd>
                 <dt><label htmlFor='passive-a'>A Passive</label></dt>
-                <dd><input id="passive-a" autoComplete='off' value="HP+5" /></dd>
+                <dd><input disabled id="passive-a" autoComplete='off' value="HP+5" /></dd>
                 <dt><label htmlFor='passive-b'>B Passive</label></dt>
                 <dd><input id="passive-b" autoComplete='off' value="Vantage 3" /></dd>
                 <dt><label htmlFor='passive-c'>C Passive</label></dt>
-                <dd><input autoComplete='off' id="passive-c" value="Atk Smoke 3" /></dd>
+                <dd><input disabled autoComplete='off' id="passive-c" value="Atk Smoke 3" /></dd>
                 <dt><label htmlFor='sacred-seal'>Sacred Seal</label></dt>
-                <dd><input id="sacred-seal" autoComplete="off" value="Poison Strike 3" /></dd>
+                <dd><input disabled id="sacred-seal" autoComplete="off" value="Poison Strike 3" /></dd>
               </dl>
             </div>
             <div style={{ flex: 1 }}>
@@ -199,24 +201,36 @@ export default function Home() {
                 <legend>Level</legend>
                 <div><label htmlFor='level-1'>Level 1</label> <input id="level-1" type="radio" name="level" value={1} /> <label htmlFor='level-40'>Level 40</label> <input type="radio" id="level-40" name="level" value={40} /></div>
               </fieldset>
-              <ul>
+              <ul aria-atomic aria-label='Detailed options' aria-live="polite">
                 <li><label htmlFor="merges-count">Merges</label> <input id="merges-count" type="number" aria-valuemin={0} aria-valuemax={10} max={10} step={1} min={0} /></li>
                 <li><label htmlFor='resplendence'>Resplendent</label> <input type="checkbox" id="resplendence" /></li>
-                <li><label htmlFor='boon-selection'>Boon</label> <select id="boon-selection"><option></option><option>HP</option><option>Atk</option><option>Spd</option><option>Def</option><option>Res</option></select> <label htmlFor='bane-selection'>Bane</label> <select id="bane-selection"><option></option><option>HP</option><option>Atk</option><option>Spd</option><option>Def</option><option>Res</option></select></li>
+                <li><label htmlFor='boon-selection'>Boon</label><select lang="en" id="boon-selection"><option></option><option>HP</option><option>Atk</option><option>Spd</option><option>Def</option><option>Res</option></select> <label htmlFor='bane-selection'>Bane</label> <select id="bane-selection"><option></option><option>HP</option><option>Atk</option><option>Spd</option><option>Def</option><option>Res</option></select></li>
                 <li><label htmlFor='summoner-support'>Summoner Support</label></li>
               </ul>
             </form>
-            <div style={{ display: currentSubpanel !== "details" ? "block" : "none" }}>
-              <ul onClick={(e) => {
-              }}>
-                <li>Akuma</li>
-                <li>Ryu</li>
-                <li>Chun-Li</li>
-                <li>Zangief</li>
-              </ul>
+            <h2>Skills</h2>
+            <h4>Weapons</h4>
+            <div>
+              {/* searchbox with list of results */}
+            </div>
+            <h4>A Passives</h4>
+            <div>
+              {/* searchbox with list of results */}
+            </div>
+            <h4>B Passives</h4>
+            <div>
+              {/* searchbox with list of results */}
+            </div>
+            <h4>C Passives</h4>
+            <div>
+              {/* searchbox with list of results */}
+            </div>
+            <h4>Sacred Seals</h4>
+            <div>
+              {/* searchbox with list of results */}
+            </div>
             </div>
           </div>
-        </div>
       </main>
     </>
   )
