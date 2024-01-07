@@ -3,25 +3,28 @@ import Image from 'next/image'
 import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css'
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
-  const [searchInput, setSearchInput] = useState("");
-  const [filteredWeapon, setFilteredWeapon] = useState("");
-  const [filteredColor, setFilteredColor] = useState("");
-  const [currentTab, setCurrentTab] = useState<"hero" | "hero-details">("hero-details");
-  const [hero, setHero] = useState<Partial<{
-    name: string; skills: any[]; boon: ""; bane: "", resplendent: boolean; merges: number; level: number; rarity: number; stats: {
-      hp: number;
-      atk: number;
-      spd: number;
-      def: number;
-      res: number;
-    }
-  }>>({
-    name: "Chrom: Exalted Prince"
+  const { register, handleSubmit, getValues } = useForm<{
+    name: string;
+    boon: "atk" | "def" | "res" | "spd" | "hp";
+    bane: "atk" | "def" | "res" | "spd" | "hp";
+    color: "red" | "blue" | "green" | "colorless";
+    movement: string;
+    weapon: string;
+  }>({
+    mode: "onChange"
   });
+
+  const heroDetailsForm = useForm<{
+    resplendent: boolean;
+    merges: number;
+    rarity: number;
+  }>();
+  const [currentTab, setCurrentTab] = useState<"hero" | "hero-details">("hero");
 
   const [currentSubpanel, setCurrentSubpanel] = useState<"details" | "weapon" | "a-skill" | "b-skill" | "c-skill" | "sacred seal">("details");
 
@@ -45,20 +48,18 @@ export default function Home() {
           </ul>
         </nav>
         <div style={{ display: currentTab !== "hero" ? "none" : "block" }}>
-          <form style={{ width: "100%" }}>
+          <form onSubmit={handleSubmit((valu) => {
+            console.log(valu);
+          })} style={{ width: "100%" }}>
             <fieldset>
               <legend>Filters</legend>
               <dl>
                 <dt><label id="name" htmlFor="name-input">Hero Name</label></dt>
-                <dd><input id="name-input" autoComplete="off" aria-labelledby='name' value={searchInput} onChange={(e) => {
-                  setSearchInput(e.target.value);
-                }} /></dd>
+                <dd><input id="name-input" autoComplete="off" aria-labelledby='name' {...register("name")} /></dd>
                 <dt><label id="hero-color" htmlFor='color-selector'>
                   Hero Color
                 </label></dt>
-                <dd><select onChange={(e) => {
-                  setFilteredColor(e.target.value);
-                }} value={filteredColor} aria-describedby='color-warning' id="color-selector" aria-labelledby='hero-color'>
+                <dd><select {...register("color")} aria-describedby='color-warning' id="color-selector" aria-labelledby='hero-color'>
                   <option></option>
                   <option>Red</option>
                   <option>Blue</option>
@@ -68,9 +69,7 @@ export default function Home() {
                 <dt><label id="hero-weapon" htmlFor='weapon-selector'>
                   Hero Weapon
                 </label></dt>
-                <dd><select onChange={(e) => {
-                  setFilteredWeapon(e.target.value);
-                }} value={filteredWeapon} aria-describedby='hero-weapon' id="weapon-selector">
+                <dd><select {...register("weapon")} aria-describedby='hero-weapon' id="weapon-selector">
                   <option></option>
                   <optgroup label="Close Range">
                     <option>Sword</option>
@@ -83,10 +82,11 @@ export default function Home() {
                     <option>Bow</option>
                     <option>Tome</option>
                     <option>Dagger</option>
+                    <option>Staff</option>
                   </optgroup>
                 </select></dd>
                 <dt><label id="hero-movement" htmlFor='movement-selector'>Movement</label></dt>
-                <dd><select id="movement-selector" aria-labelledby='hero-movement'>
+                <dd><select {...register("movement")} id="movement-selector" aria-labelledby='hero-movement'>
                   <option></option>
                   <option>Infantry</option>
                   <option>Armored</option>
@@ -101,10 +101,7 @@ export default function Home() {
             Found 100 results.
           </div>
           <table>
-            <thead onClick={(e) => {
-              // @ts-ignore
-              console.log(e.target)
-            }}>
+            <thead>
               <tr>
                 <th><button>Hero</button></th>
                 <th><button>Movement</button></th>
@@ -118,7 +115,9 @@ export default function Home() {
                 <th><button>BST</button></th>
               </tr>
             </thead>
-            <tbody onClick={console.log}>
+            <tbody onClick={(e) => {
+              console.log(e.currentTarget, e.target as HTMLTableRowElement);
+            }}>
               <tr>
                 <td><p>Chrom</p><p>Exalted Prince</p></td>
                 <td>Infantry</td>
@@ -155,17 +154,7 @@ export default function Home() {
               <div style={{ textAlign: "center" }}>
                 <Image src="" loading="lazy" alt="" height={40} width={40} style={{ margin: "auto", backgroundColor: "red" }} />
               </div>
-              <p style={{ textAlign: "center" }} aria-label="Hero name">{hero.name}</p>
-            </div>
-            <div style={{ flex: 1 }}>
-              <h4 aria-label="Hero Details">Details</h4>
-              <button aria-description="Edit the hero's level, merges, rarity, and if applicable, if they are resplendent">
-                <span style={{ display: "block" }}>Rarity: 5 stars.</span>
-                <span style={{ display: "block" }}>Level: 40.</span>
-                <span style={{ display: "block" }}>Merges: 10.</span>
-                <span style={{ display: "block" }}>Resplendent: No.</span>
-                <span style={{ display: "block" }}>Boon / Bane: None.</span>
-              </button>
+              <p style={{ textAlign: "center" }} aria-label="Hero name">{{ name: "bougnoule" }.name}</p>
             </div>
             <div style={{ flex: 1 }}>
               <h4 id="moveset-section-title">Moveset</h4>
@@ -186,7 +175,7 @@ export default function Home() {
             </div>
             <div style={{ flex: 1 }}>
               <h4>Stats</h4>
-              <table aria-label={`Stats for ${hero.name}`} aria-atomic aria-live="polite">
+              <table aria-label={`Stats for ${{ name: "bougnoule" }.name}`} aria-atomic aria-live="polite">
                 <tbody>
                   <tr><td scope="row" style={{ textAlign: "right" }} colSpan={2}>HP</td><td colSpan={2}>59</td></tr>
                   <tr><td scope='row'>Atk</td><td>70</td><td scope="row">Def</td><td>46</td></tr>
@@ -229,8 +218,8 @@ export default function Home() {
             <div>
               {/* searchbox with list of results */}
             </div>
-            </div>
           </div>
+        </div>
       </main>
     </>
   )
