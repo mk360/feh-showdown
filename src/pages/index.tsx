@@ -19,7 +19,11 @@ export default function Home() {
     mode: "onSubmit"
   });
   const [team, setTeam] = useState([]);
-  const [currentHero, setCurrentHero] = useState("");
+  const [currentHero, setCurrentHero] = useState({
+    name: "",
+    movementType: "",
+    weaponType: "",
+  });
   const [heroesList, setHeroesList] = useState<any[]>([]);
   const [skillsList, setSkillsList] = useState();
 
@@ -141,7 +145,9 @@ export default function Home() {
             <tbody>
               {heroesList.map((sv) => (
                 <tr key={sv.Name} onClick={() => {
-                  setCurrentHero(sv.Name);
+                  setCurrentHero({
+                    
+                  });
                   setCurrentTab("hero-details");
                 }}>
                   <td style={{ display: "flex" }}>
