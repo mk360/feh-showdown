@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css';
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { Button, DropdownMenu, Theme } from '@radix-ui/themes';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -23,9 +24,17 @@ export default function Home() {
     name: "",
     movementType: "",
     weaponType: "",
+    weaponColor: "",
   });
   const [heroesList, setHeroesList] = useState<any[]>([]);
-  const [skillsList, setSkillsList] = useState();
+  const [skillsList, setSkillsList] = useState({
+    weapon: [] as string[],
+    assist: [] as string[],
+    special: [] as string[],
+    passivea: [] as string[],
+    passiveb: [] as string[],
+    passivec: [] as string[]
+  });
 
   const heroDetailsForm = useForm<{
     resplendent: boolean;
@@ -38,10 +47,10 @@ export default function Home() {
   const [currentSubpanel, setCurrentSubpanel] = useState<"details" | "weapon" | "a-skill" | "b-skill" | "c-skill" | "sacred seal">("details");
 
   useEffect(() => {
-    if (currentHero) {
-      fetch(`/api/skills?name=${encodeURIComponent(currentHero)}`).then((res) => {
-        res.json().then((resp: CargoQuery<{ Name: string, Scategory: string, Description: string }>) => {
-          console.log(resp);
+    if (currentHero.name) {
+      fetch(`/api/skills?name=${encodeURIComponent(currentHero.name)}&movementType=${currentHero.movementType}&weaponType=${currentHero.weaponType}&weaponColor=${currentHero.weaponColor}`).then((res) => {
+        res.json().then((resp) => {
+          setSkillsList(resp);
         });
       });
     }
@@ -54,7 +63,7 @@ export default function Home() {
         <meta name="description" content="FEH Showdown" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
-        <style dangerouslySetInnerHTML={{ __html: "button { width: 100% } "}} />
+        <style dangerouslySetInnerHTML={{ __html: "button { width: 100% } " }} />
       </Head>
       <main className={`${styles.main} ${inter.className}`}>
         <nav style={{ width: "100%" }}>
@@ -146,7 +155,10 @@ export default function Home() {
               {heroesList.map((sv) => (
                 <tr key={sv.Name} onClick={() => {
                   setCurrentHero({
-                    
+                    name: sv.Name,
+                    movementType: sv.MoveType,
+                    weaponType: sv.WeaponType,
+                    weaponColor: sv.WeaponColor
                   });
                   setCurrentTab("hero-details");
                 }}>
@@ -177,7 +189,7 @@ export default function Home() {
               <div style={{ textAlign: "center" }}>
                 <Image src="" loading="lazy" alt="" height={40} width={40} style={{ margin: "auto", backgroundColor: "red" }} />
               </div>
-              <p style={{ textAlign: "center" }} aria-label="Hero name">{currentHero}</p>
+              <p style={{ textAlign: "center" }} aria-label="Hero name">{currentHero.name}</p>
             </div>
             <div style={{ flex: 1 }}>
               <h4 id="moveset-section-title">Moveset</h4>
@@ -220,27 +232,78 @@ export default function Home() {
                 <li><label htmlFor='summoner-support'>Summoner Support</label></li>
               </ul>
             </form>
-            <h2>Skills</h2>
-            <h4>Weapons</h4>
-            <div>
-              {/* searchbox with list of results */}
-            </div>
-            <h4>A Passives</h4>
-            <div>
-              {/* searchbox with list of results */}
-            </div>
-            <h4>B Passives</h4>
-            <div>
-              {/* searchbox with list of results */}
-            </div>
-            <h4>C Passives</h4>
-            <div>
-              {/* searchbox with list of results */}
-            </div>
-            <h4>Sacred Seals</h4>
-            <div>
-              {/* searchbox with list of results */}
-            </div>
+            <Theme>
+              <h2>Skills</h2>
+              <h4>Weapons</h4>
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger>
+                  <Button variant="solid">
+                    Armes
+                  </Button>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content>
+                  {skillsList.weapon.map((w) => {
+                    return <DropdownMenu.Item key={w.name}>{w.name}</DropdownMenu.Item>
+                  })}
+                </DropdownMenu.Content>
+              </DropdownMenu.Root>
+              <h4>Assists</h4>
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger>
+                  <Button variant="solid">
+                    Assists
+                  </Button>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content onClick={console.log}>
+                  {skillsList.assist.map((w) => {
+                    return <DropdownMenu.Item key={w.name}>{w.name}</DropdownMenu.Item>
+                  })}
+                </DropdownMenu.Content>
+              </DropdownMenu.Root>
+              <h4>A Passives</h4>
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger>
+                  <Button variant="solid">
+                    A Passives
+                  </Button>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content>
+                  {skillsList.passivea.map((w) => {
+                    return <DropdownMenu.Item key={w.name}>{w.name}</DropdownMenu.Item>
+                  })}
+                </DropdownMenu.Content>
+              </DropdownMenu.Root>
+              <h4>B Passives</h4>
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger>
+                  <Button variant="solid">
+                    B Passives
+                  </Button>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content>
+                  {skillsList.passiveb.map((w) => {
+                    return <DropdownMenu.Item key={w.name}>{w.name}</DropdownMenu.Item>
+                  })}
+                </DropdownMenu.Content>
+              </DropdownMenu.Root>
+              <h4>C Passives</h4>
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger>
+                  <Button variant="solid">
+                    C Passives
+                  </Button>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content>
+                  {skillsList.passivec.map((w) => {
+                    return <DropdownMenu.Item key={w.name}>{w.name}</DropdownMenu.Item>
+                  })}
+                </DropdownMenu.Content>
+              </DropdownMenu.Root>
+              <h4>Sacred Seals</h4>
+              <div>
+                {/* searchbox with list of results */}
+              </div>
+            </Theme>
           </div>
         </div>
       </main>
