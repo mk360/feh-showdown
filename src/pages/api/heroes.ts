@@ -1,23 +1,26 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
 async function heroes(req: NextApiRequest, res: NextApiResponse) {
-    const { name, weaponType, movement, color } = req.query;
+    const { name, weaponType, movement, color } = req.query as Required<{ [k in "name" | "weaponType" | "movement" | "color"]: string }>;
     const domain = "https://feheroes.fandom.com/api.php";
     const urlQuery = new URLSearchParams();
     urlQuery.append("action", "cargoquery");
     urlQuery.append("tables", "Units, UnitStats");
     urlQuery.append("format", "json");
-    urlQuery.append("limit", "500");
+    urlQuery.append("limit", "5000");
     const fields = ["Units._pageName=Name", "MoveType", "WeaponType", "HPGR3", "Lv1HP5", "AtkGR3", "Lv1Atk5", "SpdGR3", "Lv1Spd5", "DefGR3", "Lv1Def5", "ResGR3", "Lv1Res5"];
-    const conditions: string[] = [`ReleaseDate <= "2017-12-31"`];
+    const conditions: string[] = ["Properties holds not \"enemy\""];
     urlQuery.append("join_on", "Units._pageName=UnitStats._pageName");
+    urlQuery.append("group_by", "Units._pageName");
 
     if (name) {
         conditions.push(`Units._pageName like "${name}%"`);
     }
 
     if (weaponType || color) {
-        const colorQuery = (color + " " + weaponType).trim();
+        const lockedColor = weaponType === "Axe" ? "Green" : weaponType === "Sword" ? "Red" : weaponType === "Lance" ? "Blue" : color;
+        const colorQuery = (lockedColor + " " + weaponType).trim();
+        console.log({ colorQuery });
         conditions.push(`WeaponType like "%${colorQuery}%"`);
     }
 

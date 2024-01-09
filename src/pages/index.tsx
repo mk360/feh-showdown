@@ -18,16 +18,30 @@ export default function Home() {
   }>({
     mode: "onSubmit"
   });
+  const [team, setTeam] = useState([]);
+  const [currentHero, setCurrentHero] = useState("");
   const [heroesList, setHeroesList] = useState<any[]>([]);
+  const [skillsList, setSkillsList] = useState();
 
   const heroDetailsForm = useForm<{
     resplendent: boolean;
     merges: number;
     rarity: number;
   }>();
+
   const [currentTab, setCurrentTab] = useState<"hero" | "hero-details">("hero");
 
   const [currentSubpanel, setCurrentSubpanel] = useState<"details" | "weapon" | "a-skill" | "b-skill" | "c-skill" | "sacred seal">("details");
+
+  useEffect(() => {
+    if (currentHero) {
+      fetch(`/api/skills?name=${encodeURIComponent(currentHero)}`).then((res) => {
+        res.json().then((resp: CargoQuery<{ Name: string, Scategory: string, Description: string }>) => {
+          console.log(resp);
+        });
+      });
+    }
+  }, [currentHero]);
 
   return (
     <>
@@ -36,6 +50,7 @@ export default function Home() {
         <meta name="description" content="FEH Showdown" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
+        <style dangerouslySetInnerHTML={{ __html: "button { width: 100% } "}} />
       </Head>
       <main className={`${styles.main} ${inter.className}`}>
         <nav style={{ width: "100%" }}>
@@ -49,9 +64,8 @@ export default function Home() {
           </ul>
         </nav>
         <div style={{ display: currentTab !== "hero" ? "none" : "block" }}>
-          <form onSubmit={handleSubmit((valu) => {
-            console.log(valu);
-            const s = new URLSearchParams(valu).toString();
+          <form onSubmit={handleSubmit((heroesQuery) => {
+            const s = new URLSearchParams(heroesQuery).toString();
 
             fetch(`/api/heroes?${s}`).then((res) => {
               res.json().then((v) => {
@@ -107,12 +121,11 @@ export default function Home() {
             </fieldset>
           </form>
           <div aria-relevant="all" aria-live="polite">
-            Found 100 results.
+            Found {heroesList.length} results.
           </div>
-          <table>
+          <table style={{ width: "100%" }}>
             <thead>
               <tr>
-                <th></th>
                 <th><button>Hero</button></th>
                 <th><button>Movement</button></th>
                 <th><button>Color</button></th>
@@ -125,16 +138,17 @@ export default function Home() {
                 <th><button>BST</button></th>
               </tr>
             </thead>
-            <tbody style={{ width: "100%" }} onClick={(e) => {
-              console.log(e.currentTarget, e.target as HTMLTableRowElement);
-            }}>
+            <tbody>
               {heroesList.map((sv) => (
-                <tr key={sv.Name}>
-                  <td>
-                    <img height={40} width={40} loading="lazy" src={`/api/portrait?name=${encodeURIComponent(sv.Name)}`} />
-                  </td>
-                  <td>
-                    <p>{sv.Name}</p>
+                <tr key={sv.Name} onClick={() => {
+                  setCurrentHero(sv.Name);
+                  setCurrentTab("hero-details");
+                }}>
+                  <td style={{ display: "flex" }}>
+                    <div style={{ flex: 0.5, display: "flex", justifyContent: "center" }}>
+                      <img height={60} width={60} loading="lazy" src={`/api/portrait?name=${encodeURIComponent(sv.Name)}`} />
+                    </div>
+                    <p style={{ display: "block", flex: 1 }}>{sv.Name}</p>
                   </td>
                   <td>{sv.MoveType}</td>
                   <td>{sv.WeaponColor}</td>
@@ -150,13 +164,14 @@ export default function Home() {
             </tbody>
           </table>
         </div>
+
         <div style={{ display: currentTab !== "hero-details" ? "none" : "block" }}>
           <div style={{ display: "flex" }}>
             <div style={{ flex: 1 }}>
               <div style={{ textAlign: "center" }}>
                 <Image src="" loading="lazy" alt="" height={40} width={40} style={{ margin: "auto", backgroundColor: "red" }} />
               </div>
-              <p style={{ textAlign: "center" }} aria-label="Hero name">{{ name: "bougnoule" }.name}</p>
+              <p style={{ textAlign: "center" }} aria-label="Hero name">{currentHero}</p>
             </div>
             <div style={{ flex: 1 }}>
               <h4 id="moveset-section-title">Moveset</h4>
