@@ -18,6 +18,7 @@ export default function handler(
   conditions.push(`(UnitSkills._pageName = "${decodeURIComponent(name)}" and Skills.Exclusive = true) or (Skills.Exclusive = false and Skills.CanUseMove holds "${movementType}" and Skills.CanUseWeapon holds "${weaponColor} ${weaponType}")`);
   urlObj.append("where", conditions.join(""));
   urlObj.append("group_by", "Name");
+  urlObj.append("order_by", "Exclusive DESC, Name ASC");
   fetch(`${domain}?${urlObj.toString()}`).then((r) => {
     r.json().then((x: CargoQuery<{ [f in typeof fields[number]]: string }>) => {
       const mapped = x.cargoquery.map((i) => i.title);
