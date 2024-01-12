@@ -13,3 +13,9 @@ interface RawHeroIdentity {
     MoveType: string;
     WeaponType: string;
 }
+
+type HeroProperty = "name" | "weapon" | "assist" | "special" | "passivea" | "passiveb" | "passivec";
+
+type HeroDetails = {
+    [k in HeroProperty]: string;
+}

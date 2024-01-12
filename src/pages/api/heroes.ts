@@ -20,7 +20,6 @@ async function heroes(req: NextApiRequest, res: NextApiResponse) {
     if (weaponType || color) {
         const lockedColor = weaponType === "Axe" ? "Green" : weaponType === "Sword" ? "Red" : weaponType === "Lance" ? "Blue" : color;
         const colorQuery = (lockedColor + " " + weaponType).trim();
-        console.log({ colorQuery });
         conditions.push(`WeaponType like "%${colorQuery}%"`);
     }
 
@@ -60,7 +59,7 @@ async function heroes(req: NextApiRequest, res: NextApiResponse) {
 };
 
 function getLv40Stat(lv1Stat: number, growthRate: number) {
-    return Number(lv1Stat) + Math.floor(Math.floor(+growthRate * 1.14) * 39 / 100);
+    return Number(lv1Stat) + Math.floor(Number(growthRate) * 1.14 * 39 / 100);
 }
 
 export default heroes;

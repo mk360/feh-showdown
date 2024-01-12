@@ -4,7 +4,7 @@ import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css';
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Button, DropdownMenu, Select, Theme } from '@radix-ui/themes';
+import { Button, DropdownMenu, Select, Tabs, Theme } from '@radix-ui/themes';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -19,7 +19,7 @@ export default function Home() {
   }>({
     mode: "onSubmit"
   });
-  const [team, setTeam] = useState([]);
+  const [team, setTeam] = useState<Partial<HeroDetails>[]>([{}]);
   const [currentHero, setCurrentHero] = useState({
     name: "",
     movementType: "",
@@ -68,14 +68,15 @@ export default function Home() {
       <main className={`${styles.main} ${inter.className}`}>
         <Theme>
           <nav style={{ width: "100%" }}>
-            <ul style={{ display: "flex", listStyleType: "none" }}>
-              <li style={{ flex: 1 }}>
-                <button style={{ width: "100%" }}>Chrom: Exalted Prince</button>
-              </li>
-              <li style={{ flex: 1 }}>
-                <button style={{ width: "100%" }}>New Hero</button>
-              </li>
-            </ul>
+            <Tabs.Root>
+              <Tabs.List style={{ display: "flex" }}>
+                {team.map((i, j) => (
+                  <Tabs.Trigger key={j} value="tab1">
+                    {i.name}
+                  </Tabs.Trigger>
+                ))}
+              </Tabs.List>
+            </Tabs.Root>
           </nav>
           <div style={{ display: currentTab !== "hero-list" ? "none" : "block" }}>
             <form onSubmit={handleSubmit((heroesQuery) => {
@@ -123,13 +124,13 @@ export default function Home() {
                   </select></dd>
                   <dt><label id="hero-movement" htmlFor='movement-selector'>Movement</label></dt>
                   <dd>
-                      <select {...register("movement")} id="movement-selector" aria-labelledby='hero-movement'>
-                    <option></option>
-                    <option>Infantry</option>
-                    <option>Armored</option>
-                    <option>Flying</option>
-                    <option>Cavalry</option>
-                      </select>
+                    <select {...register("movement")} id="movement-selector" aria-labelledby='hero-movement'>
+                      <option></option>
+                      <option>Infantry</option>
+                      <option>Armored</option>
+                      <option>Flying</option>
+                      <option>Cavalry</option>
+                    </select>
                   </dd>
                 </dl>
                 <p id="color-warning">Color selection can be overriden by weapon choice, if only one color of that weapon exists (ex. Swords are always Red).</p>
@@ -189,19 +190,19 @@ export default function Home() {
           <div style={{ display: currentTab !== "hero-details" ? "none" : "block" }}>
             <div style={{ display: "flex" }}>
               <div>
-                  <Button onClick={() => {
-                    setHeroesList([]);
-                    reset();
-                    setCurrentHero({
-                      name: "",
-                      weaponColor: "",
-                      weaponType: "",
-                      movementType: ""
-                    });
-                    setCurrentTab("hero-list");
-                  }} variant="surface">
-                    Go Back
-                  </Button>
+                <Button onClick={() => {
+                  setHeroesList([]);
+                  reset();
+                  setCurrentHero({
+                    name: "",
+                    weaponColor: "",
+                    weaponType: "",
+                    movementType: ""
+                  });
+                  setCurrentTab("hero-list");
+                }} variant="surface">
+                  Go Back
+                </Button>
               </div>
               <div>
                 <div>
@@ -214,7 +215,7 @@ export default function Home() {
                 <h2>Skills</h2>
                 <h4>Weapons</h4>
                 <Select.Root>
-                    <Select.Trigger inputMode="text">
+                  <Select.Trigger inputMode="text">
                     <Button variant="solid">
                       Assists
                     </Button>
