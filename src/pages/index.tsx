@@ -3,12 +3,14 @@ import Image from 'next/image'
 import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css';
 import React, { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { Form, useForm } from 'react-hook-form'
 import { Button, DropdownMenu, Select, Tabs, Theme } from '@radix-ui/themes';
+import FormTab from '@/components/form-tab';
+import shortid from "shortid";
 
 const inter = Inter({ subsets: ['latin'] })
 
-export default function Home() {
+export default function Home({ ids }: { ids: string[] }) {
   const { register, handleSubmit, reset } = useForm<{
     name: string;
     boon: "atk" | "def" | "res" | "spd" | "hp";
@@ -19,7 +21,9 @@ export default function Home() {
   }>({
     mode: "onSubmit"
   });
-  const [team, setTeam] = useState<Partial<HeroDetails>[]>([{}]);
+  const [team, setTeam] = useState<Partial<HeroDetails>[]>(ids.map((_, j) => ({
+    id: ids[j]
+  })));
   const [currentHero, setCurrentHero] = useState({
     name: "",
     movementType: "",
@@ -71,11 +75,14 @@ export default function Home() {
             <Tabs.Root>
               <Tabs.List style={{ display: "flex" }}>
                 {team.map((i, j) => (
-                  <Tabs.Trigger key={j} value="tab1">
-                    {i.name}
+                  <Tabs.Trigger style={{ flex: 1 }} key={j} value={i.id!}>
+                    {i.name || `Hero #${j + 1}`}
                   </Tabs.Trigger>
                 ))}
               </Tabs.List>
+              {team.map((member) => (
+                <FormTab key={member.id} callback={() => { }} id={member.id!} />
+              ))}
             </Tabs.Root>
           </nav>
           <div style={{ display: currentTab !== "hero-list" ? "none" : "block" }}>
@@ -188,112 +195,18 @@ export default function Home() {
           </div>
 
           <div style={{ display: currentTab !== "hero-details" ? "none" : "block" }}>
-            <div style={{ display: "flex" }}>
-              <div>
-                <Button onClick={() => {
-                  setHeroesList([]);
-                  reset();
-                  setCurrentHero({
-                    name: "",
-                    weaponColor: "",
-                    weaponType: "",
-                    movementType: ""
-                  });
-                  setCurrentTab("hero-list");
-                }} variant="surface">
-                  Go Back
-                </Button>
-              </div>
-              <div>
-                <div>
-                  <img src={`/api/portrait?name=${encodeURIComponent(currentHero.name)}`} loading="lazy" alt="" height={120} width={120} style={{ margin: "auto", backgroundColor: "red" }} />
-                </div>
-                <p aria-label="Hero name">{currentHero.name}</p>
-                <p>{currentHero.weaponColor} {currentHero.weaponType} {currentHero.movementType}</p>
-              </div>
-              <div>
-                <h2>Skills</h2>
-                <h4>Weapons</h4>
-                <Select.Root>
-                  <Select.Trigger inputMode="text">
-                    <Button variant="solid">
-                      Assists
-                    </Button>
-                  </Select.Trigger>
-                  <Select.Content>
-                    {skillsList.weapon.map((w) => {
-                      return <Select.Item value={w.name} key={w.name}>{w.name}</Select.Item>
-                    })}
-                  </Select.Content>
-                </Select.Root>
-                <h4>Assists</h4>
-                <Select.Root>
-                  <Select.Trigger inputMode="text">
-                    <Button variant="solid">
-                      Assists
-                    </Button>
-                  </Select.Trigger>
-                  <Select.Content onClick={console.log}>
-                    {skillsList.assist.map((w) => {
-                      return <Select.Item key={w.name} value={w.name}>{w.name}</Select.Item>
-                    })}
-                  </Select.Content>
-                </Select.Root>
-                <h4>A Passives</h4>
-                <Select.Root>
-                  <Select.Trigger>
-                    <Button variant="solid">
-                      A Passives
-                    </Button>
-                  </Select.Trigger>
-                  <Select.Content>
-                    {skillsList.passivea.map((w) => {
-                      return <Select.Item key={w.name} value={w.name}>{w.name}</Select.Item>
-                    })}
-                  </Select.Content>
-                </Select.Root>
-                <h4>B Passives</h4>
-                <Select.Root>
-                  <Select.Trigger>
-                    <Button variant="solid">
-                      B Passives
-                    </Button>
-                  </Select.Trigger>
-                  <Select.Content>
-                    {skillsList.passiveb.map((w) => {
-                      return <Select.Item key={w.name} value={w.name}>{w.name}</Select.Item>
-                    })}
-                  </Select.Content>
-                </Select.Root>
-                <h4>C Passives</h4>
-                <Select.Root>
-                  <Select.Trigger>
-                    <Button variant="solid">
-                      C Passives
-                    </Button>
-                  </Select.Trigger>
-                  <Select.Content>
-                    {skillsList.passivec.map((w) => {
-                      return <Select.Item key={w.name} value={w.name}>{w.name}</Select.Item>
-                    })}
-                  </Select.Content>
-                </Select.Root>
-              </div>
-              <div>
-                <fieldset>
-                  <legend>Details</legend>
-                  <ul aria-atomic aria-label='Detailed options' aria-live="polite">
-                    <li><label htmlFor="merges-count">Merges</label> <input id="merges-count" type="number" aria-valuemin={0} aria-valuemax={10} max={10} step={1} min={0} /></li>
-                    <li><label htmlFor='resplendence'>Resplendent</label> <input type="checkbox" id="resplendence" /></li>
-                    <li><label htmlFor='boon-selection'>Boon</label><select lang="en" id="boon-selection"><option></option><option>HP</option><option>Atk</option><option>Spd</option><option>Def</option><option>Res</option></select> <label htmlFor='bane-selection'>Bane</label> <select id="bane-selection"><option></option><option>HP</option><option>Atk</option><option>Spd</option><option>Def</option><option>Res</option></select></li>
-                    <li><label htmlFor='summoner-support'>Summoner Support</label></li>
-                  </ul>
-                </fieldset>
-              </div>
-            </div>
+            
           </div>
         </Theme>
       </main>
     </>
   )
 }
+
+export async function getServerSideProps() {
+  return {
+    props: {
+      ids: Array.from({ length: 4 }).map(() => shortid())
+    }
+  };
+};
