@@ -1,10 +1,9 @@
 import { Button, SelectItem, TabsContent } from "@radix-ui/themes";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as Label from "@radix-ui/react-label";
 import * as Select from '@radix-ui/react-select';
 import styles from "./form-tab.module.scss";
-import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons';
 
 function FormTab({ id, callback }: { id: string, callback: (details: Partial<HeroDetails>) => void}) {
     const [currentTab, setCurrentTab] = useState<"hero-list" | "hero-details">("hero-list");
@@ -36,7 +35,15 @@ function FormTab({ id, callback }: { id: string, callback: (details: Partial<Her
         passivec: []
     })
     const heroDetailsForm = useForm<HeroDetails>();
-    
+
+    useEffect(() => {
+      if (currentHero.name) {
+        fetch(`/api/skills?name=${encodeURIComponent(currentHero.name)}&movementType=${currentHero.movementType}&weaponType=${currentHero.weaponType}&weaponColor=${currentHero.weaponColor}`).then((response) => response.json()).then((data: SkillList) => {
+          setSkillsList(data);
+        });
+      }
+    }, [currentHero.name]);
+
     return (
         <TabsContent value={id}>
             <div style={{ display: currentTab !== "hero-list" ? "none" : "block" }}>
@@ -119,141 +126,180 @@ function FormTab({ id, callback }: { id: string, callback: (details: Partial<Her
                         <th><button>BST</button></th>
                     </tr>
                     </thead>
-                    <tbody>
-                    {heroesList.map((sv) => (
-                        <tr key={sv.Name} onClick={() => {
-                        setCurrentHero({
-                            name: sv.Name,
-                            movementType: sv.MoveType,
-                            weaponType: sv.WeaponType,
-                            weaponColor: sv.WeaponColor
-                        });
-                        setCurrentTab("hero-details");
-                        }}>
-                        <td style={{ display: "flex" }}>
-                            <div style={{ flex: 0.5, display: "flex", justifyContent: "center" }}>
-                            <img height={60} width={60} loading="lazy" src={`/api/portrait?name=${encodeURIComponent(sv.Name)}`} />
-                            </div>
-                            <p style={{ display: "block", flex: 1 }}>{sv.Name}</p>
-                        </td>
-                        <td>{sv.MoveType}</td>
-                        <td>{sv.WeaponColor}</td>
-                        <td>{sv.WeaponType}</td>
-                        <td>{sv.hp}</td>
-                        <td>{sv.atk}</td>
-                        <td>{sv.spd}</td>
-                        <td>{sv.def}</td>
-                        <td>{sv.res}</td>
-                        <td>{sv.bst}</td>
-                        </tr>
-                    ))}
+                    <tbody onClick={(e) => {
+                      console.log(e.target, e.currentTarget);
+                    }}>
+                      {heroesList.map((sv) => (
+                          <tr key={sv.Name} onClick={() => {
+                            setCurrentHero({
+                                name: sv.Name,
+                                movementType: sv.MoveType,
+                                weaponType: sv.WeaponType,
+                                weaponColor: sv.WeaponColor
+                            });
+                            setCurrentTab("hero-details");
+                          }}
+                          >
+                          <td style={{ display: "flex" }}>
+                              <div style={{ flex: 0.5, display: "flex", justifyContent: "center" }}>
+                              <img height={60} width={60} loading="lazy" src={`/api/portrait?name=${encodeURIComponent(sv.Name)}`} />
+                              </div>
+                              <div style={{ display: "flex", flex: 1, justifyContent: "center", alignItems: "center" }}>
+                                <p id="test" style={{ width: "auto", textAlign: "center", wordWrap: "normal" }}>{sv.Name}</p>
+                              </div>
+                          </td>
+                          <td>{sv.MoveType}</td>
+                          <td>{sv.WeaponColor}</td>
+                          <td>{sv.WeaponType}</td>
+                          <td>{sv.hp}</td>
+                          <td>{sv.atk}</td>
+                          <td>{sv.spd}</td>
+                          <td>{sv.def}</td>
+                          <td>{sv.res}</td>
+                          <td>{sv.bst}</td>
+                          </tr>
+                      ))}
                     </tbody>
                 </table>
             </div>
             <div style={{ display: currentTab !== "hero-details" ? "none" : "block"}}>
-                <div style={{ display: "flex" }}>
-              <div>
-                <Button onClick={() => {
-                  setHeroesList([]);
-                  heroQueryForm.reset();
-                  setCurrentHero({
-                    name: "",
-                    weaponColor: "",
-                    weaponType: "",
-                    movementType: ""
-                  });
-                  setCurrentTab("hero-list");
-                }} variant="surface">
-                  Go Back
-                </Button>
-              </div>
               <div>
                 <div>
-                  <img src={`/api/portrait?name=${encodeURIComponent(currentHero.name)}`} loading="lazy" alt="" height={120} width={120} style={{ margin: "auto", backgroundColor: "red" }} />
+                  <Button onClick={() => {
+                    setHeroesList([]);
+                    heroQueryForm.reset();
+                    setCurrentHero({
+                      name: "",
+                      weaponColor: "",
+                      weaponType: "",
+                      movementType: ""
+                    });
+                    setCurrentTab("hero-list");
+                  }} variant="surface">
+                    Go Back
+                  </Button>
                 </div>
-                <p aria-label="Hero name">{currentHero.name}</p>
-                <p>{currentHero.weaponColor} {currentHero.weaponType} {currentHero.movementType}</p>
+                <section style={{ display : "flex", justifyContent: "space-between" }}>
+                  <div>
+                    <div>
+                      <img src={`/api/portrait?name=${encodeURIComponent(currentHero.name)}`} loading="lazy" alt="" height={120} width={120} style={{ margin: "auto" }} />
+                    </div>
+                    <p aria-label="Hero name">{currentHero.name}</p>
+                    <p>{currentHero.weaponColor} {currentHero.weaponType} {currentHero.movementType}</p>
+                  </div>
+                  <div>
+                    <div className={styles.MovesetSlot}>
+                      <Label.Root>
+                        Weapon
+                      </Label.Root>
+                      <input {...heroDetailsForm.register("weapon")} disabled />
+                    </div>
+                    <div className={styles.MovesetSlot}>
+                      <Label.Root>
+                        Assist
+                      </Label.Root>
+                      <input {...heroDetailsForm.register("assist")} disabled />
+                    </div>
+                    <div className={styles.MovesetSlot}>
+                      <Label.Root>
+                        A
+                      </Label.Root>
+                      <input {...heroDetailsForm.register("passivea")} disabled />
+                    </div>
+                    <div className={styles.MovesetSlot}>
+                      <Label.Root>
+                        B
+                      </Label.Root>
+                      <input {...heroDetailsForm.register("passiveb")} disabled />
+                    </div>
+                    <div className={styles.MovesetSlot}>
+                      <Label.Root>
+                        C
+                      </Label.Root>
+                      <input {...heroDetailsForm.register("passivec")} disabled />
+                    </div>
+                  </div>
+                </section>
+                <div>
+                  <h2>Skills</h2>
+                  <h4>Weapons</h4>
+                  <Select.Root>
+                    <Select.Trigger inputMode="text">
+                      <Button variant="solid">
+                        Weapons
+                      </Button>
+                    </Select.Trigger>
+                    <Select.Content>
+                      {skillsList.weapon.map((w) => {
+                        return <Select.Item value={w.name} key={w.name}>{w.name}</Select.Item>
+                      })}
+                    </Select.Content>
+                  </Select.Root>
+                  <h4>Assists</h4>
+                  <Select.Root>
+                    <Select.Trigger inputMode="text">
+                      <Button variant="solid">
+                        Assists
+                      </Button>
+                    </Select.Trigger>
+                    <Select.Content onClick={console.log}>
+                      {skillsList.assist.map((w) => {
+                        return <Select.Item key={w.name} value={w.name}>{w.name}</Select.Item>
+                      })}
+                    </Select.Content>
+                  </Select.Root>
+                  <h4>A Passives</h4>
+                  <Select.Root>
+                    <Select.Trigger>
+                      <Button variant="solid">
+                        A Passives
+                      </Button>
+                    </Select.Trigger>
+                    <Select.Content>
+                      {skillsList.passivea.map((w) => {
+                        return <Select.Item key={w.name} value={w.name}>{w.name}</Select.Item>
+                      })}
+                    </Select.Content>
+                  </Select.Root>
+                  <h4>B Passives</h4>
+                  <Select.Root>
+                    <Select.Trigger>
+                      <Button variant="solid">
+                        B Passives
+                      </Button>
+                    </Select.Trigger>
+                    <Select.Content>
+                      {skillsList.passiveb.map((w) => {
+                        return <Select.Item key={w.name} value={w.name}>{w.name}</Select.Item>
+                      })}
+                    </Select.Content>
+                  </Select.Root>
+                  <h4>C Passives</h4>
+                  <Select.Root>
+                    <Select.Trigger>
+                      <Button variant="solid">
+                        C Passives
+                      </Button>
+                    </Select.Trigger>
+                    <Select.Content>
+                      {skillsList.passivec.map((w) => {
+                        return <Select.Item key={w.name} value={w.name}>{w.name}</Select.Item>
+                      })}
+                    </Select.Content>
+                  </Select.Root>
+                </div>
+                <div>
+                  <fieldset>
+                    <legend>Details</legend>
+                    <ul aria-atomic aria-label='Detailed options' aria-live="polite">
+                      <li><label htmlFor="merges-count">Merges</label> <input id="merges-count" type="number" aria-valuemin={0} aria-valuemax={10} max={10} step={1} min={0} /></li>
+                      <li><label htmlFor='resplendence'>Resplendent</label> <input type="checkbox" id="resplendence" /></li>
+                      <li><label htmlFor='boon-selection'>Boon</label><select lang="en" id="boon-selection"><option></option><option>HP</option><option>Atk</option><option>Spd</option><option>Def</option><option>Res</option></select> <label htmlFor='bane-selection'>Bane</label> <select id="bane-selection"><option></option><option>HP</option><option>Atk</option><option>Spd</option><option>Def</option><option>Res</option></select></li>
+                      <li><label htmlFor='summoner-support'>Summoner Support</label></li>
+                    </ul>
+                  </fieldset>
+                </div>
               </div>
-              <div>
-                <h2>Skills</h2>
-                <h4>Weapons</h4>
-                <Select.Root>
-                  <Select.Trigger inputMode="text">
-                    <Button variant="solid">
-                      Assists
-                    </Button>
-                  </Select.Trigger>
-                  <Select.Content>
-                    {skillsList.weapon.map((w) => {
-                      return <Select.Item value={w.name} key={w.name}>{w.name}</Select.Item>
-                    })}
-                  </Select.Content>
-                </Select.Root>
-                <h4>Assists</h4>
-                <Select.Root>
-                  <Select.Trigger inputMode="text">
-                    <Button variant="solid">
-                      Assists
-                    </Button>
-                  </Select.Trigger>
-                  <Select.Content onClick={console.log}>
-                    {skillsList.assist.map((w) => {
-                      return <Select.Item key={w.name} value={w.name}>{w.name}</Select.Item>
-                    })}
-                  </Select.Content>
-                </Select.Root>
-                <h4>A Passives</h4>
-                <Select.Root>
-                  <Select.Trigger>
-                    <Button variant="solid">
-                      A Passives
-                    </Button>
-                  </Select.Trigger>
-                  <Select.Content>
-                    {skillsList.passivea.map((w) => {
-                      return <Select.Item key={w.name} value={w.name}>{w.name}</Select.Item>
-                    })}
-                  </Select.Content>
-                </Select.Root>
-                <h4>B Passives</h4>
-                <Select.Root>
-                  <Select.Trigger>
-                    <Button variant="solid">
-                      B Passives
-                    </Button>
-                  </Select.Trigger>
-                  <Select.Content>
-                    {skillsList.passiveb.map((w) => {
-                      return <Select.Item key={w.name} value={w.name}>{w.name}</Select.Item>
-                    })}
-                  </Select.Content>
-                </Select.Root>
-                <h4>C Passives</h4>
-                <Select.Root>
-                  <Select.Trigger>
-                    <Button variant="solid">
-                      C Passives
-                    </Button>
-                  </Select.Trigger>
-                  <Select.Content>
-                    {skillsList.passivec.map((w) => {
-                      return <Select.Item key={w.name} value={w.name}>{w.name}</Select.Item>
-                    })}
-                  </Select.Content>
-                </Select.Root>
-              </div>
-              <div>
-                <fieldset>
-                  <legend>Details</legend>
-                  <ul aria-atomic aria-label='Detailed options' aria-live="polite">
-                    <li><label htmlFor="merges-count">Merges</label> <input id="merges-count" type="number" aria-valuemin={0} aria-valuemax={10} max={10} step={1} min={0} /></li>
-                    <li><label htmlFor='resplendence'>Resplendent</label> <input type="checkbox" id="resplendence" /></li>
-                    <li><label htmlFor='boon-selection'>Boon</label><select lang="en" id="boon-selection"><option></option><option>HP</option><option>Atk</option><option>Spd</option><option>Def</option><option>Res</option></select> <label htmlFor='bane-selection'>Bane</label> <select id="bane-selection"><option></option><option>HP</option><option>Atk</option><option>Spd</option><option>Def</option><option>Res</option></select></li>
-                    <li><label htmlFor='summoner-support'>Summoner Support</label></li>
-                  </ul>
-                </fieldset>
-              </div>
-            </div>
             </div>
         </TabsContent>
     );

@@ -23,6 +23,7 @@ export default function handler(
     r.json().then((x: CargoQuery<{ [f in typeof fields[number]]: string }>) => {
       const mapped = x.cargoquery.map((i) => i.title);
       const obj: { [k: string]: { name: string; description: string }[] } = {};
+      // fetch default skills, then fetch other skills separately
       for (let item of mapped) {
         obj[item.Scategory] = obj[item.Scategory] || [];
         obj[item.Scategory].push({
