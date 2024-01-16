@@ -1,9 +1,22 @@
-import { Button, SelectItem, TabsContent } from "@radix-ui/themes";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Button, TabsContent } from "@radix-ui/themes";
+import { ReactNode, Ref, forwardRef, useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import * as Label from "@radix-ui/react-label";
 import * as Select from '@radix-ui/react-select';
 import styles from "./form-tab.module.scss";
+import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon } from "@radix-ui/react-icons";
+
+
+const SelectItem = forwardRef(({ children, className, ...props }: { children: ReactNode, className: string } & any, forwardedRef: Ref<any>) => {
+  return (
+    <Select.Item className={`SelectItem ${className}`} {...props} ref={forwardedRef}>
+      <Select.ItemText><div>{children}</div></Select.ItemText>
+      <Select.ItemIndicator className="SelectItemIndicator">
+        <ChevronRightIcon />
+      </Select.ItemIndicator>
+    </Select.Item>
+  );
+});
 
 function FormTab({ id, callback }: { id: string, callback: (details: Partial<HeroDetails>) => void}) {
     const [currentTab, setCurrentTab] = useState<"hero-list" | "hero-details">("hero-list");
@@ -43,6 +56,8 @@ function FormTab({ id, callback }: { id: string, callback: (details: Partial<Her
         });
       }
     }, [currentHero.name]);
+
+    // maybe try a select inside an accordion?
 
     return (
         <TabsContent value={id}>
@@ -192,101 +207,178 @@ function FormTab({ id, callback }: { id: string, callback: (details: Partial<Her
                       <Label.Root>
                         Weapon
                       </Label.Root>
-                      <input {...heroDetailsForm.register("weapon")} disabled />
+                      <input defaultValue={heroDetailsForm.watch("weapon")} disabled />
                     </div>
                     <div className={styles.MovesetSlot}>
                       <Label.Root>
                         Assist
                       </Label.Root>
-                      <input {...heroDetailsForm.register("assist")} disabled />
+                      <input defaultValue={heroDetailsForm.watch("assist")} disabled />
                     </div>
                     <div className={styles.MovesetSlot}>
                       <Label.Root>
                         A
                       </Label.Root>
-                      <input {...heroDetailsForm.register("passivea")} disabled />
+                      <input defaultValue={heroDetailsForm.watch("passivea")} disabled />
                     </div>
                     <div className={styles.MovesetSlot}>
                       <Label.Root>
                         B
                       </Label.Root>
-                      <input {...heroDetailsForm.register("passiveb")} disabled />
+                      <input defaultValue={heroDetailsForm.watch("passiveb")} disabled />
                     </div>
                     <div className={styles.MovesetSlot}>
                       <Label.Root>
                         C
                       </Label.Root>
-                      <input {...heroDetailsForm.register("passivec")} disabled />
+                      <input defaultValue={heroDetailsForm.watch("passivec")} disabled />
                     </div>
                   </div>
                 </section>
                 <div>
                   <h2>Skills</h2>
                   <h4>Weapons</h4>
-                  <Select.Root>
-                    <Select.Trigger inputMode="text">
-                      <Button variant="solid">
-                        Weapons
-                      </Button>
-                    </Select.Trigger>
-                    <Select.Content>
-                      {skillsList.weapon.map((w) => {
-                        return <Select.Item value={w.name} key={w.name}>{w.name}</Select.Item>
-                      })}
-                    </Select.Content>
-                  </Select.Root>
+                  <Controller control={heroDetailsForm.control} name="weapon" render={({ field }) => 
+                    <Select.Root onValueChange={field.onChange}>
+                      <Select.Trigger className="SelectTrigger" aria-label="Food">
+                        <Select.Value placeholder="Select a weapon..." />
+                        <Select.Icon className="SelectIcon">
+                          <ChevronDownIcon />
+                        </Select.Icon>
+                      </Select.Trigger>
+                      <Select.Portal>
+                        <Select.Content className="SelectContent">
+                          <Select.ScrollUpButton className="SelectScrollButton">
+                            <ChevronUpIcon />
+                          </Select.ScrollUpButton>
+                          <Select.Viewport className="SelectViewport">
+                            <Select.Group>
+                              <SelectItem value="-" />
+                              {skillsList.weapon.map((weapon) => (
+                                <SelectItem key={weapon.name} value={weapon.name}>{weapon.name}</SelectItem>
+                              ))}
+                            </Select.Group>
+                          </Select.Viewport>
+                          <Select.ScrollDownButton className="SelectScrollButton">
+                            <ChevronDownIcon />
+                          </Select.ScrollDownButton>
+                        </Select.Content>
+                      </Select.Portal>
+                    </Select.Root>
+                  } />
+                  
                   <h4>Assists</h4>
-                  <Select.Root>
-                    <Select.Trigger inputMode="text">
-                      <Button variant="solid">
-                        Assists
-                      </Button>
-                    </Select.Trigger>
-                    <Select.Content onClick={console.log}>
-                      {skillsList.assist.map((w) => {
-                        return <Select.Item key={w.name} value={w.name}>{w.name}</Select.Item>
-                      })}
-                    </Select.Content>
-                  </Select.Root>
+                  <Controller control={heroDetailsForm.control} name="assist" render={({ field }) => 
+                    <Select.Root onValueChange={field.onChange}>
+                      <Select.Trigger className="SelectTrigger" aria-label="Food">
+                        <Select.Value placeholder="Select an assist..." />
+                        <Select.Icon className="SelectIcon">
+                          <ChevronDownIcon />
+                        </Select.Icon>
+                      </Select.Trigger>
+                      <Select.Portal>
+                        <Select.Content className="SelectContent">
+                          <Select.ScrollUpButton className="SelectScrollButton">
+                            <ChevronUpIcon />
+                          </Select.ScrollUpButton>
+                          <Select.Viewport className="SelectViewport">
+                            <Select.Group>
+                              {skillsList.assist.map((weapon) => (
+                                <SelectItem key={weapon.name} value={weapon.name}>{weapon.name}</SelectItem>
+                              ))}
+                            </Select.Group>
+                          </Select.Viewport>
+                          <Select.ScrollDownButton className="SelectScrollButton">
+                            <ChevronDownIcon />
+                          </Select.ScrollDownButton>
+                        </Select.Content>
+                      </Select.Portal>
+                    </Select.Root>
+                  } />
                   <h4>A Passives</h4>
-                  <Select.Root>
-                    <Select.Trigger>
-                      <Button variant="solid">
-                        A Passives
-                      </Button>
-                    </Select.Trigger>
-                    <Select.Content>
-                      {skillsList.passivea.map((w) => {
-                        return <Select.Item key={w.name} value={w.name}>{w.name}</Select.Item>
-                      })}
-                    </Select.Content>
-                  </Select.Root>
+                  <Controller control={heroDetailsForm.control} name="passivea" render={({ field }) => 
+                    <Select.Root onValueChange={field.onChange}>
+                      <Select.Trigger className="SelectTrigger" aria-label="Food">
+                        <Select.Value placeholder="Select an A Passive..." />
+                        <Select.Icon className="SelectIcon">
+                          <ChevronDownIcon />
+                        </Select.Icon>
+                      </Select.Trigger>
+                      <Select.Portal>
+                        <Select.Content className="SelectContent">
+                          <Select.ScrollUpButton className="SelectScrollButton">
+                            <ChevronUpIcon />
+                          </Select.ScrollUpButton>
+                          <Select.Viewport className="SelectViewport">
+                            <Select.Group>
+                              {skillsList.passivea.map((passive) => (
+                                <SelectItem key={passive.name} value={passive.name}>{passive.name}</SelectItem>
+                              ))}
+                            </Select.Group>
+                          </Select.Viewport>
+                          <Select.ScrollDownButton className="SelectScrollButton">
+                            <ChevronDownIcon />
+                          </Select.ScrollDownButton>
+                        </Select.Content>
+                      </Select.Portal>
+                    </Select.Root>
+                  } />
                   <h4>B Passives</h4>
-                  <Select.Root>
-                    <Select.Trigger>
-                      <Button variant="solid">
-                        B Passives
-                      </Button>
-                    </Select.Trigger>
-                    <Select.Content>
-                      {skillsList.passiveb.map((w) => {
-                        return <Select.Item key={w.name} value={w.name}>{w.name}</Select.Item>
-                      })}
-                    </Select.Content>
-                  </Select.Root>
+                  <Controller control={heroDetailsForm.control} name="passiveb" render={({ field }) => 
+                    <Select.Root onValueChange={field.onChange}>
+                      <Select.Trigger className="SelectTrigger" aria-label="Food">
+                        <Select.Value placeholder="Select a B Passive..." />
+                        <Select.Icon className="SelectIcon">
+                          <ChevronDownIcon />
+                        </Select.Icon>
+                      </Select.Trigger>
+                      <Select.Portal>
+                        <Select.Content className="SelectContent">
+                          <Select.ScrollUpButton className="SelectScrollButton">
+                            <ChevronUpIcon />
+                          </Select.ScrollUpButton>
+                          <Select.Viewport className="SelectViewport">
+                            <Select.Group>
+                              {skillsList.passiveb.map((passive) => (
+                                <SelectItem key={passive.name} value={passive.name}>{passive.name}</SelectItem>
+                              ))}
+                            </Select.Group>
+                          </Select.Viewport>
+                          <Select.ScrollDownButton className="SelectScrollButton">
+                            <ChevronDownIcon />
+                          </Select.ScrollDownButton>
+                        </Select.Content>
+                      </Select.Portal>
+                    </Select.Root>
+                  } />
                   <h4>C Passives</h4>
-                  <Select.Root>
-                    <Select.Trigger>
-                      <Button variant="solid">
-                        C Passives
-                      </Button>
-                    </Select.Trigger>
-                    <Select.Content>
-                      {skillsList.passivec.map((w) => {
-                        return <Select.Item key={w.name} value={w.name}>{w.name}</Select.Item>
-                      })}
-                    </Select.Content>
-                  </Select.Root>
+                  <Controller control={heroDetailsForm.control} name="passivec" render={({ field }) => 
+                    <Select.Root onValueChange={field.onChange}>
+                      <Select.Trigger className="SelectTrigger" aria-label="Food">
+                        <Select.Value placeholder="Select a C Passive..." />
+                        <Select.Icon className="SelectIcon">
+                          <ChevronDownIcon />
+                        </Select.Icon>
+                      </Select.Trigger>
+                      <Select.Portal>
+                        <Select.Content className="SelectContent">
+                          <Select.ScrollUpButton className="SelectScrollButton">
+                            <ChevronUpIcon />
+                          </Select.ScrollUpButton>
+                          <Select.Viewport className="SelectViewport">
+                            <Select.Group>
+                              {skillsList.passivec.map((passive) => (
+                                <SelectItem key={passive.name} value={passive.name}>{passive.name}</SelectItem>
+                              ))}
+                            </Select.Group>
+                          </Select.Viewport>
+                          <Select.ScrollDownButton className="SelectScrollButton">
+                            <ChevronDownIcon />
+                          </Select.ScrollDownButton>
+                        </Select.Content>
+                      </Select.Portal>
+                    </Select.Root>
+                  } />
                 </div>
                 <div>
                   <fieldset>
