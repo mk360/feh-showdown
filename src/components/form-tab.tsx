@@ -1,8 +1,10 @@
-import { Button, TabsContent } from "@radix-ui/themes";
+import { Button, TabsContent, VisuallyHidden } from "@radix-ui/themes";
 import { ReactNode, Ref, forwardRef, useEffect, useState } from "react";
+import * as ScrollArea from "@radix-ui/react-scroll-area";
 import { Controller, useForm } from "react-hook-form";
 import * as Label from "@radix-ui/react-label";
 import * as Select from '@radix-ui/react-select';
+import * as ToggleGroup from '@radix-ui/react-toggle-group';
 import styles from "./form-tab.module.scss";
 import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon } from "@radix-ui/react-icons";
 
@@ -72,7 +74,6 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
 
     return (
         <TabsContent forceMount hidden={currentId !== id} value={id}>
-        <>
             <div style={{ display: currentPanel !== "hero-list" ? "none" : "block" }}>
                 <form onSubmit={heroQueryForm.handleSubmit((heroesQuery) => {
                     const s = new URLSearchParams(heroesQuery).toString();
@@ -190,6 +191,7 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
                 </table></>
                 )}
             </div>
+            <VisuallyHidden>
             <div style={{ display: currentPanel !== "hero-details" ? "none" : "block"}}>
               <form onSubmit={heroDetailsForm.handleSubmit((heroDetails) => {
                 console.log({ heroDetails });
@@ -447,7 +449,28 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
                 </div>
               </form>
             </div>
-          </>
+          </VisuallyHidden>
+            <ScrollArea.Root className="ScrollAreaRoot">
+            <ScrollArea.Viewport className="ScrollAreaViewport">
+              <ToggleGroup.Root type="single">
+                <div style={{ padding: '15px 20px' }}>
+                  <div className="Text">Tags</div>
+                  {skillsList.weapon.concat(skillsList.passivea).concat(skillsList.passiveb).map((tag) => (
+                    <ToggleGroup.Item className="ToggleGroupItem" key={tag.name} value={tag.name}>
+                      {tag.name}
+                    </ToggleGroup.Item>
+                  ))}
+                </div>
+              </ToggleGroup.Root>
+            </ScrollArea.Viewport>
+            <ScrollArea.Scrollbar className="ScrollAreaScrollbar" orientation="vertical">
+              <ScrollArea.Thumb className="ScrollAreaThumb" />
+            </ScrollArea.Scrollbar>
+            <ScrollArea.Scrollbar className="ScrollAreaScrollbar" orientation="horizontal">
+              <ScrollArea.Thumb className="ScrollAreaThumb" />
+            </ScrollArea.Scrollbar>
+            <ScrollArea.Corner className="ScrollAreaCorner" />
+          </ScrollArea.Root>
         </TabsContent>
     );
 };
