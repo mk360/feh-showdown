@@ -13,8 +13,11 @@ function PreviewTab({ team }: { team: Partial<HeroDetails>[] }) {
                     <p>Assist: {member.assist || "-"}</p>
                     <p>Special: {member.special || "-"}</p>
                     <p>A: {member.passivea || "-"}</p>
+                    {member.passivea && <p><img style={{ height: 40, width: 40 }} src={`/api/img?name=${encodeURIComponent(member.passivea!)}`} /></p>}
                     <p>B: {member.passiveb || "-"}</p>
+                    {member.passiveb && <p><img style={{ height: 40, width: 40 }} src={`/api/img?name=${encodeURIComponent(member.passiveb!)}`} /></p>}
                     <p>C: {member.passivec || "-"}</p>
+                    {member.passivec && <p><img style={{ height: 40, width: 40 }} src={`/api/img?name=${encodeURIComponent(member.passivec!)}`} /></p>}
                 </div>
             </div>
         })}

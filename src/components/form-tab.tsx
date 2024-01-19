@@ -68,14 +68,6 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
       });
     }, [currentHero.name]);
 
-    function submit() {
-      const data = {
-        ...heroDetailsForm.getValues(),
-        ...currentHero
-      };
-      callback(data);
-    }
-
     // maybe try a select inside an accordion?
 
     return (
@@ -200,7 +192,8 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
             </div>
             <div style={{ display: currentPanel !== "hero-details" ? "none" : "block"}}>
               <form onSubmit={heroDetailsForm.handleSubmit((heroDetails) => {
-                
+                console.log({ heroDetails });
+                callback({...heroDetails, ...currentHero });
               })}>
                 <div>
                   <Button onClick={() => {
@@ -436,7 +429,10 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
                       </Select.Portal>
                     </Select.Root>
                   } />
-                  <Button onClick={submit} type="submit">Submit</Button>
+                  <Button style={{
+                    transition: "background-color color",
+                    transitionDuration: "200ms"
+                  }} disabled={!heroDetailsForm.formState.isDirty}type="submit">Submit</Button>
                 </div>
                 <div>
                   <fieldset>
