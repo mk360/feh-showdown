@@ -18,9 +18,8 @@ const SelectItem = forwardRef(({ children, className, ...props }: { children: Re
   );
 });
 
-function FormTab({ id, callback }: { id: string, callback: (details: Partial<HeroDetails>) => void}) {
-    const [currentTab, setCurrentTab] = useState<"hero-list" | "hero-details">("hero-list");
-
+function FormTab({ id, currentId, callback }: { id: string, currentId: string, callback: (details: Partial<HeroDetails>) => void}) {
+    const [currentPanel, setCurrentPanel] = useState<"hero-list" | "hero-details">("hero-list");
     const [heroesList, setHeroesList] = useState<(RawHeroIdentity & ProcessedHeroStats)[]>([]);
     const [currentHero, setCurrentHero] = useState<{
         name: string;
@@ -57,11 +56,32 @@ function FormTab({ id, callback }: { id: string, callback: (details: Partial<Her
       }
     }, [currentHero.name]);
 
+    useEffect(() => {
+      heroDetailsForm.reset();
+      setSkillsList({
+        weapon: [],
+        assist: [],
+        special: [],
+        passivea: [],
+        passiveb: [],
+        passivec: [],
+      });
+    }, [currentHero.name]);
+
+    function submit() {
+      const data = {
+        ...heroDetailsForm.getValues(),
+        ...currentHero
+      };
+      callback(data);
+    }
+
     // maybe try a select inside an accordion?
 
     return (
-        <TabsContent value={id}>
-            <div style={{ display: currentTab !== "hero-list" ? "none" : "block" }}>
+        <TabsContent forceMount hidden={currentId !== id} value={id}>
+        <>
+            <div style={{ display: currentPanel !== "hero-list" ? "none" : "block" }}>
                 <form onSubmit={heroQueryForm.handleSubmit((heroesQuery) => {
                     const s = new URLSearchParams(heroesQuery).toString();
                     fetch(`/api/heroes?${s}`).then((res) => {
@@ -120,10 +140,10 @@ function FormTab({ id, callback }: { id: string, callback: (details: Partial<Her
                         </dd>
                     </dl>
                     <p id="color-warning">Color selection can be overriden by weapon choice, if only one color of that weapon exists (ex. Swords are always Red).</p>
-                    <button type="submit">Find Heroes</button>
+                    <Button type="submit">Find Heroes</Button>
                     </fieldset>
                 </form>
-                <div aria-relevant="all" aria-live="polite">
+                {heroQueryForm.formState.isSubmitSuccessful && (<><div aria-relevant="all" aria-live="polite">
                     Found {heroesList.length} results.
                 </div>
                 <table style={{ width: "100%" }}>
@@ -142,7 +162,7 @@ function FormTab({ id, callback }: { id: string, callback: (details: Partial<Her
                     </tr>
                     </thead>
                     <tbody onClick={(e) => {
-                      console.log(e.target, e.currentTarget);
+                      // console.log(e.target, e.currentTarget);
                     }}>
                       {heroesList.map((sv) => (
                           <tr key={sv.Name} onClick={() => {
@@ -152,7 +172,7 @@ function FormTab({ id, callback }: { id: string, callback: (details: Partial<Her
                                 weaponType: sv.WeaponType,
                                 weaponColor: sv.WeaponColor
                             });
-                            setCurrentTab("hero-details");
+                            setCurrentPanel("hero-details");
                           }}
                           >
                           <td style={{ display: "flex" }}>
@@ -175,10 +195,13 @@ function FormTab({ id, callback }: { id: string, callback: (details: Partial<Her
                           </tr>
                       ))}
                     </tbody>
-                </table>
+                </table></>
+                )}
             </div>
-            <div style={{ display: currentTab !== "hero-details" ? "none" : "block"}}>
-              <div>
+            <div style={{ display: currentPanel !== "hero-details" ? "none" : "block"}}>
+              <form onSubmit={heroDetailsForm.handleSubmit((heroDetails) => {
+                
+              })}>
                 <div>
                   <Button onClick={() => {
                     setHeroesList([]);
@@ -189,7 +212,7 @@ function FormTab({ id, callback }: { id: string, callback: (details: Partial<Her
                       weaponType: "",
                       movementType: ""
                     });
-                    setCurrentTab("hero-list");
+                    setCurrentPanel("hero-list");
                   }} variant="surface">
                     Go Back
                   </Button>
@@ -217,6 +240,12 @@ function FormTab({ id, callback }: { id: string, callback: (details: Partial<Her
                     </div>
                     <div className={styles.MovesetSlot}>
                       <Label.Root>
+                        Special
+                      </Label.Root>
+                      <input defaultValue={heroDetailsForm.watch("special")} disabled />
+                    </div>
+                    <div className={styles.MovesetSlot}>
+                      <Label.Root>
                         A
                       </Label.Root>
                       <input defaultValue={heroDetailsForm.watch("passivea")} disabled />
@@ -238,8 +267,8 @@ function FormTab({ id, callback }: { id: string, callback: (details: Partial<Her
                 <div>
                   <h2>Skills</h2>
                   <h4>Weapons</h4>
-                  <Controller control={heroDetailsForm.control} name="weapon" render={({ field }) => 
-                    <Select.Root onValueChange={field.onChange}>
+                  <Controller control={heroDetailsForm.control} name="weapon" render={({ field }) => {
+                    return <Select.Root onValueChange={field.onChange}>
                       <Select.Trigger className="SelectTrigger" aria-label="Food">
                         <Select.Value placeholder="Select a weapon..." />
                         <Select.Icon className="SelectIcon">
@@ -265,7 +294,7 @@ function FormTab({ id, callback }: { id: string, callback: (details: Partial<Her
                         </Select.Content>
                       </Select.Portal>
                     </Select.Root>
-                  } />
+                  }} />
                   
                   <h4>Assists</h4>
                   <Controller control={heroDetailsForm.control} name="assist" render={({ field }) => 
@@ -284,6 +313,34 @@ function FormTab({ id, callback }: { id: string, callback: (details: Partial<Her
                           <Select.Viewport className="SelectViewport">
                             <Select.Group>
                               {skillsList.assist.map((weapon) => (
+                                <SelectItem key={weapon.name} value={weapon.name}>{weapon.name}</SelectItem>
+                              ))}
+                            </Select.Group>
+                          </Select.Viewport>
+                          <Select.ScrollDownButton className="SelectScrollButton">
+                            <ChevronDownIcon />
+                          </Select.ScrollDownButton>
+                        </Select.Content>
+                      </Select.Portal>
+                    </Select.Root>
+                  } />
+                  <h4>Specials</h4>
+                  <Controller control={heroDetailsForm.control} name="special" render={({ field }) => 
+                    <Select.Root onValueChange={field.onChange}>
+                      <Select.Trigger className="SelectTrigger" aria-label="Food">
+                        <Select.Value placeholder="Select a special..." />
+                        <Select.Icon className="SelectIcon">
+                          <ChevronDownIcon />
+                        </Select.Icon>
+                      </Select.Trigger>
+                      <Select.Portal>
+                        <Select.Content className="SelectContent">
+                          <Select.ScrollUpButton className="SelectScrollButton">
+                            <ChevronUpIcon />
+                          </Select.ScrollUpButton>
+                          <Select.Viewport className="SelectViewport">
+                            <Select.Group>
+                              {skillsList.special.map((weapon) => (
                                 <SelectItem key={weapon.name} value={weapon.name}>{weapon.name}</SelectItem>
                               ))}
                             </Select.Group>
@@ -379,6 +436,7 @@ function FormTab({ id, callback }: { id: string, callback: (details: Partial<Her
                       </Select.Portal>
                     </Select.Root>
                   } />
+                  <Button onClick={submit} type="submit">Submit</Button>
                 </div>
                 <div>
                   <fieldset>
@@ -391,8 +449,9 @@ function FormTab({ id, callback }: { id: string, callback: (details: Partial<Her
                     </ul>
                   </fieldset>
                 </div>
-              </div>
+              </form>
             </div>
+          </>
         </TabsContent>
     );
 };

@@ -22,7 +22,7 @@ export default async function handler(
   const x: CargoQuery<{ [field in typeof fields[number]]: string }> = await fetch(`${domain}?${urlObj.toString()}`).then((r) => r.json());
   const mapped = x.cargoquery.map((i) => i.title);
 
-  const dex: { [k in Exclude<HeroProperty, "name">]: { name: string; description: string }[] } = {
+  const dex: { [k in Exclude<HeroProperty, "name">]: { name: string; description?: string }[] } = {
     weapon: [],
     assist: [],
     special: [],
@@ -43,7 +43,7 @@ export default async function handler(
     alreadyFetchedNames.push(item.Name);
   }
 
-  console.log({ alreadyFetchedNames });
+  // console.log({ alreadyFetchedNames });
 
   conditions[0] = `(Skills.Exclusive = false and Skills.CanUseMove holds "${movementType}" and Skills.CanUseWeapon holds "${weaponColor} ${weaponType}")`;
 
@@ -61,7 +61,7 @@ export default async function handler(
     dex[castScategory] = dex[castScategory] || [];
     dex[castScategory].push({
       name: item.Name,
-      description: item.Description
+      // description: item.Description
     });
   }
 

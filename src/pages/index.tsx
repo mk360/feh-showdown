@@ -1,65 +1,20 @@
 import Head from 'next/head'
-import Image from 'next/image'
 import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css';
 import styles2 from './index.module.scss';
-import React, { useEffect, useState } from 'react'
-import { Form, useForm } from 'react-hook-form'
+import React, { useState } from 'react'
 import { Button, DropdownMenu, Select, Tabs, Theme } from '@radix-ui/themes';
 import FormTab from '@/components/form-tab';
 import shortid from "shortid";
+import PreviewTab from '@/components/preview-tab';
 
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home({ ids }: { ids: string[] }) {
-  const { register, handleSubmit, reset } = useForm<{
-    name: string;
-    boon: "atk" | "def" | "res" | "spd" | "hp";
-    bane: "atk" | "def" | "res" | "spd" | "hp";
-    color: "red" | "blue" | "green" | "colorless";
-    movement: string;
-    weaponType: string;
-  }>({
-    mode: "onSubmit"
-  });
-  const [team, setTeam] = useState<Partial<HeroDetails>[]>(ids.map((_, j) => ({
-    id: ids[j]
+  const [team, setTeam] = useState<Partial<HeroDetails>[]>(ids.map((id) => ({
+    id,
   })));
-  const [currentHero, setCurrentHero] = useState({
-    name: "",
-    movementType: "",
-    weaponType: "",
-    weaponColor: "",
-  });
-  const [heroesList, setHeroesList] = useState<any[]>([]);
-  const [skillsList, setSkillsList] = useState({
-    weapon: [] as { name: string; description: string }[],
-    assist: [] as { name: string; description: string }[],
-    special: [] as { name: string; description: string }[],
-    passivea: [] as { name: string; description: string }[],
-    passiveb: [] as { name: string; description: string }[],
-    passivec: [] as { name: string; description: string }[]
-  });
-
-  const heroDetailsForm = useForm<{
-    resplendent: boolean;
-    merges: number;
-    rarity: number;
-  }>();
-
-  const [currentTab, setCurrentTab] = useState<"hero-list" | "hero-details">("hero-list");
-
-  const [currentSubpanel, setCurrentSubpanel] = useState<"details" | "weapon" | "a-skill" | "b-skill" | "c-skill" | "sacred seal">("details");
-
-  useEffect(() => {
-    if (currentHero.name) {
-      fetch(`/api/skills?name=${encodeURIComponent(currentHero.name)}&movementType=${currentHero.movementType}&weaponType=${currentHero.weaponType}&weaponColor=${currentHero.weaponColor}`).then((res) => {
-        res.json().then((resp) => {
-          setSkillsList(resp);
-        });
-      });
-    }
-  }, [currentHero]);
+  const [currentTab, setCurrentTab] = useState("");
 
   return (
     <>
@@ -72,18 +27,27 @@ export default function Home({ ids }: { ids: string[] }) {
       </Head>
       <main className={`${styles.main} ${inter.className}`}>
         <Theme>
-          <Tabs.Root className={styles2.TabList}>
+          <Tabs.Root value={currentTab} onValueChange={setCurrentTab} className={styles2.TabList}>
             <Tabs.List onFocus={() => {
             }} style={{ display: "flex" }}>
               {team.map((i, j) => (
                 <Tabs.Trigger style={{ flex: 1 }} key={j} value={i.id!}>
-                  {i.name || `Hero #${j + 1}`}
+                  Hero #{j + 1}
                 </Tabs.Trigger>
               ))}
+              <Tabs.Trigger style={{ flex: 1 }} value="preview">
+                Team Preview
+              </Tabs.Trigger>
             </Tabs.List>
-            {team.map((member) => (
-              <FormTab key={member.id} callback={() => { }} id={member.id!} />
+            {team.map((member, i) => (
+              <FormTab currentId={currentTab} key={member.id} callback={(data) => { 
+                const newData = {...team[i], ...data};
+                const copy = [...team];
+                copy[i] = newData;
+                setTeam(copy);
+              }} id={member.id!} />
             ))}
+            <PreviewTab team={team} />
           </Tabs.Root>
           <div className={styles2.startupMessage}>
             Greetings, Professors! Please select a Hero to begin!
