@@ -7,6 +7,7 @@ import * as Select from '@radix-ui/react-select';
 import * as ToggleGroup from '@radix-ui/react-toggle-group';
 import styles from "./form-tab.module.scss";
 import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon } from "@radix-ui/react-icons";
+import SkillScroller from "../SkillScroller";
 
 
 const SelectItem = forwardRef(({ children, className, ...props }: { children: ReactNode, className: string } & any, forwardedRef: Ref<any>) => {
@@ -191,7 +192,6 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
                 </table></>
                 )}
             </div>
-            <VisuallyHidden>
             <div style={{ display: currentPanel !== "hero-details" ? "none" : "block"}}>
               <form onSubmit={heroDetailsForm.handleSubmit((heroDetails) => {
                 console.log({ heroDetails });
@@ -263,174 +263,31 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
                   <h2>Skills</h2>
                   <h4>Weapons</h4>
                   <Controller control={heroDetailsForm.control} name="weapon" render={({ field }) => {
-                    return <Select.Root onValueChange={field.onChange}>
-                      <Select.Trigger className="SelectTrigger" aria-label="Food">
-                        <Select.Value placeholder="Select a weapon..." />
-                        <Select.Icon className="SelectIcon">
-                          <ChevronDownIcon />
-                        </Select.Icon>
-                      </Select.Trigger>
-                      <Select.Portal>
-                        <Select.Content className="SelectContent">
-                          <Select.ScrollUpButton className="SelectScrollButton">
-                            <ChevronUpIcon />
-                          </Select.ScrollUpButton>
-                          <Select.Viewport className="SelectViewport">
-                            <Select.Group>
-                              <SelectItem value="-" />
-                              {skillsList.weapon.map((weapon) => (
-                                <SelectItem key={weapon.name} value={weapon.name}>{weapon.name}</SelectItem>
-                              ))}
-                            </Select.Group>
-                          </Select.Viewport>
-                          <Select.ScrollDownButton className="SelectScrollButton">
-                            <ChevronDownIcon />
-                          </Select.ScrollDownButton>
-                        </Select.Content>
-                      </Select.Portal>
-                    </Select.Root>
+                    return <SkillScroller value={field.value} onValueChange={field.onChange} data={skillsList.weapon} />
                   }} />
                   
                   <h4>Assists</h4>
-                  <Controller control={heroDetailsForm.control} name="assist" render={({ field }) => 
-                    <Select.Root onValueChange={field.onChange}>
-                      <Select.Trigger className="SelectTrigger" aria-label="Food">
-                        <Select.Value placeholder="Select an assist..." />
-                        <Select.Icon className="SelectIcon">
-                          <ChevronDownIcon />
-                        </Select.Icon>
-                      </Select.Trigger>
-                      <Select.Portal>
-                        <Select.Content className="SelectContent">
-                          <Select.ScrollUpButton className="SelectScrollButton">
-                            <ChevronUpIcon />
-                          </Select.ScrollUpButton>
-                          <Select.Viewport className="SelectViewport">
-                            <Select.Group>
-                              {skillsList.assist.map((weapon) => (
-                                <SelectItem key={weapon.name} value={weapon.name}>{weapon.name}</SelectItem>
-                              ))}
-                            </Select.Group>
-                          </Select.Viewport>
-                          <Select.ScrollDownButton className="SelectScrollButton">
-                            <ChevronDownIcon />
-                          </Select.ScrollDownButton>
-                        </Select.Content>
-                      </Select.Portal>
-                    </Select.Root>
-                  } />
+                  <Controller control={heroDetailsForm.control} name="assist" render={({ field }) => {
+                    return <SkillScroller value={field.value} onValueChange={field.onChange} data={skillsList.assist} />
+                  }} />
                   <h4>Specials</h4>
-                  <Controller control={heroDetailsForm.control} name="special" render={({ field }) => 
-                    <Select.Root onValueChange={field.onChange}>
-                      <Select.Trigger className="SelectTrigger" aria-label="Food">
-                        <Select.Value placeholder="Select a special..." />
-                        <Select.Icon className="SelectIcon">
-                          <ChevronDownIcon />
-                        </Select.Icon>
-                      </Select.Trigger>
-                      <Select.Portal>
-                        <Select.Content className="SelectContent">
-                          <Select.ScrollUpButton className="SelectScrollButton">
-                            <ChevronUpIcon />
-                          </Select.ScrollUpButton>
-                          <Select.Viewport className="SelectViewport">
-                            <Select.Group>
-                              {skillsList.special.map((weapon) => (
-                                <SelectItem key={weapon.name} value={weapon.name}>{weapon.name}</SelectItem>
-                              ))}
-                            </Select.Group>
-                          </Select.Viewport>
-                          <Select.ScrollDownButton className="SelectScrollButton">
-                            <ChevronDownIcon />
-                          </Select.ScrollDownButton>
-                        </Select.Content>
-                      </Select.Portal>
-                    </Select.Root>
-                  } />
+                  <Controller control={heroDetailsForm.control} name="special" render={({ field }) => {
+                    return <SkillScroller value={field.value} onValueChange={field.onChange} data={skillsList.special} />
+                  }} />
                   <h4>A Passives</h4>
-                  <Controller control={heroDetailsForm.control} name="passivea" render={({ field }) => 
-                    <Select.Root onValueChange={field.onChange}>
-                      <Select.Trigger className="SelectTrigger" aria-label="Food">
-                        <Select.Value placeholder="Select an A Passive..." />
-                        <Select.Icon className="SelectIcon">
-                          <ChevronDownIcon />
-                        </Select.Icon>
-                      </Select.Trigger>
-                      <Select.Portal>
-                        <Select.Content className="SelectContent">
-                          <Select.ScrollUpButton className="SelectScrollButton">
-                            <ChevronUpIcon />
-                          </Select.ScrollUpButton>
-                          <Select.Viewport className="SelectViewport">
-                            <Select.Group>
-                              {skillsList.passivea.map((passive) => (
-                                <SelectItem key={passive.name} value={passive.name}>{passive.name}</SelectItem>
-                              ))}
-                            </Select.Group>
-                          </Select.Viewport>
-                          <Select.ScrollDownButton className="SelectScrollButton">
-                            <ChevronDownIcon />
-                          </Select.ScrollDownButton>
-                        </Select.Content>
-                      </Select.Portal>
-                    </Select.Root>
-                  } />
+                  <Controller control={heroDetailsForm.control} name="passivea" render={({ field }) => {
+                    return <SkillScroller value={field.value} onValueChange={field.onChange} data={skillsList.passivea} />
+                  }} />
                   <h4>B Passives</h4>
-                  <Controller control={heroDetailsForm.control} name="passiveb" render={({ field }) => 
-                    <Select.Root onValueChange={field.onChange}>
-                      <Select.Trigger className="SelectTrigger" aria-label="Food">
-                        <Select.Value placeholder="Select a B Passive..." />
-                        <Select.Icon className="SelectIcon">
-                          <ChevronDownIcon />
-                        </Select.Icon>
-                      </Select.Trigger>
-                      <Select.Portal>
-                        <Select.Content className="SelectContent">
-                          <Select.ScrollUpButton className="SelectScrollButton">
-                            <ChevronUpIcon />
-                          </Select.ScrollUpButton>
-                          <Select.Viewport className="SelectViewport">
-                            <Select.Group>
-                              {skillsList.passiveb.map((passive) => (
-                                <SelectItem key={passive.name} value={passive.name}>{passive.name}</SelectItem>
-                              ))}
-                            </Select.Group>
-                          </Select.Viewport>
-                          <Select.ScrollDownButton className="SelectScrollButton">
-                            <ChevronDownIcon />
-                          </Select.ScrollDownButton>
-                        </Select.Content>
-                      </Select.Portal>
-                    </Select.Root>
-                  } />
+                  <Controller control={heroDetailsForm.control} name="passiveb" render={({ field }) => {
+                    return <SkillScroller value={field.value} onValueChange={field.onChange} data={skillsList.passiveb} />
+                  }} />
+
                   <h4>C Passives</h4>
-                  <Controller control={heroDetailsForm.control} name="passivec" render={({ field }) => 
-                    <Select.Root onValueChange={field.onChange}>
-                      <Select.Trigger className="SelectTrigger" aria-label="Food">
-                        <Select.Value placeholder="Select a C Passive..." />
-                        <Select.Icon className="SelectIcon">
-                          <ChevronDownIcon />
-                        </Select.Icon>
-                      </Select.Trigger>
-                      <Select.Portal>
-                        <Select.Content className="SelectContent">
-                          <Select.ScrollUpButton className="SelectScrollButton">
-                            <ChevronUpIcon />
-                          </Select.ScrollUpButton>
-                          <Select.Viewport className="SelectViewport">
-                            <Select.Group>
-                              {skillsList.passivec.map((passive) => (
-                                <SelectItem key={passive.name} value={passive.name}>{passive.name}</SelectItem>
-                              ))}
-                            </Select.Group>
-                          </Select.Viewport>
-                          <Select.ScrollDownButton className="SelectScrollButton">
-                            <ChevronDownIcon />
-                          </Select.ScrollDownButton>
-                        </Select.Content>
-                      </Select.Portal>
-                    </Select.Root>
-                  } />
+                  <Controller control={heroDetailsForm.control} name="passivec" render={({ field }) => {
+                    return <SkillScroller value={field.value} onValueChange={field.onChange} data={skillsList.passivec} />
+                  }} />
+
                   <Button style={{
                     transition: "background-color color",
                     transitionDuration: "200ms"
@@ -449,28 +306,6 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
                 </div>
               </form>
             </div>
-          </VisuallyHidden>
-            <ScrollArea.Root className="ScrollAreaRoot">
-            <ScrollArea.Viewport className="ScrollAreaViewport">
-              <ToggleGroup.Root type="single">
-                <div style={{ padding: '15px 20px' }}>
-                  <div className="Text">Tags</div>
-                  {skillsList.weapon.concat(skillsList.passivea).concat(skillsList.passiveb).map((tag) => (
-                    <ToggleGroup.Item className="ToggleGroupItem" key={tag.name} value={tag.name}>
-                      {tag.name}
-                    </ToggleGroup.Item>
-                  ))}
-                </div>
-              </ToggleGroup.Root>
-            </ScrollArea.Viewport>
-            <ScrollArea.Scrollbar className="ScrollAreaScrollbar" orientation="vertical">
-              <ScrollArea.Thumb className="ScrollAreaThumb" />
-            </ScrollArea.Scrollbar>
-            <ScrollArea.Scrollbar className="ScrollAreaScrollbar" orientation="horizontal">
-              <ScrollArea.Thumb className="ScrollAreaThumb" />
-            </ScrollArea.Scrollbar>
-            <ScrollArea.Corner className="ScrollAreaCorner" />
-          </ScrollArea.Root>
         </TabsContent>
     );
 };

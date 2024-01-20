@@ -286,8 +286,10 @@ button {
 }
 
 .Text {
-  color: var(--violet-11);
+  background-color: var(--violet-11);
+  color: white;
   font-size: 15px;
+  padding: 10px;
   line-height: 18px;
   font-weight: 500;
 }
@@ -320,12 +322,9 @@ button {
 .ToggleGroupItem {
   background-color: white;
   color: var(--mauve-11);
-  height: 35px;
-  width: 35px;
-  display: flex;
-  font-size: 15px;
   line-height: 1;
   align-items: center;
+  padding-right: 10px;
   justify-content: center;
   margin-left: 1px;
 }
