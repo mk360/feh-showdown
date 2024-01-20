@@ -11,7 +11,7 @@ import PreviewTab from '@/components/preview-tab';
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home({ ids }: { ids: string[] }) {
-  const [team, setTeam] = useState<Partial<HeroDetails>[]>(ids.map((id) => ({
+  const [team, setTeam] = useState<Partial<HeroDetails & RawHeroIdentity>[]>(ids.map((id) => ({
     id,
   })));
   const [currentTab, setCurrentTab] = useState("");
@@ -40,8 +40,8 @@ export default function Home({ ids }: { ids: string[] }) {
               </Tabs.Trigger>
             </Tabs.List>
             {team.map((member, i) => (
-              <FormTab currentId={currentTab} key={member.id} callback={(data) => { 
-                const newData = {...team[i], ...data};
+              <FormTab currentId={currentTab} key={member.id} callback={(data) => {
+                const newData = { ...team[i], ...data };
                 const copy = [...team];
                 copy[i] = newData;
                 setTeam(copy);

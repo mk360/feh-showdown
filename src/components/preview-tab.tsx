@@ -1,27 +1,34 @@
 import { Button, TabsContent } from "@radix-ui/themes";
 
-function PreviewTab({ team }: { team: Partial<HeroDetails>[] }) {
+function PreviewTab({ team }: { team: Partial<HeroDetails & RawHeroIdentity>[] }) {
     const renderedTeam = team.filter((m) => m.name);
 
     async function submitRequest() {
         const trimmedBody = renderedTeam.map((i) => {
-            const {  } = i;
-        })
-        await fetch("http://localhost:3600/team", {
+            const { Name, weapon, passivea, passiveb, passivec } = i;
+            return {
+                name: Name,
+                weapon,
+                passivea,
+                passiveb,
+                passivec
+            };
+        });
+        await fetch("http://localhost:3600/team/", {
             method: "POST",
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(renderedTeam)
-        }).then(() => {});
+            body: JSON.stringify(trimmedBody)
+        }).then(() => { });
     };
 
     return <TabsContent value="preview">
         {renderedTeam.map((member) => {
             return <div key={member.id} style={{ display: "flex", justifyContent: "space-between" }}>
                 <div style={{ height: 100 }}>
-                    <img src={`/api/portrait?name=${encodeURIComponent(member.name!)}`} style={{ width: "100%", height: "100%"}} />
+                    <img src={`/api/portrait?name=${encodeURIComponent(member.name!)}`} style={{ width: "100%", height: "100%" }} />
                 </div>
                 <p>{member.name}</p>
                 <div>
