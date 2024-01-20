@@ -31,7 +31,7 @@ export default async function handler(
     passivec: []
   };
   // fetch default skills, then fetch other skills separately
-  const alreadyFetchedNames: string[] = [];
+  // const alreadyFetchedNames: string[] = [];
 
   for (let item of mapped) {
     const castScategory = item.Scategory as Exclude<HeroProperty, "name">;
@@ -40,30 +40,28 @@ export default async function handler(
       name: item.Name,
       description: item.Description
     });
-    alreadyFetchedNames.push(item.Name);
+    // alreadyFetchedNames.push(item.Name);
   }
 
-  // console.log({ alreadyFetchedNames });
+  // conditions[0] = `(Skills.Exclusive = false and Skills.CanUseMove holds "${movementType}" and Skills.CanUseWeapon holds "${weaponColor} ${weaponType}")`;
 
-  conditions[0] = `(Skills.Exclusive = false and Skills.CanUseMove holds "${movementType}" and Skills.CanUseWeapon holds "${weaponColor} ${weaponType}")`;
+  // conditions.push(`(Skills.Name not in (${alreadyFetchedNames.map(i => '"' + i + '"').join(", ")}))`);
 
-  conditions.push(`(Skills.Name not in (${alreadyFetchedNames.map(i => '"' + i + '"').join(", ")}))`);
+  // conditions.push('(Scategory <> "passivex")');
 
-  conditions.push('(Scategory <> "passivex")');
+  // urlObj.set("where", conditions.join(" and "));
+  // urlObj.set("limit", "5000");
 
-  urlObj.set("where", conditions.join(" and "));
-  urlObj.set("limit", "5000");
+  // const s: CargoQuery<{ [field in typeof fields[number]]: string }> = await fetch(`${domain}?${urlObj.toString()}`).then((r) => r.json());
 
-  const s: CargoQuery<{ [field in typeof fields[number]]: string }> = await fetch(`${domain}?${urlObj.toString()}`).then((r) => r.json());
-
-  for (let item of s.cargoquery.map((i) => i.title)) {
-    const castScategory = item.Scategory as Exclude<HeroProperty, "name">;
-    dex[castScategory] = dex[castScategory] || [];
-    dex[castScategory].push({
-      name: item.Name,
-      // description: item.Description
-    });
-  }
+  // for (let item of s.cargoquery.map((i) => i.title)) {
+  //   const castScategory = item.Scategory as Exclude<HeroProperty, "name">;
+  //   dex[castScategory] = dex[castScategory] || [];
+  //   dex[castScategory].push({
+  //     name: item.Name,
+  //     description: item.Description
+  //   });
+  // }
 
   res.send(dex);
   res.end();

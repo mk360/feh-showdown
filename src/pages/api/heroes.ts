@@ -1,5 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
+const THRESHOLD = "2017-11-28";
+
 async function heroes(req: NextApiRequest, res: NextApiResponse) {
     const { name, weaponType, movement, color } = req.query as Required<{ [k in "name" | "weaponType" | "movement" | "color"]: string }>;
     const domain = "https://feheroes.fandom.com/api.php";
@@ -26,6 +28,8 @@ async function heroes(req: NextApiRequest, res: NextApiResponse) {
     if (movement) {
         conditions.push(`MoveType = "${movement}"`);
     }
+
+    conditions.push(`ReleaseDate < "${THRESHOLD}"`);
 
     urlQuery.append("where", conditions.map((v) => `(${v})`).join(" and "));
     const r = await fetch(`${domain}?${urlQuery.toString()}&fields=${fields.join(",")}`);
