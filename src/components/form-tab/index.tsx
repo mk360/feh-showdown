@@ -24,16 +24,11 @@ const SelectItem = forwardRef(({ children, className, ...props }: { children: Re
 function FormTab({ id, currentId, callback }: { id: string, currentId: string, callback: (details: Partial<HeroDetails>) => void}) {
     const [currentPanel, setCurrentPanel] = useState<"hero-list" | "hero-details">("hero-list");
     const [heroesList, setHeroesList] = useState<(RawHeroIdentity & ProcessedHeroStats)[]>([]);
-    const [currentHero, setCurrentHero] = useState<{
-        name: string;
-        movementType: string;
-        weaponType: string;
-        weaponColor: string;
-    }>({
-        name: "",
-        movementType: "",
-        weaponColor: "",
-        weaponType: ""
+    const [currentHero, setCurrentHero] = useState<RawHeroIdentity>({
+        Name: "",
+        MovementType: "",
+        WeaponColor: "",
+        WeaponType: ""
     });
     const heroQueryForm = useForm<{
         name: string;
@@ -291,7 +286,7 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
                   <Button style={{
                     transition: "background-color color",
                     transitionDuration: "200ms"
-                  }} disabled={!heroDetailsForm.formState.isDirty}type="submit">Submit</Button>
+                  }} disabled={!heroDetailsForm.formState.isDirty} type="submit">Submit</Button>
                 </div>
                 <div>
                   <fieldset>
