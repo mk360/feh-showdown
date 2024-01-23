@@ -3,7 +3,7 @@ import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css';
 import styles2 from './index.module.scss';
 import React, { useState } from 'react'
-import { Button, DropdownMenu, Select, Tabs, Theme } from '@radix-ui/themes';
+import { Tabs, Theme } from '@radix-ui/themes';
 import FormTab from '@/components/form-tab';
 import shortid from "shortid";
 import PreviewTab from '@/components/preview-tab';
@@ -27,31 +27,40 @@ export default function Home({ ids }: { ids: string[] }) {
       </Head>
       <main className={`${styles.main} ${inter.className}`}>
         <Theme>
-          <Tabs.Root value={currentTab} onValueChange={setCurrentTab} className={styles2.TabList}>
-            <Tabs.List onFocus={() => {
-            }} style={{ display: "flex" }}>
-              {team.map((i, j) => (
-                <Tabs.Trigger style={{ flex: 1 }} key={j} value={i.id!}>
-                  Hero #{j + 1}
-                </Tabs.Trigger>
-              ))}
-              <Tabs.Trigger style={{ flex: 1 }} value="preview">
-                Team Preview
-              </Tabs.Trigger>
+          <Tabs.Root style={{ display: "flex" }} orientation="vertical">
+            <Tabs.List>
+              <Tabs.Trigger value='team-1'>Team 1</Tabs.Trigger>
+              <Tabs.Trigger value='team-2'>Team 2</Tabs.Trigger>
+              <Tabs.Trigger value='team-3'>Validate</Tabs.Trigger>
             </Tabs.List>
-            {team.map((member, i) => (
-              <FormTab currentId={currentTab} key={member.id} callback={(data) => {
-                const newData = { ...team[i], ...data };
-                const copy = [...team];
-                copy[i] = newData;
-                setTeam(copy);
-              }} id={member.id!} />
-            ))}
-            <PreviewTab team={team} />
-          </Tabs.Root>
+          <Tabs.Content forceMount value='team-1'>
+            <Tabs.Root value={currentTab} onValueChange={setCurrentTab} className={styles2.TabList}>
+              <Tabs.List onFocus={() => {
+              }} style={{ display: "flex" }}>
+                {team.map((i, j) => (
+                  <Tabs.Trigger style={{ flex: 1 }} key={j} value={i.id!}>
+                    Hero #{j + 1}
+                  </Tabs.Trigger>
+                ))}
+                <Tabs.Trigger style={{ flex: 1 }} value="preview">
+                  Team Preview
+                </Tabs.Trigger>
+              </Tabs.List>
+              {team.map((member, i) => (
+                <FormTab currentId={currentTab} key={member.id} callback={(data) => {
+                  const newData = { ...team[i], ...data };
+                  const copy = [...team];
+                  copy[i] = newData;
+                  setTeam(copy);
+                }} id={member.id!} />
+              ))}
+              <PreviewTab team={team} />
+            </Tabs.Root>
+          </Tabs.Content>
           <div className={styles2.startupMessage}>
             Greetings, Professors! Please select a Hero to begin!
           </div>
+          </Tabs.Root>
         </Theme>
       </main>
     </>

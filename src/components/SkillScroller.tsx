@@ -10,6 +10,9 @@ function SkillScroller({
     value: string;
     onValueChange(name: string): void;
 }) {
+    // mettre le skill dans un accordion: nom dans le titre, et description dans le body
+    // faire une navigation en onglets verticaux pour changer d'équipes, mettre un troisième onglet pour la preview & le lancement de la partie
+    // valider l'équipe avec le preview, du coup si l'équipe change, la personne devra submit l'équipe à nouveau
     return <ScrollArea.Root style={{ width: "100%" }} className="ScrollAreaRoot">
     <ScrollArea.Viewport className="ScrollAreaViewport">
         <ToggleGroup.Root loop={false} value={value} onValueChange={onValueChange} type="single">

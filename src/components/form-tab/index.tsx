@@ -4,22 +4,11 @@ import * as ScrollArea from "@radix-ui/react-scroll-area";
 import { Controller, useForm } from "react-hook-form";
 import * as Label from "@radix-ui/react-label";
 import * as Select from '@radix-ui/react-select';
+import * as Accordion from '@radix-ui/react-accordion';
 import * as ToggleGroup from '@radix-ui/react-toggle-group';
 import styles from "./form-tab.module.scss";
 import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon } from "@radix-ui/react-icons";
 import SkillScroller from "../SkillScroller";
-
-
-const SelectItem = forwardRef(({ children, className, ...props }: { children: ReactNode, className: string } & any, forwardedRef: Ref<any>) => {
-  return (
-    <Select.Item className={`SelectItem ${className}`} {...props} ref={forwardedRef}>
-      <Select.ItemText><div>{children}</div></Select.ItemText>
-      <Select.ItemIndicator className="SelectItemIndicator">
-        <ChevronRightIcon />
-      </Select.ItemIndicator>
-    </Select.Item>
-  );
-});
 
 function FormTab({ id, currentId, callback }: { id: string, currentId: string, callback: (details: Partial<HeroDetails>) => void }) {
   const [currentPanel, setCurrentPanel] = useState<"hero-list" | "hero-details">("hero-list");
@@ -282,17 +271,6 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
               transition: "background-color color",
               transitionDuration: "200ms"
             }} disabled={!heroDetailsForm.formState.isDirty} type="submit">Submit</Button>
-          </div>
-          <div>
-            <fieldset>
-              <legend>Details</legend>
-              <ul aria-atomic aria-label='Detailed options' aria-live="polite">
-                <li><label htmlFor="merges-count">Merges</label> <input id="merges-count" type="number" aria-valuemin={0} aria-valuemax={10} max={10} step={1} min={0} /></li>
-                <li><label htmlFor='resplendence'>Resplendent</label> <input type="checkbox" id="resplendence" /></li>
-                <li><label htmlFor='boon-selection'>Boon</label><select lang="en" id="boon-selection"><option></option><option>HP</option><option>Atk</option><option>Spd</option><option>Def</option><option>Res</option></select> <label htmlFor='bane-selection'>Bane</label> <select id="bane-selection"><option></option><option>HP</option><option>Atk</option><option>Spd</option><option>Def</option><option>Res</option></select></li>
-                <li><label htmlFor='summoner-support'>Summoner Support</label></li>
-              </ul>
-            </fieldset>
           </div>
         </form>
       </div>

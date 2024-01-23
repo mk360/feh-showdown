@@ -1,7 +1,7 @@
 import { Button, TabsContent } from "@radix-ui/themes";
 
 function PreviewTab({ team }: { team: Partial<HeroDetails & RawHeroIdentity>[] }) {
-    const renderedTeam = team.filter((m) => m.name);
+    const renderedTeam = team.filter((m) => m.Name);
 
     async function submitRequest() {
         const trimmedBody = renderedTeam.map((i) => {
@@ -28,9 +28,9 @@ function PreviewTab({ team }: { team: Partial<HeroDetails & RawHeroIdentity>[] }
         {renderedTeam.map((member) => {
             return <div key={member.id} style={{ display: "flex", justifyContent: "space-between" }}>
                 <div style={{ height: 100 }}>
-                    <img src={`/api/portrait?name=${encodeURIComponent(member.name!)}`} style={{ width: "100%", height: "100%" }} />
+                    <img src={`/api/portrait?name=${encodeURIComponent(member.Name!)}`} style={{ width: "100%", height: "100%" }} />
                 </div>
-                <p>{member.name}</p>
+                <p>{member.Name}</p>
                 <div>
                     <p>Weapon: {member.weapon || "-"}</p>
                     <p>Assist: {member.assist || "-"}</p>
