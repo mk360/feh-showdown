@@ -1,6 +1,6 @@
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 
-function GamePage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function GamePage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
 
 };
 
