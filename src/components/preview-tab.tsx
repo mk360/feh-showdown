@@ -14,13 +14,18 @@ function PreviewTab({ team }: { team: Partial<HeroDetails & RawHeroIdentity>[] }
                 passivec
             };
         });
-        await fetch("http://localhost:3600/team/", {
+
+        console.log({ trimmedBody });
+
+        await fetch("/api/team", {
             method: "POST",
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(trimmedBody)
+            body: JSON.stringify({
+                team1: trimmedBody
+            })
         }).then(() => { });
     };
 
