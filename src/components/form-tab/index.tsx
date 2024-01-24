@@ -5,6 +5,7 @@ import { Controller, useForm } from "react-hook-form";
 import * as Label from "@radix-ui/react-label";
 import * as Select from '@radix-ui/react-select';
 import * as Accordion from '@radix-ui/react-accordion';
+import { Grid } from "@radix-ui/themes";
 import * as ToggleGroup from '@radix-ui/react-toggle-group';
 import styles from "./form-tab.module.scss";
 import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon } from "@radix-ui/react-icons";
@@ -171,7 +172,7 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
           </table></>
         )}
       </div>
-      <div style={{ display: currentPanel !== "hero-details" ? "none" : "block" }}>
+      <div style={{ display: currentPanel !== "hero-details" ? "none" : "block", padding: 10 }}>
         <form onSubmit={heroDetailsForm.handleSubmit((heroDetails) => {
           console.log({ heroDetails });
           callback({ ...heroDetails, ...currentHero });
@@ -240,33 +241,44 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
           </section>
           <div>
             <h2>Skills</h2>
-            <h4>Weapons</h4>
-            <Controller control={heroDetailsForm.control} name="weapon" render={({ field }) => {
-              return <SkillScroller value={field.value} onValueChange={field.onChange} data={skillsList.weapon} />
-            }} />
-
-            <h4>Assists</h4>
-            <Controller control={heroDetailsForm.control} name="assist" render={({ field }) => {
-              return <SkillScroller value={field.value} onValueChange={field.onChange} data={skillsList.assist} />
-            }} />
-            <h4>Specials</h4>
-            <Controller control={heroDetailsForm.control} name="special" render={({ field }) => {
-              return <SkillScroller value={field.value} onValueChange={field.onChange} data={skillsList.special} />
-            }} />
-            <h4>A Passives</h4>
-            <Controller control={heroDetailsForm.control} name="passivea" render={({ field }) => {
-              return <SkillScroller value={field.value} onValueChange={field.onChange} data={skillsList.passivea} />
-            }} />
-            <h4>B Passives</h4>
-            <Controller control={heroDetailsForm.control} name="passiveb" render={({ field }) => {
-              return <SkillScroller value={field.value} onValueChange={field.onChange} data={skillsList.passiveb} />
-            }} />
-
-            <h4>C Passives</h4>
-            <Controller control={heroDetailsForm.control} name="passivec" render={({ field }) => {
-              return <SkillScroller value={field.value} onValueChange={field.onChange} data={skillsList.passivec} />
-            }} />
-
+            <Grid columns="2" gap="6">
+              <div>
+                <h3>Weapons</h3>
+                <Controller control={heroDetailsForm.control} name="weapon" render={({ field }) => {
+                  return <SkillScroller value={field.value} onValueChange={field.onChange} data={skillsList.weapon} />
+                }} />
+              </div>
+              <div>
+                <h3>Assists</h3>
+                <Controller control={heroDetailsForm.control} name="assist" render={({ field }) => {
+                  return <SkillScroller value={field.value} onValueChange={field.onChange} data={skillsList.assist} />
+                }} />
+              </div>
+              <div>
+                <h3>Specials</h3>
+                <Controller control={heroDetailsForm.control} name="special" render={({ field }) => {
+                  return <SkillScroller value={field.value} onValueChange={field.onChange} data={skillsList.special} />
+                }} />
+              </div>
+              <div>
+                <h3>A Passives</h3>
+                <Controller control={heroDetailsForm.control} name="passivea" render={({ field }) => {
+                  return <SkillScroller value={field.value} onValueChange={field.onChange} data={skillsList.passivea} />
+                }} />
+              </div>
+              <div>
+                <h3>B Passives</h3>
+                <Controller control={heroDetailsForm.control} name="passiveb" render={({ field }) => {
+                  return <SkillScroller value={field.value} onValueChange={field.onChange} data={skillsList.passiveb} />
+                }} />
+              </div>
+              <div>
+                <h3>C Passives</h3>
+                <Controller control={heroDetailsForm.control} name="passivec" render={({ field }) => {
+                  return <SkillScroller value={field.value} onValueChange={field.onChange} data={skillsList.passivec} />
+                }} />
+              </div>
+            </Grid>
             <Button style={{
               transition: "background-color color",
               transitionDuration: "200ms"

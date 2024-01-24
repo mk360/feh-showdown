@@ -19,7 +19,7 @@ export default function Home({ ids }: { ids: string[] }) {
   })));
   const [currentFirstTeamTab, setCurrentFirstTeamTab] = useState("");
   const [currentSecondTeamTab, setCurrentSecondTeamTab] = useState("");
-  const [teamTab, setTeamTab] = useState<"team-1" | "team-2" | "preview">("team-1");
+  const [teamTab, setTeamTab] = useState("team-1");
 
   return (
     <>
@@ -32,13 +32,13 @@ export default function Home({ ids }: { ids: string[] }) {
       </Head>
       <main className={`${styles.main} ${inter.className}`}>
         <Theme>
-          <Tabs.Root>
+          <Tabs.Root onValueChange={setTeamTab}>
             <Tabs.List>
               <Tabs.Trigger style={{ backgroundColor: "rgba(0,0,255, 0.1)" }} value='team-1'>Team 1</Tabs.Trigger>
               <Tabs.Trigger style={{ backgroundColor: "rgba(255,0,0, 0.1)" }} value='team-2'>Team 2</Tabs.Trigger>
               <Tabs.Trigger value='team-3'>Validate</Tabs.Trigger>
             </Tabs.List>
-            <Tabs.Content hidden forceMount value='team-1' style={{ backgroundColor: "rgba(0,0,255, 0.1)" }}>
+            <Tabs.Content hidden={teamTab !== "team-1"} forceMount value='team-1' style={{ backgroundColor: "rgba(0,0,255, 0.1)" }}>
               <Tabs.Root value={currentFirstTeamTab} onValueChange={setCurrentFirstTeamTab} className={styles2.TabList}>
                 <Tabs.List onFocus={() => {
                 }} style={{ display: "flex" }}>
@@ -62,11 +62,11 @@ export default function Home({ ids }: { ids: string[] }) {
                 <PreviewTab team={team1} />
               </Tabs.Root>
             </Tabs.Content>
-            <Tabs.Content forceMount value='team-2' style={{ backgroundColor: "rgba(255,0,0,0.1)" }}>
-              <Tabs.Root value={currentFirstTeamTab} onValueChange={setCurrentFirstTeamTab} className={styles2.TabList}>
+            <Tabs.Content forceMount hidden={teamTab !== "team-2"} value='team-2' style={{ backgroundColor: "rgba(255,0,0,0.1)" }}>
+              <Tabs.Root value={currentSecondTeamTab} onValueChange={setCurrentSecondTeamTab} className={styles2.TabList}>
                 <Tabs.List onFocus={() => {
                 }} style={{ display: "flex" }}>
-                  {team1.map((i, j) => (
+                  {team2.map((i, j) => (
                     <Tabs.Trigger style={{ flex: 1 }} key={j} value={i.id!}>
                       Hero #{j + 1}
                     </Tabs.Trigger>
@@ -75,15 +75,15 @@ export default function Home({ ids }: { ids: string[] }) {
                     Team Preview
                   </Tabs.Trigger>
                 </Tabs.List>
-                {team1.map((member, i) => (
-                  <FormTab currentId={currentFirstTeamTab} key={member.id} callback={(data) => {
-                    const newData = { ...team1[i], ...data };
-                    const copy = [...team1];
+                {team2.map((member, i) => (
+                  <FormTab currentId={currentSecondTeamTab} key={member.id} callback={(data) => {
+                    const newData = { ...team2[i], ...data };
+                    const copy = [...team2];
                     copy[i] = newData;
-                    setTeam1(copy);
+                    setTeam2(copy);
                   }} id={member.id!} />
                 ))}
-                <PreviewTab team={team1} />
+                <PreviewTab team={team2} />
               </Tabs.Root>
             </Tabs.Content>
             <div className={styles2.startupMessage}>

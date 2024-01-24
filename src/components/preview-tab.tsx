@@ -15,9 +15,7 @@ function PreviewTab({ team }: { team: Partial<HeroDetails & RawHeroIdentity>[] }
             };
         });
 
-        console.log({ trimmedBody });
-
-        await fetch("/api/team", {
+        const response = await fetch("/api/team", {
             method: "POST",
             headers: {
                 'Accept': 'application/json',
@@ -26,28 +24,28 @@ function PreviewTab({ team }: { team: Partial<HeroDetails & RawHeroIdentity>[] }
             body: JSON.stringify({
                 team1: trimmedBody
             })
-        }).then(() => { });
+        });
+
+        const js = await response.text();
+        console.log({ js });
     };
 
     return <TabsContent value="preview">
         {renderedTeam.map((member) => {
-            return <div key={member.id} style={{ display: "flex", justifyContent: "space-between" }}>
+            return <button onClick={() => {
+                // setTeamTab to hero
+            }} key={member.id} style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
                 <div style={{ height: 100 }}>
                     <img src={`/api/portrait?name=${encodeURIComponent(member.Name!)}`} style={{ width: "100%", height: "100%" }} />
                 </div>
                 <p>{member.Name}</p>
-                <div>
-                    <p>Weapon: {member.weapon || "-"}</p>
-                    <p>Assist: {member.assist || "-"}</p>
-                    <p>Special: {member.special || "-"}</p>
-                    <p>A: {member.passivea || "-"}</p>
-                    {member.passivea && <p><img style={{ height: 40, width: 40 }} src={`/api/img?name=${encodeURIComponent(member.passivea!)}`} /></p>}
-                    <p>B: {member.passiveb || "-"}</p>
-                    {member.passiveb && <p><img style={{ height: 40, width: 40 }} src={`/api/img?name=${encodeURIComponent(member.passiveb!)}`} /></p>}
-                    <p>C: {member.passivec || "-"}</p>
-                    {member.passivec && <p><img style={{ height: 40, width: 40 }} src={`/api/img?name=${encodeURIComponent(member.passivec!)}`} /></p>}
-                </div>
-            </div>
+                <table style={{ minWidth: 256 }}>
+                    <tr><td>{member.weapon || "-"}</td><td>{!!member.passivea && <img style={{ height: 30, width: 30 }} src={`/api/img?name=${encodeURIComponent(member.passivea!)}`} />} {member.passivea}</td></tr>
+                    <tr><td>{member.assist || "-"}</td><td>{!!member.passiveb && <img style={{ height: 30, width: 30 }} src={`/api/img?name=${encodeURIComponent(member.passiveb!)}`} />} {member.passiveb}</td></tr>
+                    <tr><td>{member.special || "-"}</td><td>{!!member.passivec && <img style={{ height: 30, width: 30 }} src={`/api/img?name=${encodeURIComponent(member.passivec!)}`} />} {member.passivec}</td></tr>
+                </table>
+
+            </button>
         })}
         {!!renderedTeam.length && (
             <Button type="submit" onClick={submitRequest} variant="soft">Submit</Button>
