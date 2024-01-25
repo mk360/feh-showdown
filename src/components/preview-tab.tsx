@@ -3,32 +3,6 @@ import { Button, TabsContent } from "@radix-ui/themes";
 function PreviewTab({ team }: { team: Partial<HeroDetails & RawHeroIdentity>[] }) {
     const renderedTeam = team.filter((m) => m.Name);
 
-    async function submitRequest() {
-        const trimmedBody = renderedTeam.map((i) => {
-            const { Name, weapon, passivea, passiveb, passivec } = i;
-            return {
-                name: Name,
-                weapon,
-                passivea,
-                passiveb,
-                passivec
-            };
-        });
-
-        const response = await fetch("/api/team", {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                team1: trimmedBody
-            })
-        });
-
-        const js = await response.text();
-        console.log({ js });
-    };
 
     return <TabsContent value="preview">
         {renderedTeam.map((member) => {
@@ -48,7 +22,7 @@ function PreviewTab({ team }: { team: Partial<HeroDetails & RawHeroIdentity>[] }
             </button>
         })}
         {!!renderedTeam.length && (
-            <Button type="submit" onClick={submitRequest} variant="soft">Submit</Button>
+            <Button type="submit" onClick={() => {}} variant="soft">Submit</Button>
         )}
     </TabsContent>;
 };

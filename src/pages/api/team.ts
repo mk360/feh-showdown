@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { z, ZodError } from "zod";
 import shortid from "shortid";
+import GAME_WORLDS from "@/game-worlds";
 
 const teamMemberSchema = z.object({
     name: z.string(),
@@ -10,11 +11,9 @@ const teamMemberSchema = z.object({
     passivea: z.string().optional(),
     passiveb: z.string().optional(),
     passivec: z.string().optional(),
-});
-
-const requestBody = z.object({
-    team1: teamMemberSchema.array()
 }).strict();
+
+const requestBody = teamMemberSchema.array();
 
 export default async function team(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== "POST") {
@@ -33,11 +32,14 @@ export default async function team(req: NextApiRequest, res: NextApiResponse) {
         }
     }
 
-    return res.status(200).send(shortid());
+    const id = shortid();
+    GAME_WORLDS[id] = shortid();
+
+    return res.status(200).send(id);
 };
 
 async function validateTeams(teamData: any) {
-    const data = requestBody.parse(teamData).team1;
+    const data = requestBody.parse(teamData);
     const heroNames = Array.from(new Set(data.map((hero) => hero.name)));
 
     const url = "https://feheroes.fandom.com/api.php";

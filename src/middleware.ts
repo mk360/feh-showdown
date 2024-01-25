@@ -1,8 +1,5 @@
 import { NextRequest } from "next/server";
-
-const GAME_WORLDS: {
-    [id: string]: string
-} = {};
+import GAME_WORLDS from "./game-worlds";
 
 export function middleware(req: NextRequest) {
     if (req.nextUrl.pathname.startsWith("/play")) {

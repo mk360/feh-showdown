@@ -174,7 +174,6 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
       </div>
       <div style={{ display: currentPanel !== "hero-details" ? "none" : "block", padding: 10 }}>
         <form onSubmit={heroDetailsForm.handleSubmit((heroDetails) => {
-          console.log({ heroDetails });
           callback({ ...heroDetails, ...currentHero });
         })}>
           <div>
