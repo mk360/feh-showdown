@@ -27,7 +27,7 @@ export default function Home({ ids }: { ids: string[] }) {
   const renderedTeam2 = team2.filter((i) => i.Name);
 
   async function createTeams() {
-        const trimmedTeams = team1.concat(team2).map((i) => {
+        const trimmedTeam1 = team1.map((i) => {
             const { Name, weapon, passivea, passiveb, passivec } = i;
             return {
                 name: Name,
@@ -38,18 +38,32 @@ export default function Home({ ids }: { ids: string[] }) {
             };
         });
 
-        const response = await fetch("/api/team", {
+        const trimmedTeam2 = team1.map((i) => {
+            const { Name, weapon, passivea, passiveb, passivec } = i;
+            return {
+                name: Name,
+                weapon,
+                passivea,
+                passiveb,
+                passivec
+            };
+        });
+
+        const response = await fetch("http://localhost:3600/team", {
             method: "POST",
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(trimmedTeams)
+            body: JSON.stringify({
+              team1: trimmedTeam1,
+              team2: trimmedTeam2,
+            })
         });
 
         const js = await response.text();
-        router.push(`/play/${js}`);
-    };
+        if (response.ok && response.status === 200) router.push(`/play/${js}`);
+  };
 
   return (
     <>
@@ -66,7 +80,7 @@ export default function Home({ ids }: { ids: string[] }) {
             <Tabs.List>
               <Tabs.Trigger style={{ backgroundColor: "rgba(0,0,255, 0.1)" }} value='team-1'>Team 1</Tabs.Trigger>
               <Tabs.Trigger style={{ backgroundColor: "rgba(255,0,0, 0.1)" }} value='team-2'>Team 2</Tabs.Trigger>
-              <Tabs.Trigger value='preview'>Validate</Tabs.Trigger>
+              <Tabs.Trigger style={{ background: "rgba(0, 255, 0, 0.1)"}} value='preview'>Battle Preview</Tabs.Trigger>
             </Tabs.List>
             <Tabs.Content hidden={teamTab !== "team-1"} forceMount value='team-1' style={{ backgroundColor: "rgba(0,0,255, 0.1)" }}>
               <Tabs.Root value={currentFirstTeamTab} onValueChange={setCurrentFirstTeamTab} className={styles2.TabList}>
@@ -116,10 +130,10 @@ export default function Home({ ids }: { ids: string[] }) {
                 <PreviewTab team={team2} />
               </Tabs.Root>
             </Tabs.Content>
-            <Tabs.Content forceMount hidden={teamTab !== "preview"} value="preview">
+            <Tabs.Content forceMount hidden={teamTab !== "preview" || !renderedTeam1.concat(renderedTeam2).length} value="preview">
             <Grid columns="2">
-              <div style={{ backgroundColor: "rgba(0, 0, 255, 0.1)", padding: 6 }}>
-                {!!renderedTeam1.length && (<><h3>
+              <div style={{ backgroundColor: "rgba(0, 0, 255, 0.1)", paddingRight: 10, paddingLeft: 10, paddingBottom: 10, display: "flex", gap: 10, flexDirection: "column" }}>
+                {!!renderedTeam1.length && (<><h3 style={{ textAlign: "end"}}>
                     Team 1
                   </h3>
                   {renderedTeam1.map((member) => {
@@ -139,7 +153,7 @@ export default function Home({ ids }: { ids: string[] }) {
                     </button>
                 })}</>)}
               </div>
-              <div style={{ backgroundColor: "rgba(255, 0, 0, 0.1)", padding: 6 }}>
+              <div style={{ backgroundColor: "rgba(255, 0, 0, 0.1)", paddingRight: 10, paddingLeft: 10, display: "flex", gap: 10, flexDirection: "column" }}>
                 {!!renderedTeam2.length && (
                   <>
                     <h3>Team 2</h3>
@@ -155,9 +169,68 @@ export default function Home({ ids }: { ids: string[] }) {
                 )}
               </div>
             </Grid>
-            <Button variant='solid' onClick={createTeams}>Submit</Button>
+            <Button variant='solid' style={{ marginTop: 10 }} onClick={createTeams}>Start Battle!</Button>
             </Tabs.Content>
           </Tabs.Root>
+          <Button onClick={() => {
+            setTeam1([{
+              id: team1[0].id,
+              Name: "Roy: Brave Lion",
+              weapon: "Durandal",
+              special: "Galeforce",
+              passivea: "Steady Blow 2",
+              passiveb: "Desperation 3",
+            }, {
+              id: team1[1].id,
+              Name: "Lyn: Brave Lady",
+              weapon: "Mulagir",
+              special: "Draconic Aura",
+              passivea: "Swift Sparrow 2",
+              passiveb: "Sacae's Blessing",
+              passivec: "Atk Smoke 3"
+            }, {
+              id: team1[2].id,
+              Name: "Ike: Brave Mercenary",
+              weapon: "Silver Axe+",
+              special: "Aether",
+              passiveb: "Beorc's Blessing"
+            }, {
+              id: team1[3].id,
+              Name: "Lucina: Brave Princess",
+              weapon: "Geirskögul",
+              special: "Aether",
+              passivea: "Sturdy Blow 2",
+              passivec: "Drive Spd 2"
+            }]);
+            setTeam2([{
+              id: team2[0].id,
+              Name: "Hector: General of Ostia",
+              weapon: "Armads",
+              special: "Pavise",
+              passivea: "Distant Counter",
+              passiveb: "Goad Armor",
+            }, {
+              id: team2[1].id,
+              Name: "Chrom: Exalted Prince",
+              weapon: "Silver Sword+",
+              special: "Aether",
+              passivea: "Defiant Def 3",
+              passivec: "Spur Def 3"
+            }, {
+              id: team2[2].id,
+              Name: "Ike: Brave Mercenary",
+              weapon: "Silver Axe+",
+              special: "Aether",
+              passiveb: "Beorc's Blessing"
+            }, {
+              id: team2[3].id,
+              Name: "Lucina: Brave Princess",
+              weapon: "Geirskögul",
+              special: "Aether",
+              passivea: "Sturdy Blow 2",
+              passivec: "Drive Spd 2"
+            }])
+          }} variant="surface">Fill Debug Data</Button>
         </Theme>
       </main>
     </>

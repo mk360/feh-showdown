@@ -33,7 +33,7 @@ type SkillList = {
     passivec: { name: string; description: string }[];
 };
 
-type HeroProperty = "name" | "weapon" | "assist" | "special" | "passivea" | "passiveb" | "passivec";
+type HeroProperty = "Name" | "weapon" | "assist" | "special" | "passivea" | "passiveb" | "passivec";
 
 type HeroDetails = {
     [k in HeroProperty | "id"]: string;

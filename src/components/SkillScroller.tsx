@@ -1,5 +1,6 @@
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
+import * as Accordion from "@radix-ui/react-accordion";
 
 function SkillScroller({
     data,
@@ -16,14 +17,14 @@ function SkillScroller({
     return <ScrollArea.Root style={{ width: "100%" }} className="ScrollAreaRoot">
         <ScrollArea.Viewport className="ScrollAreaViewport">
             {!!data.length ? (
-                <ToggleGroup.Root loop={false} value={value} onValueChange={onValueChange} type="single">
+                <Accordion.Root value={value} onValueChange={onValueChange} type="single">
                     {data.map((element) => (
-                        <ToggleGroup.Item className="ToggleGroupItem" key={element.name} value={element.name} style={{ padding: 10, width: "100%" }}>
-                            <p>{element.name}</p>
-                            <p>{element.description}</p>
-                        </ToggleGroup.Item>
+                        <Accordion.Item className="ToggleGroupItem" key={element.name} value={element.name} style={{ padding: 10, width: "100%" }}>
+                            <Accordion.Trigger style={{ width: "100%" }}>{element.name}</Accordion.Trigger>
+                            <Accordion.Content>{element.description}</Accordion.Content>
+                        </Accordion.Item>
                     ))}
-                </ToggleGroup.Root>
+                </Accordion.Root>
             ) : <div style={{ textAlign: "center", height: "100%", verticalAlign: "center" }}>No skill available</div>}
         </ScrollArea.Viewport>
         <ScrollArea.Scrollbar className="ScrollAreaScrollbar" orientation="vertical">

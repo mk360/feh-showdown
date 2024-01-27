@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { z, ZodError } from "zod";
 import shortid from "shortid";
 import GAME_WORLDS from "@/game-worlds";
+import GameWorld from "feh-battles";
 
 const teamMemberSchema = z.object({
     name: z.string(),
@@ -21,8 +22,47 @@ export default async function team(req: NextApiRequest, res: NextApiResponse) {
         return;
     }
 
+    const id = shortid();
+    
     try {
-        await validateTeams(req.body);
+        const teams = requestBody.parse(req.body);
+        await validateTeams(teams);
+        const createdWorld = new GameWorld();
+        GAME_WORLDS[id] = createdWorld;
+        createdWorld.initiate({
+            team1: teams.slice(0, 4).map((member) => {
+                return {
+                    skills: {
+                        assist: member.assist!,
+                        S: "",
+                        special: member.special!,
+                        A: member.passivea!,
+                        B: member.passiveb!,
+                        C: member.passivec!
+                    },
+                    rarity: 5,
+                    name: member.name,
+                    weapon: member.weapon!,
+                    
+                }
+            }),
+            team2: teams.slice(4).map((member) => {
+                return {
+                    skills: {
+                        assist: member.assist!,
+                        S: "",
+                        special: member.special!,
+                        A: member.passivea!,
+                        B: member.passiveb!,
+                        C: member.passivec!
+                    },
+                    rarity: 5,
+                    name: member.name,
+                    weapon: member.weapon!,
+                }
+            }),
+        });
+        console.log(Array.from(createdWorld.getEntities("Name")).map((i => i.getObject(false))));
     } catch (e: any) {
         if (e instanceof ZodError) {
             return res.status(400).send(e.flatten());
@@ -31,9 +71,6 @@ export default async function team(req: NextApiRequest, res: NextApiResponse) {
             return res.status(500).send(e.message);
         }
     }
-
-    const id = shortid();
-    GAME_WORLDS[id] = shortid();
 
     return res.status(200).send(id);
 };

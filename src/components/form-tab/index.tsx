@@ -68,6 +68,8 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
               setHeroesList(v);
             });
           });
+        }, (errors) => {
+          console.log({ errors });
         })} style={{ width: "100%" }}>
           <fieldset>
             <legend>Filters</legend>
@@ -75,7 +77,9 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
               <dt>
                 <Label.Root htmlFor="name-input">Hero Name</Label.Root>
               </dt>
-              <dd><input id="name-input" autoComplete="off" aria-labelledby='name' {...heroQueryForm.register("name")} /></dd>
+              <dd><input id="name-input" autoComplete="off" aria-labelledby='name' {...heroQueryForm.register("name", {
+                pattern: /^[A-Z\p{Letter} ]+$/ui
+              })} /></dd>
               <dt><label id="hero-color" htmlFor='color-selector'>
                 Hero Color
               </label></dt>
