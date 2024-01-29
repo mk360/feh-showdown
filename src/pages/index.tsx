@@ -38,7 +38,7 @@ export default function Home({ ids }: { ids: string[] }) {
             };
         });
 
-        const trimmedTeam2 = team1.map((i) => {
+        const trimmedTeam2 = team2.map((i) => {
             const { Name, weapon, passivea, passiveb, passivec } = i;
             return {
                 name: Name,

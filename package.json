@@ -16,6 +16,7 @@
     "@radix-ui/themes": "^2.0.3",
     "feh-battles": "file:../feh-battles",
     "next": "14.0.3",
+    "phaser": "^3.70.0",
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.49.2",

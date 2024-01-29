@@ -1,8 +1,6 @@
-import GAME_WORLDS from "@/game-worlds";
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 
 export default function GamePage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
-    console.log(props);
     return <></>;
 
 };
@@ -15,7 +13,6 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         };
     }
     const worldData = await resp.json();
-    console.log(worldData);
     return {
         props: {
             id: ctx.query.gameId?.toString(),
