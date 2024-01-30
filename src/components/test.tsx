@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 import Phaser from "phaser";
+import config from "fire-emblem-heroes/src/scripts/game"
+import PreloadScene from "@/game/Preload";
 
 export default function Index() {
   useEffect(() => {
@@ -11,12 +13,13 @@ export default function Index() {
       return;
     }
 
+    const DEFAULT_WIDTH = 750;
+    const DEFAULT_HEIGHT = 1080;
+
     var config = {
       type: Phaser.AUTO,
-      width: window.innerWidth,
-      height: window.innerHeight,
-      // width: window.innerWidth * window.devicePixelRatio,
-      // height: window.innerHeight * window.devicePixelRatio,
+      width: DEFAULT_WIDTH,
+      height: DEFAULT_HEIGHT,
       backgroundColor: '#4eb3e7',
       physics: {
         default: 'arcade',
@@ -25,7 +28,7 @@ export default function Index() {
         },
       },
       parent: 'game',
-
+      scene: [PreloadScene],
       scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
