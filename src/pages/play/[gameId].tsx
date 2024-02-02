@@ -1,8 +1,22 @@
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
+import { useEffect, useState } from "react";
+import dynamic from 'next/dynamic';
+import { useGameContext } from "@/context/game-context";
+const Test = dynamic(() => import("@/components/test"), { ssr: false });
 
-export default function GamePage(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
-    return <></>;
+export default function GameSession(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+    const [loading, setLoading] = useState(false);
+    const { setGame } = useGameContext();
 
+    useEffect(() => {
+        setGame!(props.world);
+        setLoading(true);
+    }, []);
+
+    return <>
+        <div id="game" />
+        {loading && <Test />}
+    </>;
 };
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
@@ -16,7 +30,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     return {
         props: {
             id: ctx.query.gameId?.toString(),
-            world: worldData
+            world: worldData as JSONEntity[]
         }
     };
 }

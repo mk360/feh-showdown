@@ -27,42 +27,42 @@ export default function Home({ ids }: { ids: string[] }) {
   const renderedTeam2 = team2.filter((i) => i.Name);
 
   async function createTeams() {
-        const trimmedTeam1 = team1.map((i) => {
-            const { Name, weapon, passivea, passiveb, passivec } = i;
-            return {
-                name: Name,
-                weapon,
-                passivea,
-                passiveb,
-                passivec
-            };
-        });
+    const trimmedTeam1 = team1.map((i) => {
+      const { Name, weapon, passivea, passiveb, passivec } = i;
+      return {
+        name: Name,
+        weapon,
+        passivea,
+        passiveb,
+        passivec
+      };
+    });
 
-        const trimmedTeam2 = team2.map((i) => {
-            const { Name, weapon, passivea, passiveb, passivec } = i;
-            return {
-                name: Name,
-                weapon,
-                passivea,
-                passiveb,
-                passivec
-            };
-        });
+    const trimmedTeam2 = team2.map((i) => {
+      const { Name, weapon, passivea, passiveb, passivec } = i;
+      return {
+        name: Name,
+        weapon,
+        passivea,
+        passiveb,
+        passivec
+      };
+    });
 
-        const response = await fetch("http://localhost:3600/team", {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              team1: trimmedTeam1,
-              team2: trimmedTeam2,
-            })
-        });
+    const response = await fetch("http://localhost:3600/team", {
+      method: "POST",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        team1: trimmedTeam1,
+        team2: trimmedTeam2,
+      })
+    });
 
-        const js = await response.text();
-        if (response.ok && response.status === 200) router.push(`/play/${js}`);
+    const js = await response.text();
+    if (response.ok && response.status === 200) router.push(`/play/${js}`);
   };
 
   return (
@@ -80,7 +80,7 @@ export default function Home({ ids }: { ids: string[] }) {
             <Tabs.List>
               <Tabs.Trigger style={{ backgroundColor: "rgba(0,0,255, 0.1)" }} value='team-1'>Team 1</Tabs.Trigger>
               <Tabs.Trigger style={{ backgroundColor: "rgba(255,0,0, 0.1)" }} value='team-2'>Team 2</Tabs.Trigger>
-              <Tabs.Trigger style={{ background: "rgba(0, 255, 0, 0.1)"}} value='preview'>Battle Preview</Tabs.Trigger>
+              <Tabs.Trigger style={{ background: "rgba(0, 255, 0, 0.1)" }} value='preview'>Battle Preview</Tabs.Trigger>
             </Tabs.List>
             <Tabs.Content hidden={teamTab !== "team-1"} forceMount value='team-1' style={{ backgroundColor: "rgba(0,0,255, 0.1)" }}>
               <Tabs.Root value={currentFirstTeamTab} onValueChange={setCurrentFirstTeamTab} className={styles2.TabList}>
@@ -131,45 +131,43 @@ export default function Home({ ids }: { ids: string[] }) {
               </Tabs.Root>
             </Tabs.Content>
             <Tabs.Content forceMount hidden={teamTab !== "preview" || !renderedTeam1.concat(renderedTeam2).length} value="preview">
-            <Grid columns="2">
-              <div style={{ backgroundColor: "rgba(0, 0, 255, 0.1)", paddingRight: 10, paddingLeft: 10, paddingBottom: 10, display: "flex", gap: 10, flexDirection: "column" }}>
-                {!!renderedTeam1.length && (<><h3 style={{ textAlign: "end"}}>
+              <Grid columns="2">
+                <div style={{ backgroundColor: "rgba(0, 0, 255, 0.1)", paddingRight: 10, paddingLeft: 10, paddingBottom: 10, display: "flex", gap: 10, flexDirection: "column" }}>
+                  {!!renderedTeam1.length && (<><h3 style={{ textAlign: "end" }}>
                     Team 1
                   </h3>
-                  {renderedTeam1.map((member) => {
-                    return <button onClick={() => {
-                        // setTeamTab to hero
-                    }} key={member.id} style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
+                    {renderedTeam1.map((member) => {
+                      return <button onClick={() => {
+                        setCurrentFirstTeamTab(member.id!);
+                        setTeamTab("team1");
+                      }} key={member.id} style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
                         <div style={{ height: 100 }}>
-                            <img src={`/api/portrait?name=${encodeURIComponent(member.Name!)}`} style={{ width: "100%", height: "100%" }} />
+                          <img src={`/api/portrait?name=${encodeURIComponent(member.Name!)}`} style={{ width: "100%", height: "100%" }} />
                         </div>
                         <p>{member.Name}</p>
-                        {/* <table style={{ minWidth: 256 }}>
-                            <tr><td>{member.weapon || "-"}</td><td>{!!member.passivea && <img style={{ height: 30, width: 30 }} src={`/api/img?name=${encodeURIComponent(member.passivea!)}`} />} {member.passivea}</td></tr>
-                            <tr><td>{member.assist || "-"}</td><td>{!!member.passiveb && <img style={{ height: 30, width: 30 }} src={`/api/img?name=${encodeURIComponent(member.passiveb!)}`} />} {member.passiveb}</td></tr>
-                            <tr><td>{member.special || "-"}</td><td>{!!member.passivec && <img style={{ height: 30, width: 30 }} src={`/api/img?name=${encodeURIComponent(member.passivec!)}`} />} {member.passivec}</td></tr>
-                        </table> */}
-
-                    </button>
-                })}</>)}
-              </div>
-              <div style={{ backgroundColor: "rgba(255, 0, 0, 0.1)", paddingRight: 10, paddingLeft: 10, display: "flex", gap: 10, flexDirection: "column" }}>
-                {!!renderedTeam2.length && (
-                  <>
-                    <h3>Team 2</h3>
-                    {renderedTeam2.map((member) => {
-                      return <button onClick={() => {}} key={member.id} style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
-                        <p>{member.Name}</p>
-                        <div style={{ height: 100 }}>
-                            <img src={`/api/portrait?name=${encodeURIComponent(member.Name!)}`} style={{ width: "100%", height: "100%" }} />
-                        </div>
                       </button>
-                    })}
-                  </>
-                )}
-              </div>
-            </Grid>
-            <Button variant='solid' style={{ marginTop: 10 }} onClick={createTeams}>Start Battle!</Button>
+                    })}</>)}
+                </div>
+                <div style={{ backgroundColor: "rgba(255, 0, 0, 0.1)", paddingRight: 10, paddingLeft: 10, display: "flex", gap: 10, flexDirection: "column" }}>
+                  {!!renderedTeam2.length && (
+                    <>
+                      <h3>Team 2</h3>
+                      {renderedTeam2.map((member) => {
+                        return <button onClick={() => {
+                          setCurrentSecondTeamTab(member.id!);
+                          setTeamTab("team-2");
+                        }} key={member.id} style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
+                          <p>{member.Name}</p>
+                          <div style={{ height: 100 }}>
+                            <img src={`/api/portrait?name=${encodeURIComponent(member.Name!)}`} style={{ width: "100%", height: "100%" }} />
+                          </div>
+                        </button>
+                      })}
+                    </>
+                  )}
+                </div>
+              </Grid>
+              <Button variant='solid' style={{ marginTop: 10 }} onClick={createTeams}>Start Battle!</Button>
             </Tabs.Content>
           </Tabs.Root>
           <Button onClick={() => {

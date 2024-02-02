@@ -23,7 +23,7 @@ export default async function team(req: NextApiRequest, res: NextApiResponse) {
     }
 
     const id = shortid();
-    
+
     try {
         const teams = requestBody.parse(req.body);
         await validateTeams(teams);
@@ -43,7 +43,7 @@ export default async function team(req: NextApiRequest, res: NextApiResponse) {
                     rarity: 5,
                     name: member.name,
                     weapon: member.weapon!,
-                    
+
                 }
             }),
             team2: teams.slice(4).map((member) => {
@@ -62,7 +62,6 @@ export default async function team(req: NextApiRequest, res: NextApiResponse) {
                 }
             }),
         });
-        console.log(Array.from(createdWorld.getEntities("Name")).map((i => i.getObject(false))));
     } catch (e: any) {
         if (e instanceof ZodError) {
             return res.status(400).send(e.flatten());

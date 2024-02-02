@@ -18,7 +18,7 @@ export default class PreloadScene extends Phaser.Scene {
     super({ key: 'PreloadScene' })
   }
 
-   async preload() {
+  async preload() {
     const { world } = this.game.registry.list as {
       id: string;
       world: JSONEntity[];
@@ -26,7 +26,7 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.setBaseURL(__dirname);
     this.load.image("test", "assets/skills.webp");
     // this.load.image("map", "assets/maps/map.webp");
-    // this.load.atlas("skills", "assets/sheets/skills.webp", "assets/sheets/skills.json");
+    this.load.atlas("skills", "assets/sheets/skills.webp", "assets/sheets/skills.json");
     // this.load.atlas("interactions", "assets/sheets/interactions.webp", "assets/sheets/interactions.json");
     // this.load.atlas("skills-ui", "assets/sheets/skills-ui.webp", "assets/sheets/skills-ui.json");
     // this.load.audioSprite("sfx", "assets/audio/sfx.json", "assets/audio/sfx.ogg");
@@ -42,16 +42,16 @@ export default class PreloadScene extends Phaser.Scene {
     // this.load.image("debuff", "assets/debuff-arrow.png");
     // this.load.image("effect-shine", "assets/effect.png");
     // this.load.audio("bgm", "assets/audio/bgm/leif's army in search of victory.ogg");
-    // for (let hero of world) {
-    //   const heroName = hero.components.find((c) => c.type === "Name")!.value as string;
-    //   const formatted = formatName(heroName);
-    //   this.load.atlas(heroName, `assets/battle/${formatted}.webp`, `assets/battle/${formatted}.json`);
-    //   this.load.audioSprite(`${heroName} quotes`, `assets/audio/quotes/${formatted}.json`, `assets/audio/quotes/${formatted}.m4a`);
-    // }
+    for (let hero of world) {
+      const heroName = hero.components.find((c) => c.type === "Name")!.value as string;
+      const formatted = formatName(heroName);
+      this.load.atlas(heroName, `assets/battle/${formatted}.webp`, `assets/battle/${formatted}.json`);
+      this.load.audioSprite(`${heroName} quotes`, `assets/audio/quotes/${formatted}.json`, `assets/audio/quotes/${formatted}.m4a`);
+    }
   }
 
   create() {
-    // this.scene.start('MainScene')
+    this.scene.start('MainScene');
 
     /**
      * This is how you would dynamically import the mainScene class (with code splitting),

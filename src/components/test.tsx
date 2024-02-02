@@ -1,9 +1,11 @@
 import { useEffect } from "react";
 import Phaser from "phaser";
-import config from "fire-emblem-heroes/src/scripts/game"
 import PreloadScene from "@/game/Preload";
+import { useGameContext } from "@/context/game-context";
+import MainScene from "@/game/MainScene";
 
 export default function Index() {
+  const { game: world } = useGameContext();
   useEffect(() => {
     loadGame();
   }, []);
@@ -16,29 +18,26 @@ export default function Index() {
     const DEFAULT_WIDTH = 750;
     const DEFAULT_HEIGHT = 1080;
 
-    var config = {
-      type: Phaser.AUTO,
-      width: DEFAULT_WIDTH,
-      height: DEFAULT_HEIGHT,
-      backgroundColor: '#4eb3e7',
-      physics: {
-        default: 'arcade',
-        arcade: {
-          gravity: { y: 200 },
-        },
+    const config = {
+      type: Phaser.WEBGL,
+      backgroundColor: '#1F5E6D',
+      fps: {
+        forceSetTimeout: true,
+        target: 15,
+        min: 15,
       },
-      parent: 'game',
-      scene: [PreloadScene],
       scale: {
+        parent: 'phaser-game',
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
+        width: DEFAULT_WIDTH,
+        height: DEFAULT_HEIGHT
       },
-    };
+      scene: [PreloadScene, MainScene],
+    }
 
     var game = new Phaser.Game(config);
-
-    // game.scene.add('main', Main);
-    // game.scene.start('main');
+    game.registry.set("world", world);
   };
 
   return null;
