@@ -16,7 +16,7 @@ export default function Index() {
     }
 
     const DEFAULT_WIDTH = 750;
-    const DEFAULT_HEIGHT = 1080;
+    const DEFAULT_HEIGHT = 1200;
 
     const config = {
       type: Phaser.WEBGL,

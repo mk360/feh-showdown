@@ -76,7 +76,8 @@ export default class MainScene extends Phaser.Scene {
             id: string;
             world: JSONEntity[];
         };
-        entities.forEach((entity, i) => {
+        this.add.image(0, 180, "map").setDisplaySize(750, 1000).setOrigin(0, 0);
+        entities.forEach((entity) => {
             const hero = new Hero(this, entity);
             const c = entity.components.find((c) => c.type === "Position")!;
             const { x, y } = gridToPixels(c.x, c.y);
@@ -84,7 +85,6 @@ export default class MainScene extends Phaser.Scene {
             hero.y = y;
             this.add.existing(hero);
         });
-        this.add.image(0, 180, "map").setDisplaySize(750, 1000).setOrigin(0, 0).setDepth(0);
     }
 }
 
