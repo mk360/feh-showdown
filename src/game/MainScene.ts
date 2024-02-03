@@ -84,6 +84,7 @@ export default class MainScene extends Phaser.Scene {
             hero.y = y;
             this.add.existing(hero);
         });
+        this.add.image(0, 180, "map").setDisplaySize(750, 1000).setOrigin(0, 0).setDepth(0);
     }
 }
 
@@ -698,7 +699,6 @@ export default class MainScene extends Phaser.Scene {
 //     const banner = this.add.image(-90, 0, "background").setOrigin(0).setTint(0x0F343D);
 //     this.startBackgroundMusic(0.13);
 //     banner.setDisplaySize(banner.displayWidth, 180);
-//     this.add.image(0, 180, "map").setDisplaySize(750, 1000).setOrigin(0, 0).setDepth(0);
 //     this.createTiles();
 
 //     for (let heroId in battle.state.teams.team1.members) {

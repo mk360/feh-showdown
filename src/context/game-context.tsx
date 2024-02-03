@@ -9,7 +9,7 @@ export const gameContext = createContext<{
 
 
 function GameContext({ children }: { children: ReactNode }) {
-    const [game, setGame] = useState<JSONEntity[]>();
+    const [game, setGame] = useState<JSONEntity[] | undefined>();
 
     return <gameContext.Provider value={{ game, setGame }}>
         {children}

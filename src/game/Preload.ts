@@ -25,7 +25,7 @@ export default class PreloadScene extends Phaser.Scene {
     };
     this.load.setBaseURL(__dirname);
     this.load.image("test", "assets/skills.webp");
-    // this.load.image("map", "assets/maps/map.webp");
+    this.load.image("map", "assets/maps/map.webp");
     this.load.atlas("skills", "assets/sheets/skills.webp", "assets/sheets/skills.json");
     // this.load.atlas("interactions", "assets/sheets/interactions.webp", "assets/sheets/interactions.json");
     // this.load.atlas("skills-ui", "assets/sheets/skills-ui.webp", "assets/sheets/skills-ui.json");
@@ -42,12 +42,16 @@ export default class PreloadScene extends Phaser.Scene {
     // this.load.image("debuff", "assets/debuff-arrow.png");
     // this.load.image("effect-shine", "assets/effect.png");
     // this.load.audio("bgm", "assets/audio/bgm/leif's army in search of victory.ogg");
-    for (let hero of world) {
-      const heroName = hero.components.find((c) => c.type === "Name")!.value as string;
-      const formatted = formatName(heroName);
-      this.load.atlas(heroName, `assets/battle/${formatted}.webp`, `assets/battle/${formatted}.json`);
-      this.load.audioSprite(`${heroName} quotes`, `assets/audio/quotes/${formatted}.json`, `assets/audio/quotes/${formatted}.m4a`);
-    }
+    const names = world.map((entity) => {
+      const nameValue = entity.components.find((t) => t.type === "Name")!.value;
+      return nameValue;
+    });
+    const uniqueNames = new Set(names);
+    uniqueNames.forEach(((hero) => {
+      const formatted = formatName(hero);
+      this.load.atlas(hero, `assets/battle/${formatted}.webp`, `assets/battle/${formatted}.json`);
+      this.load.audioSprite(`${hero} quotes`, `assets/audio/quotes/${formatted}.json`, `assets/audio/quotes/${formatted}.m4a`);
+    }));
   }
 
   create() {

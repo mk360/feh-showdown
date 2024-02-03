@@ -6,16 +6,22 @@ const Test = dynamic(() => import("@/components/test"), { ssr: false });
 
 export default function GameSession(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const [loading, setLoading] = useState(false);
-    const { setGame } = useGameContext();
+    const { setGame, game } = useGameContext();
 
     useEffect(() => {
         setGame!(props.world);
         setLoading(true);
+        return () => {
+            setGame!(undefined);
+            for (let node of Array.from(document.querySelectorAll("canvas"))) {
+                document.body.removeChild(node);
+            }
+        }
     }, []);
 
     return <>
         <div id="game" />
-        {loading && <Test />}
+        {Boolean(game) && loading && <Test />}
     </>;
 };
 
