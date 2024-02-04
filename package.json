@@ -15,6 +15,7 @@
     "@radix-ui/react-toggle-group": "^1.0.4",
     "@radix-ui/themes": "^2.0.3",
     "feh-battles": "file:../feh-battles",
+    "fire-emblem-heroes": "file:../feh",
     "next": "14.0.3",
     "phaser": "^3.70.0",
     "react": "^18",
@@ -30,6 +31,7 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/shortid": "^0.0.32",
+    "copy-webpack-plugin": "^12.0.2",
     "eslint": "^8",
     "eslint-config-next": "14.0.3",
     "typescript": "^5"
