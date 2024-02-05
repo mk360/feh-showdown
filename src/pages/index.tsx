@@ -8,8 +8,11 @@ import FormTab from '@/components/form-tab';
 import shortid from "shortid";
 import PreviewTab from '@/components/preview-tab';
 import { useRouter } from 'next/router';
+import f from "fire-emblem-heroes/src/assets/battle/Alfonse_Prince_of_Askr.webp";
 
 const inter = Inter({ subsets: ['latin'] })
+
+console.log(f)
 
 export default function Home({ ids }: { ids: string[] }) {
   const [team1, setTeam1] = useState<Partial<HeroDetails & RawHeroIdentity>[]>(ids.slice(0, 4).map((id) => ({

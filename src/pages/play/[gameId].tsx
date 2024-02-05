@@ -20,8 +20,8 @@ export default function GameSession(props: InferGetServerSidePropsType<typeof ge
     }, []);
 
     return <>
-        <div id="game" />
-        {Boolean(game) && loading && <Test />}
+        <div id="game" style={{ height: "100%" }} />
+        <Test />
     </>;
 };
 
