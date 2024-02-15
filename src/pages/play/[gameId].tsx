@@ -6,7 +6,7 @@ const Test = dynamic(() => import("@/components/test"), { ssr: false });
 
 export default function GameSession(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const [loading, setLoading] = useState(false);
-    const { setGame, game } = useGameContext();
+    const { setGame } = useGameContext();
 
     useEffect(() => {
         setGame!(props.world);
@@ -20,7 +20,7 @@ export default function GameSession(props: InferGetServerSidePropsType<typeof ge
     }, []);
 
     return <>
-        <div id="game" style={{ height: "100%" }} />
+        <div id="game" style={{ height: "100%", fontFamily: "FEH" }} />
         <Test />
     </>;
 };
