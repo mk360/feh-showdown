@@ -2,17 +2,15 @@ import Head from 'next/head'
 import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css';
 import styles2 from './index.module.scss';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, Grid, Tabs, Theme } from '@radix-ui/themes';
 import FormTab from '@/components/form-tab';
 import shortid from "shortid";
 import PreviewTab from '@/components/preview-tab';
 import { useRouter } from 'next/router';
-import f from "fire-emblem-heroes/src/assets/battle/Alfonse_Prince_of_Askr.webp";
+import io, { Socket } from "socket.io-client";
 
 const inter = Inter({ subsets: ['latin'] })
-
-console.log(f)
 
 export default function Home({ ids }: { ids: string[] }) {
   const [team1, setTeam1] = useState<Partial<HeroDetails & RawHeroIdentity>[]>(ids.slice(0, 4).map((id) => ({
@@ -21,6 +19,7 @@ export default function Home({ ids }: { ids: string[] }) {
   const [team2, setTeam2] = useState<Partial<HeroDetails & RawHeroIdentity>[]>(ids.slice(4).map((id) => ({
     id
   })));
+  const [socket, setSocket] = useState<Socket>();
   const [currentFirstTeamTab, setCurrentFirstTeamTab] = useState("");
   const [currentSecondTeamTab, setCurrentSecondTeamTab] = useState("");
   const [teamTab, setTeamTab] = useState("team-1");
@@ -67,6 +66,25 @@ export default function Home({ ids }: { ids: string[] }) {
     const js = await response.text();
     if (response.ok && response.status === 200) router.push(`/play/${js}`);
   };
+
+  function testSocket() {
+    socket!.emit("movement request", { heroId: "bonjour", sessionId: "aurevoir" })
+  }
+
+  useEffect(() => {
+    const socket = io("http://localhost:3600", {
+      
+    });
+    socket.on("message", (msg) => {
+      console.log(msg);
+    });
+
+    setSocket(socket);
+
+    return () => {
+      socket.disconnect();
+    }
+  }, []);
 
   return (
     <>
@@ -232,6 +250,9 @@ export default function Home({ ids }: { ids: string[] }) {
               passivec: "Drive Spd 2"
             }])
           }} variant="surface">Fill Debug Data</Button>
+          <Button onClick={testSocket} variant="classic">
+            Test Socket
+          </Button>
         </Theme>
       </main>
     </>

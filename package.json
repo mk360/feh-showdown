@@ -24,6 +24,7 @@
     "react-hook-form": "^7.49.2",
     "sass": "^1.69.7",
     "shortid": "^2.2.16",
+    "socket.io-client": "^4.7.4",
     "zod": "^3.22.4",
     "zod-express-middleware": "^1.4.0"
   },
