@@ -62,6 +62,7 @@ export default function Home({ ids }: { ids: string[] }) {
         team2: trimmedTeam2,
       })
     });
+    //
 
     const js = await response.text();
     if (response.ok && response.status === 200) router.push(`/play/${js}`);
