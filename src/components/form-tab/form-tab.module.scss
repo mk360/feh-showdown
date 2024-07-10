@@ -3,3 +3,33 @@
     justify-content: space-between;
     gap: 20px;
 }
+
+.StatModsGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    margin: 0 auto;
+    width: 70%;
+}
+
+.HP:has(~ #hp-minus:checked) {
+    color: red;
+    text-shadow: 0 0 1px black;
+}
+
+.HP:has(~ #hp-plus:checked) {
+    color: blue;
+    text-shadow: 0 0 1px black;
+}
+
+.HP:has(~ #hp-neutral:checked) {
+    color: unset;
+}
+
+// #hp-minus:checked + label {
+//     background-color: red;
+// }
+
+// #hp-plus:checked + label {
+//     background-color: green;
+// }

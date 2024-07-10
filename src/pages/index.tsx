@@ -68,25 +68,6 @@ export default function Home({ ids }: { ids: string[] }) {
     if (response.ok && response.status === 200) router.push(`/play/${js}`);
   };
 
-  function testSocket() {
-    socket!.emit("movement request", { heroId: "bonjour", sessionId: "aurevoir" })
-  }
-
-  useEffect(() => {
-    const socket = io("http://localhost:3600", {
-      
-    });
-    socket.on("message", (msg) => {
-      console.log(msg);
-    });
-
-    setSocket(socket);
-
-    return () => {
-      socket.disconnect();
-    }
-  }, []);
-
   return (
     <>
       <Head>
@@ -97,7 +78,7 @@ export default function Home({ ids }: { ids: string[] }) {
         <style dangerouslySetInnerHTML={{ __html: "button { width: 100% } " }} />
       </Head>
       <main className={`${styles.main} ${inter.className}`}>
-        <Theme>
+        <Theme accentColor="amber">
           <Tabs.Root onValueChange={setTeamTab}>
             <Tabs.List>
               <Tabs.Trigger style={{ backgroundColor: "rgba(0,0,255, 0.1)" }} value='team-1'>Team 1</Tabs.Trigger>
@@ -251,9 +232,9 @@ export default function Home({ ids }: { ids: string[] }) {
               passivec: "Drive Spd 2"
             }])
           }} variant="surface">Fill Debug Data</Button>
-          <Button onClick={testSocket} variant="classic">
+          {/* <Button onClick={testSocket} variant="classic">
             Test Socket
-          </Button>
+          </Button> */}
         </Theme>
       </main>
     </>

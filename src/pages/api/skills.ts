@@ -22,7 +22,7 @@ export default async function handler(
   const x: CargoQuery<{ [field in typeof fields[number]]: string }> = await fetch(`${domain}?${urlObj.toString()}`).then((r) => r.json());
   const mapped = x.cargoquery.map((i) => i.title);
 
-  const dex: { [k in Exclude<HeroProperty, "name">]: { name: string; description?: string }[] } = {
+  const dex: { [k in Exclude<HeroProperty, "Name">]: { name: string; description?: string }[] } = {
     weapon: [],
     assist: [],
     special: [],
@@ -34,7 +34,7 @@ export default async function handler(
   // const alreadyFetchedNames: string[] = [];
 
   for (let item of mapped) {
-    const castScategory = item.Scategory as Exclude<HeroProperty, "name">;
+    const castScategory = item.Scategory as Exclude<HeroProperty, "Name">;
     dex[castScategory] = dex[castScategory] || [];
     dex[castScategory].push({
       name: item.Name,

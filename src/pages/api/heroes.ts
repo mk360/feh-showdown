@@ -1,9 +1,18 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import z from "zod";
 
 const THRESHOLD = "2017-11-28";
 
+const heroQuery = z.object({
+    name: z.string().optional(),
+    weaponType: z.enum(["Sword", "Lance", "Axe", "Bow", "Dagger", "Tome", "Breath", "Beast", "Staff"]).optional(),
+    color: z.enum(["Red", "Blue", "Green", "Colorless"]).optional(),
+    movement: z.enum(["Infantry", "Armored", "Flying", "Cavalry"]).optional(),
+    sort: z.string().optional()
+});
+
 async function heroes(req: NextApiRequest, res: NextApiResponse) {
-    const { name, weaponType, movement, color } = req.query as Required<{ [k in "name" | "weaponType" | "movement" | "color"]: string }>;
+    const { name, weaponType, movement, color } = heroQuery.parse(req.query);
     const domain = "https://feheroes.fandom.com/api.php";
     const urlQuery = new URLSearchParams();
     urlQuery.append("action", "cargoquery");
@@ -20,8 +29,8 @@ async function heroes(req: NextApiRequest, res: NextApiResponse) {
     }
 
     if (weaponType || color) {
-        const lockedColor = weaponType === "Axe" ? "Green" : weaponType === "Sword" ? "Red" : weaponType === "Lance" ? "Blue" : color;
-        const colorQuery = (lockedColor + " " + weaponType).trim();
+        const lockedColor = weaponType === "Axe" ? "Green" : weaponType === "Sword" ? "Red" : weaponType === "Lance" ? "Blue" : (color || "");
+        const colorQuery = (lockedColor + " " + (weaponType || "")).trim();
         conditions.push(`WeaponType like "%${colorQuery}%"`);
     }
 

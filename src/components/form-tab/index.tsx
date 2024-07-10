@@ -5,10 +5,9 @@ import { Controller, useForm } from "react-hook-form";
 import * as Label from "@radix-ui/react-label";
 import * as Select from '@radix-ui/react-select';
 import * as Accordion from '@radix-ui/react-accordion';
-import { Grid } from "@radix-ui/themes";
+import { Grid, Slider } from "@radix-ui/themes";
 import * as ToggleGroup from '@radix-ui/react-toggle-group';
 import styles from "./form-tab.module.scss";
-import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon } from "@radix-ui/react-icons";
 import SkillScroller from "../SkillScroller";
 
 function FormTab({ id, currentId, callback }: { id: string, currentId: string, callback: (details: Partial<HeroDetails>) => void }) {
@@ -25,7 +24,15 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
     color: string;
     movement: string;
     weaponType: string;
-  }>();
+  }>({
+    defaultValues: {
+      name: undefined,
+      color: undefined,
+      movement: undefined,
+      weaponType: undefined
+    }
+  });
+
   const [skillsList, setSkillsList] = useState<SkillList>({
     weapon: [],
     assist: [],
@@ -62,8 +69,17 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
     <TabsContent forceMount hidden={currentId !== id} value={id}>
       <div style={{ display: currentPanel !== "hero-list" ? "none" : "block" }}>
         <form onSubmit={heroQueryForm.handleSubmit((heroesQuery) => {
-          const s = new URLSearchParams(heroesQuery).toString();
-          fetch(`/api/heroes?${s}`).then((res) => {
+          const searchParams = new URLSearchParams();
+          for (let property in heroesQuery) {
+            const castProperty = property as keyof typeof heroesQuery;
+            if (heroesQuery[castProperty])  {
+              searchParams.set(property, heroesQuery[castProperty]);
+            }
+          }
+
+          const fullUrl = `/api/heroes` + (searchParams.size ? `?${searchParams.toString()}` : "");
+
+          fetch(fullUrl).then((res) => {
             res.json().then((v) => {
               setHeroesList(v);
             });
@@ -126,7 +142,7 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
             <Button type="submit">Find Heroes</Button>
           </fieldset>
         </form>
-        {heroQueryForm.formState.isSubmitSuccessful && (<><div aria-relevant="all" aria-live="polite">
+        {heroQueryForm.formState.isSubmitSuccessful && !heroQueryForm.formState.isLoading && (<><div aria-relevant="all" aria-live="polite">
           Found {heroesList.length} results.
         </div>
           <table style={{ width: "100%" }}>
@@ -148,28 +164,28 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
               // console.log(e.target, e.currentTarget);
             }}>
               {heroesList.map((sv) => (
-                <tr key={sv.Name} onClick={() => {
+                <tr key={sv.Name} style={{ backgroundColor: colorToBackgroundColor(sv.WeaponColor) }} onClick={() => {
                   setCurrentHero(sv);
                   setCurrentPanel("hero-details");
                 }}
                 >
                   <td style={{ display: "flex" }}>
-                    <div style={{ flex: 0.5, display: "flex", justifyContent: "center" }}>
-                      <img height={60} width={60} loading="lazy" src={`/api/portrait?name=${encodeURIComponent(sv.Name)}`} />
+                    <div style={{ flex: 0.2, display: "flex", justifyContent: "center", padding: 6 }}>
+                      <img style={{ backgroundColor: "rgba(255, 255, 255, 0.2)", borderRadius: 6 }} height={60} width={60} loading="lazy" src={`/api/portrait?name=${encodeURIComponent(sv.Name)}`} />
                     </div>
-                    <div style={{ display: "flex", flex: 1, justifyContent: "center", alignItems: "center" }}>
+                    <div style={{ display: "flex", flex: 0.3, justifyContent: "center", alignItems: "center" }}>
                       <p id="test" style={{ width: "auto", textAlign: "center", wordWrap: "normal" }}>{sv.Name}</p>
                     </div>
                   </td>
-                  <td>{sv.MoveType}</td>
-                  <td>{sv.WeaponColor}</td>
-                  <td>{sv.WeaponType}</td>
-                  <td>{sv.hp}</td>
-                  <td>{sv.atk}</td>
-                  <td>{sv.spd}</td>
-                  <td>{sv.def}</td>
-                  <td>{sv.res}</td>
-                  <td>{sv.bst}</td>
+                  <td style={{ textAlign: "center", padding: 6 }}>{sv.MoveType}</td>
+                  <td style={{ textAlign: "center", padding: 6 }}>{sv.WeaponColor}</td>
+                  <td style={{ textAlign: "center", padding: 6 }}>{sv.WeaponType}</td>
+                  <td style={{ textAlign: "center", padding: 6 }}>{sv.hp}</td>
+                  <td style={{ textAlign: "center", padding: 6 }}>{sv.atk}</td>
+                  <td style={{ textAlign: "center", padding: 6 }}>{sv.spd}</td>
+                  <td style={{ textAlign: "center", padding: 6 }}>{sv.def}</td>
+                  <td style={{ textAlign: "center", padding: 6 }}>{sv.res}</td>
+                  <td style={{ textAlign: "center", padding: 6 }}>{sv.bst}</td>
                 </tr>
               ))}
             </tbody>
@@ -208,40 +224,53 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
                 <Label.Root>
                   Weapon
                 </Label.Root>
-                <input defaultValue={heroDetailsForm.watch("weapon")} disabled />
+                <input defaultValue={heroDetailsForm.getValues("weapon")} disabled />
               </div>
               <div className={styles.MovesetSlot}>
                 <Label.Root>
                   Assist
                 </Label.Root>
-                <input defaultValue={heroDetailsForm.watch("assist")} disabled />
+                <input defaultValue={heroDetailsForm.getValues("assist")} disabled />
               </div>
               <div className={styles.MovesetSlot}>
                 <Label.Root>
                   Special
                 </Label.Root>
-                <input defaultValue={heroDetailsForm.watch("special")} disabled />
+                <input defaultValue={heroDetailsForm.getValues("special")} disabled />
               </div>
               <div className={styles.MovesetSlot}>
                 <Label.Root>
                   A
                 </Label.Root>
-                <input defaultValue={heroDetailsForm.watch("passivea")} disabled />
+                <input defaultValue={heroDetailsForm.getValues("passivea")} disabled />
               </div>
               <div className={styles.MovesetSlot}>
                 <Label.Root>
                   B
                 </Label.Root>
-                <input defaultValue={heroDetailsForm.watch("passiveb")} disabled />
+                <input defaultValue={heroDetailsForm.getValues("passiveb")} disabled />
               </div>
               <div className={styles.MovesetSlot}>
                 <Label.Root>
                   C
                 </Label.Root>
-                <input defaultValue={heroDetailsForm.watch("passivec")} disabled />
+                <input defaultValue={heroDetailsForm.getValues("passivec")} disabled />
               </div>
             </div>
           </section>
+          <div>
+            <div className={styles.StatModsGrid}>
+              <div className={styles.HP}>HP</div><input type="radio" id={styles["hp-minus"]} name="hp" value="minus" style={{ display: "none" }} /><label htmlFor={styles["hp-minus"]}>Minus</label><input type="radio" id={styles["hp-neutral"]} name="hp" value="minus" style={{ display: "none" }} /><label htmlFor={styles["hp-neutral"]}>Neutral</label><input type="radio" id={styles["hp-plus"]} name="hp" value="plus" style={{ display: "none" }} /><label htmlFor={styles["hp-plus"]}>Plus</label>
+              <div>Atk</div><label>Minus</label><label>Neutral</label><label>Plus</label>
+              <div>Spd</div><label>Minus</label><label>Neutral</label><label>Plus</label>
+              <div>Def</div><label>Minus</label><label>Neutral</label><label>Plus</label>
+              <div>Res</div><label>Minus</label><label>Neutral</label><label>Plus</label>
+            </div>
+            <div>
+              <h2>Merges</h2>
+              <Slider onChange={console.log} min={0} max={10} step={1} defaultValue={[0]} />
+            </div>
+          </div>
           <div>
             <h2>Skills</h2>
             <Grid columns="2" gap="6">
@@ -292,5 +321,14 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
     </TabsContent>
   );
 };
+
+function colorToBackgroundColor(color: string) {
+  switch (color) {
+    case "Red": return `rgba(255, 0, 0, 0.4)`;
+    case "Green": return `rgba(0, 255, 0, 0.4)`;
+    case "Blue": return `rgba(0, 0, 255, 0.4)`;
+    case "Colorless": return `rgba(200, 200, 200, 0.4)`
+  }
+}
 
 export default FormTab;
