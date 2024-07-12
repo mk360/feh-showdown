@@ -1,14 +1,14 @@
+import getLv40Stat from "@/utils/get-lv40-stats";
 import { NextApiRequest, NextApiResponse } from "next";
 import z from "zod";
 
-const THRESHOLD = "2017-11-28";
+const THRESHOLD = "2023-11-28";
 
 const heroQuery = z.object({
     name: z.string().optional(),
     weaponType: z.enum(["Sword", "Lance", "Axe", "Bow", "Dagger", "Tome", "Breath", "Beast", "Staff"]).optional(),
     color: z.enum(["Red", "Blue", "Green", "Colorless"]).optional(),
     movement: z.enum(["Infantry", "Armored", "Flying", "Cavalry"]).optional(),
-    sort: z.string().optional()
 });
 
 async function heroes(req: NextApiRequest, res: NextApiResponse) {
@@ -70,9 +70,5 @@ async function heroes(req: NextApiRequest, res: NextApiResponse) {
     });
     res.send(heroesWithStats);
 };
-
-function getLv40Stat(lv1Stat: number, growthRate: number) {
-    return Number(lv1Stat) + Math.floor(Number(growthRate) * 1.14 * 39 / 100);
-}
 
 export default heroes;

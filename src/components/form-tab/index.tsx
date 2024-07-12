@@ -1,14 +1,11 @@
-import { Button, TabsContent, VisuallyHidden } from "@radix-ui/themes";
-import { ReactNode, Ref, forwardRef, useEffect, useState } from "react";
-import * as ScrollArea from "@radix-ui/react-scroll-area";
+import { Button, Select, SelectContent, Skeleton, TabsContent } from "@radix-ui/themes";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as Label from "@radix-ui/react-label";
-import * as Select from '@radix-ui/react-select';
-import * as Accordion from '@radix-ui/react-accordion';
 import { Grid, Slider } from "@radix-ui/themes";
-import * as ToggleGroup from '@radix-ui/react-toggle-group';
 import styles from "./form-tab.module.scss";
 import SkillScroller from "../SkillScroller";
+import getLv40Stat from "@/utils/get-lv40-stats";
 
 function FormTab({ id, currentId, callback }: { id: string, currentId: string, callback: (details: Partial<HeroDetails>) => void }) {
   const [currentPanel, setCurrentPanel] = useState<"hero-list" | "hero-details">("hero-list");
@@ -19,6 +16,8 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
     WeaponColor: "",
     WeaponType: ""
   });
+  const [boon, setBoon] = useState<Stats | "">("");
+  const [bane, setBane] = useState<Stats | "">("");
   const heroQueryForm = useForm<{
     name: string;
     color: string;
@@ -33,19 +32,19 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
     }
   });
 
-  const [skillsList, setSkillsList] = useState<SkillList>({
+  const [skillsList, setSkillsList] = useState<SkillList & Partial<RawHeroStats>>({
     weapon: [],
     assist: [],
     special: [],
     passivea: [],
     passiveb: [],
-    passivec: []
-  })
+    passivec: [],
+  });
   const heroDetailsForm = useForm<HeroDetails>();
 
   useEffect(() => {
     if (currentHero.Name) {
-      fetch(`/api/skills?name=${encodeURIComponent(currentHero.Name)}&movementType=${currentHero.MoveType}&weaponType=${currentHero.WeaponType}&weaponColor=${currentHero.WeaponColor}`).then((response) => response.json()).then((data: SkillList) => {
+      fetch(`/api/skills?name=${encodeURIComponent(currentHero.Name)}&movementType=${currentHero.MoveType}&weaponType=${currentHero.WeaponType}&weaponColor=${currentHero.WeaponColor}`).then((response) => response.json()).then((data: SkillList & RawHeroStats) => {
         setSkillsList(data);
       });
     }
@@ -259,17 +258,65 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
             </div>
           </section>
           <div>
-            <div className={styles.StatModsGrid}>
-              <div className={styles.HP}>HP</div><input type="radio" id={styles["hp-minus"]} name="hp" value="minus" style={{ display: "none" }} /><label htmlFor={styles["hp-minus"]}>Minus</label><input type="radio" id={styles["hp-neutral"]} name="hp" value="minus" style={{ display: "none" }} /><label htmlFor={styles["hp-neutral"]}>Neutral</label><input type="radio" id={styles["hp-plus"]} name="hp" value="plus" style={{ display: "none" }} /><label htmlFor={styles["hp-plus"]}>Plus</label>
-              <div>Atk</div><label>Minus</label><label>Neutral</label><label>Plus</label>
-              <div>Spd</div><label>Minus</label><label>Neutral</label><label>Plus</label>
-              <div>Def</div><label>Minus</label><label>Neutral</label><label>Plus</label>
-              <div>Res</div><label>Minus</label><label>Neutral</label><label>Plus</label>
-            </div>
-            <div>
               <h2>Merges</h2>
-              <Slider onChange={console.log} min={0} max={10} step={1} defaultValue={[0]} />
-            </div>
+              <Select.Root>
+                <Select.Trigger></Select.Trigger>
+                <SelectContent>
+                  <Select.Item value="0">0</Select.Item>
+                  <Select.Item value="1">1</Select.Item>
+                  <Select.Item value="2">2</Select.Item>
+                  <Select.Item value="3">3</Select.Item>
+                  <Select.Item value="4">4</Select.Item>
+                  <Select.Item value="5">5</Select.Item>
+                  <Select.Item value="6">6</Select.Item>
+                  <Select.Item value="7">7</Select.Item>
+                  <Select.Item value="8">8</Select.Item>
+                  <Select.Item value="9">9</Select.Item>
+                  <Select.Item value="10">10</Select.Item>
+                </SelectContent>
+              </Select.Root>
+          </div>
+          <div>
+            <h2>Nature</h2>
+            <h3>Boon</h3>
+            <Select.Root onValueChange={(boon: Stats | "") => setBoon(boon)} value={boon}>
+              <Select.Trigger></Select.Trigger>
+              <SelectContent>
+                <Select.Item value="neutral">Neutral</Select.Item>
+                <Select.Item value="HP">HP</Select.Item>
+                <Select.Item value="Atk">Atk</Select.Item>
+                <Select.Item value="Spd">Spd</Select.Item>
+                <Select.Item value="Def">Def</Select.Item>
+                <Select.Item value="Res">Res</Select.Item>
+              </SelectContent>
+            </Select.Root>
+            <h3>Bane</h3>
+            <Select.Root onValueChange={(bane: Stats | "") => setBane(bane)} value={bane}>
+              <Select.Trigger></Select.Trigger>
+              <SelectContent>
+                <Select.Item value="neutral">Neutral</Select.Item>
+                <Select.Item value="HP">HP</Select.Item>
+                <Select.Item value="Atk">Atk</Select.Item>
+                <Select.Item value="Spd">Spd</Select.Item>
+                <Select.Item value="Def">Def</Select.Item>
+                <Select.Item value="Res">Res</Select.Item>
+              </SelectContent>
+            </Select.Root>
+          </div>
+          <div>
+              <Skeleton loading={!skillsList.AtkGR3}>
+                <div className={styles.StatModsGrid}>
+                  <div className={styles.HP}>HP</div><input type="radio" id={styles["hp-minus"]} name="hp" value="minus" style={{ display: "none" }} /><label htmlFor={styles["hp-minus"]}>Minus</label><input type="radio" id={styles["hp-neutral"]} name="hp" style={{ display: "none" }} /><label htmlFor={styles["hp-neutral"]}>Neutral</label><input type="radio" id={styles["hp-plus"]} name="hp" value="plus" style={{ display: "none" }} /><label htmlFor={styles["hp-plus"]}>Plus</label><div>{getLv40Stat(+skillsList.Lv1HP5!, getProperGrowthRate("HP", boon, bane, +skillsList.HPGR3!), boon === "HP", bane === "HP")}</div>
+
+                  <div className={styles.Atk}>Atk</div><input type="radio" id={styles["atk-minus"]} name="atk" value="minus" style={{ display: "none" }} /><label htmlFor={styles["atk-minus"]}>Minus</label><input type="radio" id={styles["atk-neutral"]} name="atk" style={{ display: "none" }} /><label htmlFor={styles["atk-neutral"]}>Neutral</label><input type="radio" id={styles["atk-plus"]} name="atk" value="plus" style={{ display: "none" }} /><label htmlFor={styles["atk-plus"]}>Plus</label><div>{getLv40Stat(+skillsList.Lv1Atk5!, getProperGrowthRate("Atk", boon, bane, +skillsList.AtkGR3!), boon === "Atk", bane === "Atk")}</div>
+
+                  <div className={styles.Spd}>Spd</div><input type="radio" id={styles["spd-minus"]} name="spd" value="minus" style={{ display: "none" }} /><label htmlFor={styles["spd-minus"]}>Minus</label><input type="radio" id={styles["spd-neutral"]} name="spd" style={{ display: "none" }} /><label htmlFor={styles["spd-neutral"]}>Neutral</label><input type="radio" id={styles["spd-plus"]} name="spd" value="plus" style={{ display: "none" }} /><label htmlFor={styles["spd-plus"]}>Plus</label><div>{getLv40Stat(+skillsList.Lv1Spd5!, getProperGrowthRate("Spd", boon, bane, +skillsList.SpdGR3!), boon === "Spd", bane === "Spd")}</div>
+
+                  <div className={styles.Def}>Def</div><input type="radio" id={styles["def-minus"]} name="def" value="minus" style={{ display: "none" }} /><label htmlFor={styles["def-minus"]}>Minus</label><input type="radio" id={styles["def-neutral"]} name="def" style={{ display: "none" }} /><label htmlFor={styles["def-neutral"]}>Neutral</label><input type="radio" id={styles["def-plus"]} name="def" value="plus" style={{ display: "none" }} /><label htmlFor={styles["def-plus"]}>Plus</label><div>{getLv40Stat(+skillsList.Lv1Def5!, getProperGrowthRate("Def", boon, bane, +skillsList.DefGR3!), boon === "Def", bane === "Def")}</div>
+
+                  <div className={styles.Res}>Res</div><input type="radio" id={styles["res-minus"]} name="res" value="minus" style={{ display: "none" }} /><label htmlFor={styles["res-minus"]}>Minus</label><input type="radio" id={styles["res-neutral"]} name="res" style={{ display: "none" }} /><label htmlFor={styles["res-neutral"]}>Neutral</label><input type="radio" id={styles["res-plus"]} name="res" value="plus" style={{ display: "none" }} /><label htmlFor={styles["res-plus"]}>Plus</label><div>{getLv40Stat(+skillsList.Lv1Res5!, getProperGrowthRate("Res", boon, bane, +skillsList.ResGR3!), boon === "Res", bane === "Res")}</div>
+                </div>
+              </Skeleton>
           </div>
           <div>
             <h2>Skills</h2>
@@ -329,6 +376,12 @@ function colorToBackgroundColor(color: string) {
     case "Blue": return `rgba(0, 0, 255, 0.4)`;
     case "Colorless": return `rgba(200, 200, 200, 0.4)`
   }
+}
+
+function getProperGrowthRate(stat: Stats, boon: Stats | "", bane: Stats | "", baseGrowthRate: number) {
+  if (stat === boon) return baseGrowthRate + 5;
+  if (stat === bane) return baseGrowthRate - 5;
+  return baseGrowthRate;
 }
 
 export default FormTab;

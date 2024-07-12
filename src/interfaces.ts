@@ -35,6 +35,6 @@ type SkillList = {
 
 type HeroProperty = "Name" | "weapon" | "assist" | "special" | "passivea" | "passiveb" | "passivec";
 
-type HeroDetails = {
+type HeroDetails = { boon?: Stats; bane?: Stats } & {
     [k in HeroProperty | "id"]: string;
 }
