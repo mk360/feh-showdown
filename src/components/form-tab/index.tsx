@@ -67,16 +67,18 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
   return (
     <TabsContent forceMount hidden={currentId !== id} value={id}>
       <div style={{ display: currentPanel !== "hero-list" ? "none" : "block" }}>
-        <form onSubmit={heroQueryForm.handleSubmit((heroesQuery) => {
+        <form className={styles.heroSearch} onSubmit={heroQueryForm.handleSubmit((heroesQuery) => {
           const searchParams = new URLSearchParams();
           for (let property in heroesQuery) {
             const castProperty = property as keyof typeof heroesQuery;
-            if (heroesQuery[castProperty])  {
+            if (heroesQuery[castProperty].length)  {
+
               searchParams.set(property, heroesQuery[castProperty]);
             }
           }
 
           const fullUrl = `/api/heroes` + (searchParams.size ? `?${searchParams.toString()}` : "");
+          console.log({ fullUrl });
 
           fetch(fullUrl).then((res) => {
             res.json().then((v) => {
@@ -88,64 +90,129 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
         })} style={{ width: "100%" }}>
           <fieldset>
             <legend>Filters</legend>
-            <dl>
-              <dt>
-                <Label.Root htmlFor="name-input">Hero Name</Label.Root>
-              </dt>
-              <dd><input id="name-input" autoComplete="off" aria-labelledby='name' {...heroQueryForm.register("name", {
+            <div style={{ padding: 6 }}>
+              <Label.Root htmlFor="name-input" style={{ textAlign: "center" }}>Hero Name</Label.Root>
+              <div><input placeholder="Enter a name" style={{ width: "100%", padding: 2 }} id='name-input' {...heroQueryForm.register("name", {
                 pattern: /^[A-Z\p{Letter} ]+$/ui
-              })} /></dd>
-              <dt><label id="hero-color" htmlFor='color-selector'>
-                Hero Color
-              </label></dt>
-              <dd>
-                <select {...heroQueryForm.register("color")} aria-describedby='color-warning' id="color-selector" aria-labelledby='hero-color'>
-                  <option></option>
-                  <option>Red</option>
-                  <option>Blue</option>
-                  <option>Green</option>
-                  <option>Colorless</option>
-                </select>
-              </dd>
-              <dt><label id="hero-weapon" htmlFor='weapon-selector'>
-                Hero Weapon
-              </label></dt>
-              <dd><select {...heroQueryForm.register("weaponType")} aria-describedby='hero-weapon' id="weapon-selector">
-                <option></option>
-                <optgroup label="Close Range">
-                  <option>Sword</option>
-                  <option>Lance</option>
-                  <option>Axe</option>
-                  <option>Beast</option>
-                  <option>Breath</option>
-                </optgroup>
-                <optgroup label="Long Range">
-                  <option>Bow</option>
-                  <option>Tome</option>
-                  <option>Dagger</option>
-                  <option>Staff</option>
-                </optgroup>
-              </select></dd>
-              <dt><label id="hero-movement" htmlFor='movement-selector'>Movement</label></dt>
-              <dd>
-                <select {...heroQueryForm.register("movement")} id="movement-selector" aria-labelledby='hero-movement'>
-                  <option></option>
-                  <option>Infantry</option>
-                  <option>Armored</option>
-                  <option>Flying</option>
-                  <option>Cavalry</option>
-                </select>
-              </dd>
-            </dl>
-            <p id="color-warning">Color selection can be overriden by weapon choice, if only one color of that weapon exists (ex. Swords are always Red).</p>
+              })} /></div>
+            </div>
+            <table className={styles.formTable}>
+              <caption>Color</caption>
+              <tr><td><input className={styles.filterInput} type="checkbox" {...heroQueryForm.register("color")} value="Red" id="red" /><label htmlFor="red">Red</label></td>
+              <td><input className={styles.filterInput} type="checkbox" {...heroQueryForm.register("color")} value="Blue" id="blue" /><label htmlFor="blue">Blue</label></td></tr>
+              <tr><td><input className={styles.filterInput} type="checkbox" {...heroQueryForm.register("color")} value="Green" id="green" /><label htmlFor="green">Green</label></td><td><input className={styles.filterInput} type="checkbox" {...heroQueryForm.register("color")} value="Colorless" id="colorless" /><label htmlFor="colorless">Colorless</label></td></tr>
+            </table>
+            <table className={styles.formTable}>
+              <caption>Weapon</caption>
+              <tr>
+                <td>
+                  <input type="checkbox" id="red-sword" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Red Sword" />
+                  <label htmlFor="red-sword">Red Sword</label>
+                </td>
+                <td>
+                  <input type="checkbox" id="blue-lance" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Blue Lance" />
+                  <label htmlFor="blue-lance">Blue Lance</label>
+                </td>
+                <td>
+                  <input type="checkbox" id="green-axe" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Green Axe" />
+                  <label htmlFor="green-axe">Green Axe</label>
+                </td>
+                <td>
+                  <input type="checkbox" id="colorless-staff" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Colorless Staff" />
+                  <label htmlFor="colorless-staff">Colorless Staff</label>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <input type="checkbox" id="red-bow" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Red Bow" />
+                  <label htmlFor="red-bow">Red Bow</label>
+                </td>
+                <td>
+                  <input type="checkbox" id="blue-bow" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Blue Bow" />
+                  <label htmlFor="blue-bow">Blue Bow</label>
+                </td>
+                <td>
+                  <input type="checkbox" id="green-bow" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Green Bow" />
+                  <label htmlFor="green-bow">Green Bow</label>
+                </td>
+                <td>
+                  <input type="checkbox" id="colorless-bow" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Colorless Bow" />
+                  <label htmlFor="colorless-bow">Colorless Bow</label>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <input type="checkbox" id="red-tome" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Red Tome" />
+                  <label htmlFor="red-tome">Red Tome</label>
+                </td>
+                <td>
+                  <input type="checkbox" id="blue-tome" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Blue Tome" />
+                  <label htmlFor="blue-tome">Blue Tome</label>
+                </td>
+                <td>
+                  <input type="checkbox" id="green-tome" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Green Tome" />
+                  <label htmlFor="green-tome">Green Tome</label>
+                </td>
+                <td>
+                  <input type="checkbox" id="colorless-tome" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Colorless Tome" />
+                  <label htmlFor="colorless-tome">Colorless Tome</label>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <input type="checkbox" id="red-breath" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Red Breath" />
+                  <label htmlFor="red-breath">Red Breath</label>
+                </td>
+                <td>
+                  <input type="checkbox" id="blue-breath" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Blue Breath" />
+                  <label htmlFor="blue-breath">Blue Breath</label>
+                </td>
+                <td>
+                  <input type="checkbox" id="green-breath" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Green Breath" />
+                  <label htmlFor="green-breath">Green Breath</label>
+                </td>
+                <td>
+                  <input type="checkbox" id="colorless-breath" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Colorless Breath" />
+                  <label htmlFor="colorless-breath">Colorless Breath</label>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <input type="checkbox" id="red-beast" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Red Beast" />
+                  <label htmlFor="red-beast">Red Beast</label>
+                </td>
+                <td>
+                  <input type="checkbox" id="blue-beast" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Blue Beast" />
+                  <label htmlFor="blue-beast">Blue Beast</label>
+                </td>
+                <td>
+                  <input type="checkbox" id="green-beast" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Green Beast" />
+                  <label htmlFor="green-beast">Green Beast</label>
+                </td>
+                <td>
+                  <input type="checkbox" id="colorless-beast" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Colorless Beast" />
+                  <label htmlFor="colorless-beast">Colorless Beast</label>
+                </td>
+              </tr>
+            </table>
+            <table className={styles.formTable}>
+              <caption>Movement</caption>
+              <tr>
+                <td><input className={styles.filterInput} type="checkbox" {...heroQueryForm.register("movement")} value="Infantry" id="infantry" /><label htmlFor="infantry">Infantry</label></td>
+                <td><input className={styles.filterInput} type="checkbox" {...heroQueryForm.register("movement")} value="Armored" id="armored" /><label htmlFor="armored">Armored</label></td>
+                <td><input className={styles.filterInput} type="checkbox" {...heroQueryForm.register("movement")} value="Cavalry" id="cavalry" /><label htmlFor="cavalry">Cavalry</label></td>
+                <td><input className={styles.filterInput} type="checkbox" {...heroQueryForm.register("movement")} value="Flying" id="flying" /><label htmlFor="flying">Flying</label></td>
+              </tr>
+            </table>
+
             <Button type="submit">Find Heroes</Button>
           </fieldset>
         </form>
         {heroQueryForm.formState.isSubmitSuccessful && !heroQueryForm.formState.isLoading && (<><div aria-relevant="all" aria-live="polite">
           Found {heroesList.length} results.
         </div>
-          <table style={{ width: "100%" }}>
-            <thead>
+        <table style={{ width: "100%" }}>
+          <thead>
               <tr>
                 <th><button>Hero</button></th>
                 <th><button>Movement</button></th>
@@ -158,8 +225,8 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
                 <th><button>Res</button></th>
                 <th><button>BST</button></th>
               </tr>
-            </thead>
-            <tbody onClick={(e) => {
+          </thead>
+          <tbody onClick={(e) => {
               // console.log(e.target, e.currentTarget);
             }}>
               {heroesList.map((sv) => (
@@ -187,8 +254,9 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
                   <td style={{ textAlign: "center", padding: 6 }}>{sv.bst}</td>
                 </tr>
               ))}
-            </tbody>
-          </table></>
+          </tbody>
+          </table>
+          </>
         )}
       </div>
       <div style={{ display: currentPanel !== "hero-details" ? "none" : "block", padding: 10 }}>
@@ -215,7 +283,7 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
               <div>
                 <img src={`/api/portrait?name=${encodeURIComponent(currentHero.Name)}`} loading="lazy" alt="" height={120} width={120} style={{ margin: "auto" }} />
               </div>
-              <p aria-label="Hero name">{currentHero.Name}</p>
+              <p>{currentHero.Name}</p>
               <p>{currentHero.WeaponColor} {currentHero.WeaponType} {currentHero.MoveType}</p>
             </div>
             <div>
@@ -305,17 +373,26 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
           </div>
           <div>
               <Skeleton loading={!skillsList.AtkGR3}>
-                <div className={styles.StatModsGrid}>
-                  <div className={styles.HP}>HP</div><input type="radio" id={styles["hp-minus"]} name="hp" value="minus" style={{ display: "none" }} /><label htmlFor={styles["hp-minus"]}>Minus</label><input type="radio" id={styles["hp-neutral"]} name="hp" style={{ display: "none" }} /><label htmlFor={styles["hp-neutral"]}>Neutral</label><input type="radio" id={styles["hp-plus"]} name="hp" value="plus" style={{ display: "none" }} /><label htmlFor={styles["hp-plus"]}>Plus</label><div>{getLv40Stat(+skillsList.Lv1HP5!, getProperGrowthRate("HP", boon, bane, +skillsList.HPGR3!), boon === "HP", bane === "HP")}</div>
-
-                  <div className={styles.Atk}>Atk</div><input type="radio" id={styles["atk-minus"]} name="atk" value="minus" style={{ display: "none" }} /><label htmlFor={styles["atk-minus"]}>Minus</label><input type="radio" id={styles["atk-neutral"]} name="atk" style={{ display: "none" }} /><label htmlFor={styles["atk-neutral"]}>Neutral</label><input type="radio" id={styles["atk-plus"]} name="atk" value="plus" style={{ display: "none" }} /><label htmlFor={styles["atk-plus"]}>Plus</label><div>{getLv40Stat(+skillsList.Lv1Atk5!, getProperGrowthRate("Atk", boon, bane, +skillsList.AtkGR3!), boon === "Atk", bane === "Atk")}</div>
-
-                  <div className={styles.Spd}>Spd</div><input type="radio" id={styles["spd-minus"]} name="spd" value="minus" style={{ display: "none" }} /><label htmlFor={styles["spd-minus"]}>Minus</label><input type="radio" id={styles["spd-neutral"]} name="spd" style={{ display: "none" }} /><label htmlFor={styles["spd-neutral"]}>Neutral</label><input type="radio" id={styles["spd-plus"]} name="spd" value="plus" style={{ display: "none" }} /><label htmlFor={styles["spd-plus"]}>Plus</label><div>{getLv40Stat(+skillsList.Lv1Spd5!, getProperGrowthRate("Spd", boon, bane, +skillsList.SpdGR3!), boon === "Spd", bane === "Spd")}</div>
-
-                  <div className={styles.Def}>Def</div><input type="radio" id={styles["def-minus"]} name="def" value="minus" style={{ display: "none" }} /><label htmlFor={styles["def-minus"]}>Minus</label><input type="radio" id={styles["def-neutral"]} name="def" style={{ display: "none" }} /><label htmlFor={styles["def-neutral"]}>Neutral</label><input type="radio" id={styles["def-plus"]} name="def" value="plus" style={{ display: "none" }} /><label htmlFor={styles["def-plus"]}>Plus</label><div>{getLv40Stat(+skillsList.Lv1Def5!, getProperGrowthRate("Def", boon, bane, +skillsList.DefGR3!), boon === "Def", bane === "Def")}</div>
-
-                  <div className={styles.Res}>Res</div><input type="radio" id={styles["res-minus"]} name="res" value="minus" style={{ display: "none" }} /><label htmlFor={styles["res-minus"]}>Minus</label><input type="radio" id={styles["res-neutral"]} name="res" style={{ display: "none" }} /><label htmlFor={styles["res-neutral"]}>Neutral</label><input type="radio" id={styles["res-plus"]} name="res" value="plus" style={{ display: "none" }} /><label htmlFor={styles["res-plus"]}>Plus</label><div>{getLv40Stat(+skillsList.Lv1Res5!, getProperGrowthRate("Res", boon, bane, +skillsList.ResGR3!), boon === "Res", bane === "Res")}</div>
-                </div>
+                <table className={styles.formTable}>
+                  <thead>
+                    <tr>
+                      <th>HP</th>
+                      <th>Atk</th>
+                      <th>Spd</th>
+                      <th>Def</th>
+                      <th>Res</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{getLv40Stat(+skillsList.Lv1HP5!, getProperGrowthRate("HP", boon, bane, +skillsList.HPGR3!), boon === "HP", bane === "HP")}</td>
+                      <td>{getLv40Stat(+skillsList.Lv1Atk5!, getProperGrowthRate("Atk", boon, bane, +skillsList.AtkGR3!), boon === "Atk", bane === "Atk")}</td>
+                      <td>{getLv40Stat(+skillsList.Lv1Spd5!, getProperGrowthRate("Spd", boon, bane, +skillsList.SpdGR3!), boon === "Spd", bane === "Spd")}</td>
+                      <td>{getLv40Stat(+skillsList.Lv1Def5!, getProperGrowthRate("Def", boon, bane, +skillsList.DefGR3!), boon === "Def", bane === "Def")}</td>
+                      <td>{getLv40Stat(+skillsList.Lv1Res5!, getProperGrowthRate("Res", boon, bane, +skillsList.ResGR3!), boon === "Res", bane === "Res")}</td>
+                    </tr>
+                  </tbody>
+                </table>
               </Skeleton>
           </div>
           <div>

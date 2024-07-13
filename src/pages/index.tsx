@@ -2,7 +2,7 @@ import Head from 'next/head'
 import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css';
 import styles2 from './index.module.scss';
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Button, Grid, Tabs, Theme } from '@radix-ui/themes';
 import FormTab from '@/components/form-tab';
 import shortid from "shortid";

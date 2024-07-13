@@ -7,85 +7,22 @@
 .StatModsGrid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(6, 1fr);
+    grid-template-rows: repeat(2, 1fr);
     margin: 0 auto;
     width: 70%;
 }
 
-.HP:has(~ #hp-minus:checked) {
-    color: red;
-    text-shadow: 0 0 1px black;
+.filterInput {
+    display: none;
+    &:checked + label {
+        color: red;
+        font-size: 20px;
+    }
 }
 
-.HP:has(~ #hp-plus:checked) {
-    color: blue;
-    text-shadow: 0 0 1px black;
+.formTable {
+    width: 100%;
+    td {
+        text-align: center;
+    }
 }
-
-.HP:has(~ #hp-neutral:checked) {
-    color: unset;
-}
-
-.Atk:has(~ #atk-minus:checked) {
-    color: red;
-    text-shadow: 0 0 1px black;
-}
-
-.Atk:has(~ #atk-plus:checked) {
-    color: blue;
-    text-shadow: 0 0 1px black;
-}
-
-.Atk:has(~ #atk-neutral:checked) {
-    color: unset;
-}
-
-.Spd:has(~ #spd-minus:checked) {
-    color: red;
-    text-shadow: 0 0 1px black;
-}
-
-.Spd:has(~ #spd-plus:checked) {
-    color: blue;
-    text-shadow: 0 0 1px black;
-}
-
-.Spd:has(~ #spd-neutral:checked) {
-    color: unset;
-}
-
-.Def:has(~ #def-minus:checked) {
-    color: red;
-    text-shadow: 0 0 1px black;
-}
-
-.Def:has(~ #def-plus:checked) {
-    color: blue;
-    text-shadow: 0 0 1px black;
-}
-
-.Def:has(~ #def-neutral:checked) {
-    color: unset;
-}
-
-.Res:has(~ #res-minus:checked) {
-    color: red;
-    text-shadow: 0 0 1px black;
-}
-
-.Res:has(~ #res-plus:checked) {
-    color: blue;
-    text-shadow: 0 0 1px black;
-}
-
-.Res:has(~ #res-neutral:checked) {
-    color: unset;
-}
-
-// #hp-minus:checked + label {
-//     background-color: red;
-// }
-
-// #hp-plus:checked + label {
-//     background-color: green;
-// }
