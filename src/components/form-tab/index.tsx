@@ -78,7 +78,6 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
           }
 
           const fullUrl = `/api/heroes` + (searchParams.size ? `?${searchParams.toString()}` : "");
-          console.log({ fullUrl });
 
           fetch(fullUrl).then((res) => {
             res.json().then((v) => {
@@ -91,117 +90,117 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
           <fieldset>
             <legend>Filters</legend>
             <div style={{ padding: 6 }}>
-              <Label.Root htmlFor="name-input" style={{ textAlign: "center" }}>Hero Name</Label.Root>
+              <Label.Root htmlFor={`name-input-${id}`} style={{ textAlign: "center" }}>Hero Name</Label.Root>
               <div><input placeholder="Enter a name" style={{ width: "100%", padding: 2 }} id='name-input' {...heroQueryForm.register("name", {
                 pattern: /^[A-Z\p{Letter} ]+$/ui
               })} /></div>
             </div>
             <table className={styles.formTable}>
               <caption>Color</caption>
-              <tr><td><input className={styles.filterInput} type="checkbox" {...heroQueryForm.register("color")} value="Red" id="red" /><label htmlFor="red">Red</label></td>
-              <td><input className={styles.filterInput} type="checkbox" {...heroQueryForm.register("color")} value="Blue" id="blue" /><label htmlFor="blue">Blue</label></td></tr>
-              <tr><td><input className={styles.filterInput} type="checkbox" {...heroQueryForm.register("color")} value="Green" id="green" /><label htmlFor="green">Green</label></td><td><input className={styles.filterInput} type="checkbox" {...heroQueryForm.register("color")} value="Colorless" id="colorless" /><label htmlFor="colorless">Colorless</label></td></tr>
+              <tr><td><input className={styles.filterInput} type="checkbox" {...heroQueryForm.register("color")} value="Red" id={`red-${id}`} /><label htmlFor={`red-${id}`}>Red</label></td>
+              <td><input className={styles.filterInput} type="checkbox" {...heroQueryForm.register("color")} value="Blue" id={`blue-${id}`} /><label htmlFor={`blue-${id}`}>Blue</label></td></tr>
+              <tr><td><input className={styles.filterInput} type="checkbox" {...heroQueryForm.register("color")} value="Green" id={`green-${id}`} /><label htmlFor={`green-${id}`}>Green</label></td><td><input className={styles.filterInput} type="checkbox" {...heroQueryForm.register("color")} value="Colorless" id={`colorless-${id}`} /><label htmlFor={`colorless-${id}`}>Colorless</label></td></tr>
             </table>
             <table className={styles.formTable}>
               <caption>Weapon</caption>
               <tr>
                 <td>
-                  <input type="checkbox" id="red-sword" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Red Sword" />
-                  <label htmlFor="red-sword">Red Sword</label>
+                  <input type="checkbox" id={`red-sword-${id}`} className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Red Sword" />
+                  <label htmlFor={`red-sword-${id}`}>Red Sword</label>
                 </td>
                 <td>
-                  <input type="checkbox" id="blue-lance" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Blue Lance" />
-                  <label htmlFor="blue-lance">Blue Lance</label>
+                  <input type="checkbox" id={`blue-lance-${id}`} className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Blue Lance" />
+                  <label htmlFor={`blue-lance-${id}`}>Blue Lance</label>
                 </td>
                 <td>
-                  <input type="checkbox" id="green-axe" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Green Axe" />
-                  <label htmlFor="green-axe">Green Axe</label>
+                  <input type="checkbox" id={`green-axe-${id}`} className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Green Axe" />
+                  <label htmlFor={`green-axe-${id}`}>Green Axe</label>
                 </td>
                 <td>
-                  <input type="checkbox" id="colorless-staff" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Colorless Staff" />
-                  <label htmlFor="colorless-staff">Colorless Staff</label>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <input type="checkbox" id="red-bow" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Red Bow" />
-                  <label htmlFor="red-bow">Red Bow</label>
-                </td>
-                <td>
-                  <input type="checkbox" id="blue-bow" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Blue Bow" />
-                  <label htmlFor="blue-bow">Blue Bow</label>
-                </td>
-                <td>
-                  <input type="checkbox" id="green-bow" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Green Bow" />
-                  <label htmlFor="green-bow">Green Bow</label>
-                </td>
-                <td>
-                  <input type="checkbox" id="colorless-bow" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Colorless Bow" />
-                  <label htmlFor="colorless-bow">Colorless Bow</label>
+                  <input type="checkbox" id={`colorless-staff-${id}`} className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Colorless Staff" />
+                  <label htmlFor={`colorless-staff-${id}`}>Colorless Staff</label>
                 </td>
               </tr>
               <tr>
                 <td>
-                  <input type="checkbox" id="red-tome" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Red Tome" />
-                  <label htmlFor="red-tome">Red Tome</label>
+                  <input type="checkbox" id={`red-bow-${id}`} className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Red Bow" />
+                  <label htmlFor={`red-bow-${id}`}>Red Bow</label>
                 </td>
                 <td>
-                  <input type="checkbox" id="blue-tome" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Blue Tome" />
-                  <label htmlFor="blue-tome">Blue Tome</label>
+                  <input type="checkbox" id={`blue-bow-${id}`} className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Blue Bow" />
+                  <label htmlFor={`blue-bow-${id}`}>Blue Bow</label>
                 </td>
                 <td>
-                  <input type="checkbox" id="green-tome" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Green Tome" />
-                  <label htmlFor="green-tome">Green Tome</label>
+                  <input type="checkbox" id={`green-bow-${id}`} className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Green Bow" />
+                  <label htmlFor={`green-bow-${id}`}>Green Bow</label>
                 </td>
                 <td>
-                  <input type="checkbox" id="colorless-tome" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Colorless Tome" />
-                  <label htmlFor="colorless-tome">Colorless Tome</label>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <input type="checkbox" id="red-breath" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Red Breath" />
-                  <label htmlFor="red-breath">Red Breath</label>
-                </td>
-                <td>
-                  <input type="checkbox" id="blue-breath" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Blue Breath" />
-                  <label htmlFor="blue-breath">Blue Breath</label>
-                </td>
-                <td>
-                  <input type="checkbox" id="green-breath" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Green Breath" />
-                  <label htmlFor="green-breath">Green Breath</label>
-                </td>
-                <td>
-                  <input type="checkbox" id="colorless-breath" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Colorless Breath" />
-                  <label htmlFor="colorless-breath">Colorless Breath</label>
+                  <input type="checkbox" id={`colorless-bow-${id}`} className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Colorless Bow" />
+                  <label htmlFor={`colorless-bow-${id}`}>Colorless Bow</label>
                 </td>
               </tr>
               <tr>
                 <td>
-                  <input type="checkbox" id="red-beast" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Red Beast" />
-                  <label htmlFor="red-beast">Red Beast</label>
+                  <input type="checkbox" id={`red-tome-${id}`} className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Red Tome" />
+                  <label htmlFor={`red-tome-${id}`}>Red Tome</label>
                 </td>
                 <td>
-                  <input type="checkbox" id="blue-beast" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Blue Beast" />
-                  <label htmlFor="blue-beast">Blue Beast</label>
+                  <input type="checkbox" id={`blue-tome-${id}`} className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Blue Tome" />
+                  <label htmlFor={`blue-tome-${id}`}>Blue Tome</label>
                 </td>
                 <td>
-                  <input type="checkbox" id="green-beast" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Green Beast" />
-                  <label htmlFor="green-beast">Green Beast</label>
+                  <input type="checkbox" id={`green-tome-${id}`} className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Green Tome" />
+                  <label htmlFor={`green-tome-${id}`}>Green Tome</label>
                 </td>
                 <td>
-                  <input type="checkbox" id="colorless-beast" className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Colorless Beast" />
-                  <label htmlFor="colorless-beast">Colorless Beast</label>
+                  <input type="checkbox" id={`colorless-tome-${id}`} className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Colorless Tome" />
+                  <label htmlFor={`colorless-tome-${id}`}>Colorless Tome</label>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <input type="checkbox" id={`red-breath-${id}`} className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Red Breath" />
+                  <label htmlFor={`red-breath-${id}`}>Red Breath</label>
+                </td>
+                <td>
+                  <input type="checkbox" id={`blue-breath-${id}`} className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Blue Breath" />
+                  <label htmlFor={`blue-breath-${id}`}>Blue Breath</label>
+                </td>
+                <td>
+                  <input type="checkbox" id={`green-breath-${id}`} className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Green Breath" />
+                  <label htmlFor={`green-breath-${id}`}>Green Breath</label>
+                </td>
+                <td>
+                  <input type="checkbox" id={`colorless-breath-${id}`} className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Colorless Breath" />
+                  <label htmlFor={`colorless-breath-${id}`}>Colorless Breath</label>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <input type="checkbox" id={`red-beast-${id}`} className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Red Beast" />
+                  <label htmlFor={`red-beast-${id}`}>Red Beast</label>
+                </td>
+                <td>
+                  <input type="checkbox" id={`blue-beast-${id}`} className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Blue Beast" />
+                  <label htmlFor={`blue-beast-${id}`}>Blue Beast</label>
+                </td>
+                <td>
+                  <input type="checkbox" id={`green-beast-${id}`} className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Green Beast" />
+                  <label htmlFor={`green-beast-${id}`}>Green Beast</label>
+                </td>
+                <td>
+                  <input type="checkbox" id={`colorless-beast-${id}`} className={styles.filterInput} {...heroQueryForm.register("weaponType")} value="Colorless Beast" />
+                  <label htmlFor={`colorless-beast-${id}`}>Colorless Beast</label>
                 </td>
               </tr>
             </table>
             <table className={styles.formTable}>
               <caption>Movement</caption>
               <tr>
-                <td><input className={styles.filterInput} type="checkbox" {...heroQueryForm.register("movement")} value="Infantry" id="infantry" /><label htmlFor="infantry">Infantry</label></td>
-                <td><input className={styles.filterInput} type="checkbox" {...heroQueryForm.register("movement")} value="Armored" id="armored" /><label htmlFor="armored">Armored</label></td>
-                <td><input className={styles.filterInput} type="checkbox" {...heroQueryForm.register("movement")} value="Cavalry" id="cavalry" /><label htmlFor="cavalry">Cavalry</label></td>
-                <td><input className={styles.filterInput} type="checkbox" {...heroQueryForm.register("movement")} value="Flying" id="flying" /><label htmlFor="flying">Flying</label></td>
+                <td><input className={styles.filterInput} type="checkbox" {...heroQueryForm.register("movement")} value="Infantry" id={`infantry-${id}`} /><label htmlFor={`infantry-${id}`}>Infantry</label></td>
+                <td><input className={styles.filterInput} type="checkbox" {...heroQueryForm.register("movement")} value="Armored" id={`armored-${id}`} /><label htmlFor={`armored-${id}`}>Armored</label></td>
+                <td><input className={styles.filterInput} type="checkbox" {...heroQueryForm.register("movement")} value="Cavalry" id={`cavalry-${id}`} /><label htmlFor={`cavalry-${id}`}>Cavalry</label></td>
+                <td><input className={styles.filterInput} type="checkbox" {...heroQueryForm.register("movement")} value="Flying" id={`flying-${id}`} /><label htmlFor={`flying-${id}`}>Flying</label></td>
               </tr>
             </table>
 
@@ -240,7 +239,7 @@ function FormTab({ id, currentId, callback }: { id: string, currentId: string, c
                       <img style={{ backgroundColor: "rgba(255, 255, 255, 0.2)", borderRadius: 6 }} height={60} width={60} loading="lazy" src={`/api/portrait?name=${encodeURIComponent(sv.Name)}`} />
                     </div>
                     <div style={{ display: "flex", flex: 0.3, justifyContent: "center", alignItems: "center" }}>
-                      <p id="test" style={{ width: "auto", textAlign: "center", wordWrap: "normal" }}>{sv.Name}</p>
+                      <p id={`test-${id}`} style={{ width: "auto", textAlign: "center", wordWrap: "normal" }}>{sv.Name}</p>
                     </div>
                   </td>
                   <td style={{ textAlign: "center", padding: 6 }}>{sv.MoveType}</td>
