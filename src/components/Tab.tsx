@@ -41,25 +41,52 @@ function capitalize(string: string) {
 function getResultsFromFilters(filters: HeroFilters) {
   let collectedResults: string[] = [];
 
-  if (filters.color) {
-    for (let color of filters.color) {
-      const fullRoster = Object.values<string>(WEAPON_TREE[color]).flat();
-      collectedResults = collectedResults.concat(fullRoster);
+  if (filters.searchMode === "union") {
+    if (filters.color) {
+      for (let color of filters.color) {
+        const fullRoster = Object.values<string>(WEAPON_TREE[color]).flat();
+        collectedResults = collectedResults.concat(fullRoster);
+      }
     }
-  }
 
-  if (filters.weapons) {
-    for (let weapon of filters.weapons) {
-      const [color, weaponType] = weapon.split("-");
-      const units = WEAPON_TREE[color][weaponType] ?? [];
-      collectedResults = collectedResults.concat(units);
+    if (filters.weapons) {
+      for (let weapon of filters.weapons) {
+        const [color, weaponType] = weapon.split("-");
+        const units = WEAPON_TREE[color][weaponType] ?? [];
+        collectedResults = collectedResults.concat(units);
+      }
     }
-  }
 
-  if (filters.movement) {
-    for (let movement of filters.movement) {
-      const units = MOVEMENT_TREE[movement] ?? [];
-      collectedResults = collectedResults.concat(units);
+    if (filters.movement) {
+      for (let movement of filters.movement) {
+        const units = MOVEMENT_TREE[movement] ?? [];
+        collectedResults = collectedResults.concat(units);
+      }
+    }
+  } else {
+    if (filters.characterName) {
+      const formattedSearch = formatName(filters.characterName);
+      collectedResults = collectedResults.filter((result) => {
+        return result.startsWith(formattedSearch);
+      });
+    }
+
+    if (filters.color.length) {
+      collectedResults = collectedResults.filter((result) => {
+        return filters.color.includes(STATS[result].color);
+      });
+    }
+
+    if (filters.weapons.length) {
+      collectedResults = collectedResults.filter((result) => {
+        return filters.color.includes(STATS[result].weaponType);
+      });
+    }
+
+    if (filters.movement.length) {
+      collectedResults = collectedResults.filter((result) => {
+        return filters.color.includes(STATS[result].movementType);
+      });
     }
   }
 
@@ -73,9 +100,11 @@ function convertToLevel40(stat1: number, growthRate: number) {
 export default function Tab({
   data,
   onSave,
+  index,
 }: {
   data: StoredHero | null;
   onSave: (newData: StoredHero) => void;
+  index: number;
 }) {
   const { register, handleSubmit } = useForm<HeroFilters>({
     defaultValues: {
@@ -149,11 +178,11 @@ export default function Tab({
                   <input
                     type="checkbox"
                     class="red"
-                    id="red"
+                    id={`${index}-red`}
                     value="red"
                     {...register("color")}
                   />
-                  <label for="red">
+                  <label for={`${index}-red`}>
                     <b>Red</b>
                   </label>
                 </td>
@@ -161,11 +190,11 @@ export default function Tab({
                   <input
                     value="blue"
                     class="blue"
-                    id="blue"
+                    id={`${index}-blue`}
                     type="checkbox"
                     {...register("color")}
                   />
-                  <label for="blue">
+                  <label for={`${index}-blue`}>
                     <b>Blue</b>
                   </label>
                 </td>
@@ -173,11 +202,11 @@ export default function Tab({
                   <input
                     value="green"
                     class="green"
-                    id="green"
+                    id={`${index}-green`}
                     type="checkbox"
                     {...register("color")}
                   />
-                  <label for="green">
+                  <label for={`${index}-green`}>
                     <b>Green</b>
                   </label>
                 </td>
@@ -185,11 +214,11 @@ export default function Tab({
                   <input
                     value="colorless"
                     class="colorless"
-                    id="colorless"
+                    id={`${index}-colorless`}
                     type="checkbox"
                     {...register("color")}
                   />
-                  <label for="colorless">
+                  <label for={`${index}-colorless`}>
                     <b>Colorless</b>
                   </label>
                 </td>
@@ -614,7 +643,7 @@ export default function Tab({
             >
               {results.map((result) => {
                 const formattedName = formatName(result);
-                const stats = STATS[formattedName] ?? "";
+                const stats = STATS[result] ?? "";
 
                 return (
                   <tr id={result} key={result}>
@@ -680,15 +709,15 @@ export default function Tab({
                 <>
                   <img
                     src={`https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_${[
-                      STATS[formatName(temporaryChoice)].color,
-                      STATS[formatName(temporaryChoice)].weaponType,
+                      STATS[temporaryChoice].color,
+                      STATS[temporaryChoice].weaponType,
                     ]
                       .map(capitalize)
                       .join("_")}.png`}
                   />
                   <img
                     src={`https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Move_${capitalize(
-                      STATS[formatName(temporaryChoice ?? "")].movementType
+                      STATS[temporaryChoice ?? ""].movementType
                     )}.png`}
                   />
                 </>
@@ -697,7 +726,9 @@ export default function Tab({
           </div>
         </div>
         <div class="weapon-list">
-          <h2>Weapons</h2>
+          <h2>
+            <img class="game-asset" src="/weapon-icon.png" /> Weapons
+          </h2>
           {moveset &&
             [{ name: "No Weapon", description: "", might: 0 }]
               .concat(moveset.exclusiveSkills.weapons)
@@ -713,14 +744,15 @@ export default function Tab({
                       {...registerMoveset("weapons")}
                     />
                     <label
-                      class={`skill-label ${
-                        STATS[formatName(temporaryChoice)].color
-                      }`}
+                      class={`skill-label ${STATS[temporaryChoice].color}`}
                       for={weaponData.name}
                     >
                       <div>
-                        <h3>{weaponData.name}</h3>
-                        <h4>{weaponData.might}</h4>
+                        <h3>
+                          <img class="game-asset" src="/weapon-icon.png" />
+                          {weaponData.name}
+                        </h3>
+                        {!!weaponData.might && <h4>{weaponData.might}</h4>}
                       </div>
                       <p>{weaponData.description}</p>
                     </label>
@@ -729,7 +761,10 @@ export default function Tab({
               })}
         </div>
         <div class="assist-list">
-          <h2>Assists</h2>
+          <h2>
+            <img class="game-asset" src="/assist-icon.png" />
+            Assists
+          </h2>
           {moveset &&
             [{ name: "No Assist", description: "" }]
               .concat(moveset.exclusiveSkills.assists)
@@ -745,12 +780,13 @@ export default function Tab({
                       {...registerMoveset("assists")}
                     />
                     <label
-                      class={`skill-label ${
-                        STATS[formatName(temporaryChoice)].color
-                      }`}
+                      class={`skill-label ${STATS[temporaryChoice].color}`}
                       for={assistData.name}
                     >
-                      <h3>{assistData.name}</h3>
+                      <h3>
+                        <img class="game-asset" src="/assist-icon.png" />
+                        {assistData.name}
+                      </h3>
                       <p>{assistData.description}</p>
                     </label>
                   </Fragment>
@@ -758,7 +794,10 @@ export default function Tab({
               })}
         </div>
         <div class="specials-list">
-          <h2>Specials</h2>
+          <h2>
+            <img class="game-asset" src="/special-icon.png" />
+            Specials
+          </h2>
           {moveset &&
             [{ name: "No Special", description: "" }]
               .concat(moveset.exclusiveSkills.specials)
@@ -774,12 +813,13 @@ export default function Tab({
                       {...registerMoveset("specials")}
                     />
                     <label
-                      class={`skill-label ${
-                        STATS[formatName(temporaryChoice)].color
-                      }`}
+                      class={`skill-label ${STATS[temporaryChoice].color}`}
                       for={specialsData.name}
                     >
-                      <h3>{specialsData.name}</h3>
+                      <h3>
+                        <img class="game-asset" src="/special-icon.png" />
+                        {specialsData.name}
+                      </h3>
                       <p>{specialsData.description}</p>
                     </label>
                   </Fragment>
@@ -787,7 +827,10 @@ export default function Tab({
               })}
         </div>
         <div class="passive-a-list">
-          <h2>Skill A</h2>
+          <h2>
+            <img class="game-asset" src="/A.png" />
+            Skill
+          </h2>
           {moveset &&
             [{ name: "No A", description: "" }]
               .concat(moveset.exclusiveSkills.A)
@@ -803,12 +846,13 @@ export default function Tab({
                       {...registerMoveset("A")}
                     />
                     <label
-                      class={`skill-label ${
-                        STATS[formatName(temporaryChoice)].color
-                      }`}
+                      class={`skill-label ${STATS[temporaryChoice].color}`}
                       for={passive.name}
                     >
-                      <h3>{passive.name}</h3>
+                      <h3>
+                        <img class="game-asset" src="/A.png" />
+                        {passive.name}
+                      </h3>
                       <p>{passive.description}</p>
                     </label>
                   </Fragment>
@@ -816,7 +860,10 @@ export default function Tab({
               })}
         </div>
         <div class="passive-b-list">
-          <h2>Skill B</h2>
+          <h2>
+            <img class="game-asset" src="/B.png" />
+            Skill
+          </h2>
           {moveset &&
             [{ name: "No B", description: "" }]
               .concat(moveset.exclusiveSkills.B)
@@ -832,9 +879,7 @@ export default function Tab({
                       {...registerMoveset("B")}
                     />
                     <label
-                      class={`skill-label ${
-                        STATS[formatName(temporaryChoice)].color
-                      }`}
+                      class={`skill-label ${STATS[temporaryChoice].color}`}
                       for={passive.name}
                     >
                       <h3>{passive.name}</h3>
@@ -861,9 +906,7 @@ export default function Tab({
                       {...registerMoveset("C")}
                     />
                     <label
-                      class={`skill-label ${
-                        STATS[formatName(temporaryChoice)].color
-                      }`}
+                      class={`skill-label ${STATS[temporaryChoice].color}`}
                       for={passive.name}
                     >
                       <h3>{passive.name}</h3>
@@ -889,9 +932,7 @@ export default function Tab({
                       {...registerMoveset("S")}
                     />
                     <label
-                      class={`skill-label ${
-                        STATS[formatName(temporaryChoice)].color
-                      }`}
+                      class={`skill-label ${STATS[temporaryChoice].color}`}
                       for={passive.name}
                     >
                       <h3>{passive.name}</h3>
@@ -907,78 +948,208 @@ export default function Tab({
             <tbody>
               <tr>
                 <td>HP</td>
+                <td>{convertToLevel40(13, 75)}</td>
                 <td>
                   <input
-                    id="hp-flaw"
+                    class="stat-input"
+                    id="flaw-hp"
                     type="radio"
                     name="hp-change"
                     value="hp"
-                    disabled
                   />
-                  <label class="flaw" for="hp-flaw">
+                  <label class="flaw" for="flaw-hp">
                     Flaw
                   </label>
                 </td>
                 <td>
                   <input
-                    id="hp-neutral"
+                    class="stat-input"
+                    id="neutral-hp"
                     type="radio"
+                    checked
                     name="hp-change"
                     value="hp"
                   />
-                  <label class="neutral" for="hp-neutral">
+                  <label class="neutral" for="neutral-hp">
                     Neutral
                   </label>
                 </td>
                 <td>
                   <input
-                    id="hp-asset"
+                    class="stat-input"
+                    id="asset-hp"
                     type="radio"
                     name="hp-change"
                     value="hp"
                   />
-                  <label class="asset" for="hp-asset">
+                  <label class="asset" for="asset-hp">
                     Asset
                   </label>
                 </td>
-                <td>{convertToLevel40(13, 75)}</td>
               </tr>
               <tr>
                 <td>Atk</td>
+                <td>{convertToLevel40(13, 75)}</td>
                 <td>
                   <input
-                    id="atk-flaw"
+                    class="stat-input"
+                    id="flaw-atk"
                     type="radio"
                     name="atk-change"
                     value="atk"
                   />
-                  <label class="flaw" for="atk-flaw">
+                  <label class="flaw" for="flaw-atk">
                     Flaw
                   </label>
                 </td>
                 <td>
                   <input
-                    id="atk-neutral"
+                    class="stat-input"
+                    id="neutral-atk"
                     type="radio"
+                    checked
                     name="atk-change"
                     value="atk"
                   />
-                  <label class="neutral" for="atk-neutral">
+                  <label class="neutral" for="neutral-atk">
                     Neutral
                   </label>
                 </td>
                 <td>
                   <input
-                    id="atk-asset"
+                    class="stat-input"
+                    id="asset-atk"
                     type="radio"
                     name="atk-change"
                     value="atk"
                   />
-                  <label class="asset" for="atk-asset">
+                  <label class="asset" for="asset-atk">
                     Asset
                   </label>
                 </td>
+              </tr>
+              <tr>
+                <td>Spd</td>
                 <td>{convertToLevel40(13, 75)}</td>
+                <td>
+                  <input
+                    class="stat-input"
+                    id="flaw-spd"
+                    type="radio"
+                    name="spd-change"
+                    value="spd"
+                  />
+                  <label class="flaw" for="flaw-spd">
+                    Flaw
+                  </label>
+                </td>
+                <td>
+                  <input
+                    class="stat-input"
+                    id="neutral-spd"
+                    type="radio"
+                    checked
+                    name="spd-change"
+                    value="spd"
+                  />
+                  <label class="neutral" for="neutral-spd">
+                    Neutral
+                  </label>
+                </td>
+                <td>
+                  <input
+                    class="stat-input"
+                    id="asset-spd"
+                    type="radio"
+                    name="spd-change"
+                    value="spd"
+                  />
+                  <label class="asset" for="asset-spd">
+                    Asset
+                  </label>
+                </td>
+              </tr>
+              <tr>
+                <td>Def</td>
+                <td>{convertToLevel40(13, 75)}</td>
+                <td>
+                  <input
+                    class="stat-input"
+                    id="flaw-def"
+                    type="radio"
+                    name="def-change"
+                    value="def"
+                  />
+                  <label class="flaw" for="flaw-def">
+                    Flaw
+                  </label>
+                </td>
+                <td>
+                  <input
+                    class="stat-input"
+                    id="neutral-def"
+                    type="radio"
+                    checked
+                    name="def-change"
+                    value="def"
+                  />
+                  <label class="neutral" for="neutral-def">
+                    Neutral
+                  </label>
+                </td>
+                <td>
+                  <input
+                    class="stat-input"
+                    id="asset-def"
+                    type="radio"
+                    name="def-change"
+                    value="def"
+                  />
+                  <label class="asset" for="asset-def">
+                    Asset
+                  </label>
+                </td>
+              </tr>
+              <tr>
+                <td>Res</td>
+                <td>{convertToLevel40(13, 75)}</td>
+                <td>
+                  <input
+                    class="stat-input"
+                    id="flaw-res"
+                    type="radio"
+                    name="res-change"
+                    value="res"
+                  />
+                  <label class="flaw" for="flaw-res">
+                    Flaw
+                  </label>
+                </td>
+                <td>
+                  <input
+                    class="stat-input"
+                    id="neutral-res"
+                    type="radio"
+                    name="res-change"
+                    value="res"
+                    checked
+                  />
+                  <label class="neutral" for="neutral-res">
+                    Neutral
+                  </label>
+                </td>
+                <td>
+                  <input
+                    class="stat-input"
+                    id="asset-res"
+                    type="radio"
+                    name="res-change"
+                    value="res"
+                  />
+                  <label class="asset" for="asset-res">
+                    Asset
+                  </label>
+                </td>
               </tr>
             </tbody>
           </table>

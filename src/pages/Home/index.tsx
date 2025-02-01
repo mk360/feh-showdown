@@ -61,6 +61,7 @@ export default function Teambuilder() {
       </nav>
       <section class={currentTab !== 1 ? "hide" : ""} id="tab-content-1">
         <Tab
+          index={1}
           data={team[0]}
           onSave={(savedHero) => {
             updateTeam(savedHero, 0);
@@ -69,6 +70,7 @@ export default function Teambuilder() {
       </section>
       <section class={currentTab !== 2 ? "hide" : ""} id="tab-content-2">
         <Tab
+          index={2}
           data={team[1]}
           onSave={(savedHero) => {
             updateTeam(savedHero, 1);
@@ -77,6 +79,7 @@ export default function Teambuilder() {
       </section>
       <section class={currentTab !== 3 ? "hide" : ""} id="tab-content-3">
         <Tab
+          index={3}
           data={team[2]}
           onSave={(savedHero) => {
             updateTeam(savedHero, 0);
@@ -85,6 +88,7 @@ export default function Teambuilder() {
       </section>
       <section class={currentTab !== 4 ? "hide" : ""} id="tab-content-4">
         <Tab
+          index={4}
           data={team[3]}
           onSave={(savedHero) => {
             updateTeam(savedHero, 1);

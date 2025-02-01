@@ -28,7 +28,7 @@ for (let Name in characters) {
     MOVEMENT_TREE[value.movementType] = MOVEMENT_TREE[value.movementType] || [];
     MOVEMENT_TREE[value.movementType].push(Name);
 
-    STATS_TREE[formattedName] = {
+    STATS_TREE[Name] = {
         lv1: value.stats,
         growthRates: value.growthRates,
         movementType: value.movementType,
