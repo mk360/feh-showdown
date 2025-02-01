@@ -94,6 +94,7 @@ func fetchSkills(letter string, waitGroup *sync.WaitGroup) {
 		"fields": []string{"WikiName, Name"},
 		"offset": []string{strconv.Itoa(offset)},
 		"where":  []string{"Scategory in (\"passivea\", \"passiveb\", \"passivec\") and Name like \"" + letter + "%\""},
+		"limit":  []string{strconv.Itoa(500)},
 	}
 
 	waitGroup.Add(1)
@@ -104,10 +105,19 @@ func fetchSkills(letter string, waitGroup *sync.WaitGroup) {
 		var name SkillWikiName
 		json.Unmarshal(byteResponse, &name)
 		for _, skill := range name.Cargoquery {
-			getRawIcon(skill.Title.WikiName, skill.Title.Name)
+			if skill.Title.Name == "Distant Counter" {
+				fmt.Println("omega skill")
+			}
+			var formattedFilename = invalidFileNameChars.ReplaceAllLiteralString(skill.Title.Name, "")
+			var _, err = os.Stat("../../public/skills/" + formattedFilename + ".png")
+			if err != nil {
+				getRawIcon(skill.Title.WikiName, skill.Title.Name)
+			}
+
 		}
 		if len(name.Cargoquery) == 500 {
 			offset += 500
+			query.Set("offset", strconv.Itoa(offset))
 		} else {
 			waitGroup.Done()
 			break
@@ -126,6 +136,7 @@ func fetchSacredSeals(letter string, waitGroup *sync.WaitGroup) {
 		"offset":  []string{strconv.Itoa(offset)},
 		"where":   []string{"Skills.Name like \"" + letter + "%\""},
 		"join_on": []string{"SacredSealCosts.Skill = Skills.Name"},
+		"limit":   []string{strconv.Itoa(500)},
 	}
 
 	waitGroup.Add(1)
@@ -133,11 +144,14 @@ func fetchSacredSeals(letter string, waitGroup *sync.WaitGroup) {
 		var req, _ = http.NewRequest("GET", "https://feheroes.fandom.com/api.php?"+query.Encode(), nil)
 		var res, _ = client.Do(req)
 		var byteResponse, _ = io.ReadAll(res.Body)
-		fmt.Println(string(byteResponse))
 		var name SkillWikiName
 		json.Unmarshal(byteResponse, &name)
 		for _, skill := range name.Cargoquery {
-			getRawIcon(skill.Title.WikiName, skill.Title.Name)
+			var formattedFilename = invalidFileNameChars.ReplaceAllLiteralString(skill.Title.Name, "")
+			var _, err = os.Stat("../../public/skills/" + formattedFilename + ".png")
+			if err != nil {
+				getRawIcon(skill.Title.WikiName, skill.Title.Name)
+			}
 		}
 		if len(name.Cargoquery) == 500 {
 			offset += 500

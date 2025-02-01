@@ -140,6 +140,8 @@ export default function Tab({
     },
   });
 
+  const fileReg = /[<>:"/\\|?*]/;
+
   return (
     <>
       <div class={subTab === "detail" ? "hide" : ""}>
@@ -850,7 +852,13 @@ export default function Tab({
                       for={passive.name}
                     >
                       <h3>
-                        <img class="game-asset" src="/A.png" />
+                        <img
+                          class="game-asset"
+                          src={`/skills/${passive.name.replace(
+                            fileReg,
+                            ""
+                          )}.png`}
+                        />
                         {passive.name}
                       </h3>
                       <p>{passive.description}</p>
