@@ -15,6 +15,8 @@ import (
 
 var client = http.Client{}
 
+// todo : ajouter un cache qui vérifie que le skill existe déjà
+
 type Wikiname struct {
 	Cargoquery []struct {
 		Title struct {
