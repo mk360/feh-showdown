@@ -135,6 +135,10 @@ td label {
 				filter: drop-shadow(0 0 2em #673ab8aa);
 			}
 		}
+
+		.HP, .Atk, .Spd, .Def, .Res, .BST {
+			background-color: #3e3e3e;
+		}
 	}
 }
 
@@ -193,12 +197,19 @@ td label {
 	}
 
 	.hero-portrait {
-		grid-area: 1 / 1 / 5 / 3;
+		grid-area: 3 / 1 / 5 / 3;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
 		& > img {
-			width: 100%;
+			width: 90%;
+		}
+	}
+
+	.moveset-summary {
+		grid-area: 5 / 1 / 7 / 3;
+		td {
+			text-align: start;
 		}
 	}
 
@@ -266,6 +277,15 @@ td label {
 
 	.stats {
 		grid-area: 7 / 1 / 9 / 3;
+	}
+
+	.navigation {
+		grid-area: 1 / 1 / 3 / 3;
+		button {
+			background-color: #E99EAE;
+			padding: 10px;
+			color: black;
+		}
 	}
 }
 
@@ -340,7 +360,7 @@ ul {
 }
 
 .stat-input {
-	/* display: none; */
+	display: none;
 	&:disabled + label {
 		filter: brightness(80%);
 	}
@@ -357,7 +377,7 @@ ul {
 }
 
 .game-asset {
-	width: 30px;
+	width: 35px;
 }
 
 .stats {
