@@ -1,6 +1,8 @@
+export type FEH_Stat = "atk" | "def" | "spd" | "res" | "hp"
+
 interface StatChanges {
     [k: string]: {
-        [k in "atk" | "def" | "spd" | "res" | "hp"]?: number;
+        [k in FEH_Stat]?: number;
     }
 }
 
@@ -175,3 +177,5 @@ const SKILL_STAT_CHANGES: StatChanges = {
         res: 2
     },
 }
+
+export default SKILL_STAT_CHANGES;

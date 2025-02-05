@@ -1,6 +1,7 @@
-import { useState } from "preact/hooks";
+import { useCallback, useState } from "preact/hooks";
 import { Fragment } from "preact/jsx-runtime";
 import { useForm } from "react-hook-form";
+import SKILL_STAT_CHANGES, { FEH_Stat } from "../../public/buffs";
 
 interface HeroFilters {
   characterName: string;
@@ -25,7 +26,7 @@ interface SkillList {
   S: SkillWithDescription[];
 }
 
-type StatChanges = {
+type StatChangeFields = {
   [k in
     | "hp-change"
     | "atk-change"
@@ -103,7 +104,9 @@ function getResultsFromFilters(filters: HeroFilters) {
 }
 
 function convertToLevel40(stat1: number, growthRate: number) {
-  return stat1 + Math.floor(Math.floor(growthRate * 1.14) * 0.39);
+  const appliedGrowthRate = Math.floor(growthRate * 1.14 + 1e-10);
+  const growthValue = Math.floor((39 * appliedGrowthRate) / 100);
+  return stat1 + growthValue;
 }
 
 export default function Tab({
@@ -134,7 +137,7 @@ export default function Tab({
     handleSubmit: handleSubmitMoveset,
     watch,
   } = useForm<{
-    [k in keyof (SkillList & StatChanges)]: string;
+    [k in keyof (SkillList & StatChangeFields)]: string;
   }>({
     defaultValues: {
       weapons: "",
@@ -151,6 +154,68 @@ export default function Tab({
       "res-change": "neutral",
     },
   });
+
+  const getExtraStats = useCallback(() => {
+    const stats: { [k in FEH_Stat]?: number } = {
+      hp: 0,
+      atk: moveset
+        ? moveset.commonSkills.weapons
+            .concat(moveset.exclusiveSkills.weapons)
+            .find(({ name }) => name === watch("weapons"))?.might ?? 0
+        : 0,
+      spd: 0,
+      def: 0,
+      res: 0,
+    };
+
+    for (let key of [
+      "weapons",
+      "assists",
+      "specials",
+      "A",
+      "B",
+      "C",
+      "S",
+    ] as const) {
+      const fieldValue = watch(key);
+      const skillStatChange = SKILL_STAT_CHANGES[fieldValue];
+      for (let changedStat in skillStatChange) {
+        stats[changedStat] += skillStatChange[changedStat];
+      }
+    }
+
+    return stats;
+  }, []);
+
+  const getLevel40Stat = useCallback(
+    (options: {
+      lv1Stat: number;
+      character: string;
+      stat: FEH_Stat;
+      extraStats: { [k in FEH_Stat]?: number };
+    }) => {
+      const trackedStatChange = watch(`${options.stat}-change`);
+      const baseGrowthRate = STATS[options.character].growthRates[options.stat];
+      const baseLevel1 = STATS[options.character].lv1[options.stat];
+      const finalGrowthRate =
+        trackedStatChange === "asset"
+          ? baseGrowthRate + 5
+          : trackedStatChange === "flaw"
+          ? baseGrowthRate - 5
+          : baseGrowthRate;
+      const finalLevel1 =
+        trackedStatChange === "asset"
+          ? baseLevel1 + 1
+          : trackedStatChange === "flaw"
+          ? baseLevel1 - 1
+          : baseLevel1;
+      const level40Stat = convertToLevel40(finalLevel1, finalGrowthRate);
+      return level40Stat + options.extraStats[options.stat];
+    },
+    []
+  );
+
+  const extraStats = getExtraStats();
 
   return (
     <>
@@ -686,7 +751,6 @@ export default function Tab({
               <input
                 id="union"
                 type="radio"
-                checked
                 {...register("searchMode")}
                 value="union"
               />
@@ -806,7 +870,6 @@ export default function Tab({
       </div>
       <div class={(subTab === "list" ? "hide " : "") + "detail-list"}>
         <div class="hero-portrait">
-          <img src={`/portraits/${formatName(temporaryChoice ?? "")}.webp`} />
           <div class="hero-intro">
             <span>{temporaryChoice}</span>
             <div>
@@ -829,6 +892,7 @@ export default function Tab({
               )}
             </div>
           </div>
+          <img src={`/portraits/${formatName(temporaryChoice ?? "")}.webp`} />
         </div>
         <div class="weapon-list">
           <h2>
@@ -1101,18 +1165,26 @@ export default function Tab({
                 <td>HP</td>
                 <td>
                   {!!temporaryChoice &&
-                    convertToLevel40(
-                      STATS[temporaryChoice].lv1.hp,
-                      STATS[temporaryChoice].growthRates.hp
-                    )}
+                    getLevel40Stat({
+                      lv1Stat: STATS[temporaryChoice].lv1.hp,
+                      character: temporaryChoice,
+                      stat: "hp",
+                      extraStats,
+                    })}
                 </td>
                 <td>
                   <input
                     class="stat-input"
                     id={`${index}-flaw-hp`}
                     type="radio"
-                    name="hp-change"
-                    value="hp"
+                    {...registerMoveset("hp-change")}
+                    value="flaw"
+                    disabled={[
+                      watch("atk-change"),
+                      watch("spd-change"),
+                      watch("def-change"),
+                      watch("res-change"),
+                    ].includes("flaw")}
                   />
                   <label class="flaw" for={`${index}-flaw-hp`}>
                     Flaw
@@ -1123,9 +1195,8 @@ export default function Tab({
                     class="stat-input"
                     id={`${index}-neutral-hp`}
                     type="radio"
-                    checked
-                    name="hp-change"
-                    value="hp"
+                    {...registerMoveset("hp-change")}
+                    value="neutral"
                   />
                   <label class="neutral" for={`${index}-neutral-hp`}>
                     Neutral
@@ -1136,8 +1207,14 @@ export default function Tab({
                     class="stat-input"
                     id={`${index}-asset-hp`}
                     type="radio"
-                    name="hp-change"
-                    value="hp"
+                    {...registerMoveset("hp-change")}
+                    disabled={[
+                      watch("atk-change"),
+                      watch("spd-change"),
+                      watch("def-change"),
+                      watch("res-change"),
+                    ].includes("asset")}
+                    value="asset"
                   />
                   <label class="asset" for={`${index}-asset-hp`}>
                     Asset
@@ -1148,18 +1225,26 @@ export default function Tab({
                 <td>Atk</td>
                 <td>
                   {!!temporaryChoice &&
-                    convertToLevel40(
-                      STATS[temporaryChoice].lv1.atk,
-                      STATS[temporaryChoice].growthRates.atk
-                    )}
+                    getLevel40Stat({
+                      lv1Stat: STATS[temporaryChoice].lv1.atk,
+                      character: temporaryChoice,
+                      stat: "atk",
+                      extraStats,
+                    })}
                 </td>
                 <td>
                   <input
                     class="stat-input"
                     id={`${index}-flaw-atk`}
                     type="radio"
-                    name="atk-change"
-                    value="atk"
+                    {...registerMoveset("atk-change")}
+                    disabled={[
+                      watch("hp-change"),
+                      watch("spd-change"),
+                      watch("def-change"),
+                      watch("res-change"),
+                    ].includes("flaw")}
+                    value="flaw"
                   />
                   <label class="flaw" for={`${index}-flaw-atk`}>
                     Flaw
@@ -1170,9 +1255,8 @@ export default function Tab({
                     class="stat-input"
                     id={`${index}-neutral-atk`}
                     type="radio"
-                    checked
-                    name="atk-change"
-                    value="atk"
+                    {...registerMoveset("atk-change")}
+                    value="neutral"
                   />
                   <label class="neutral" for={`${index}-neutral-atk`}>
                     Neutral
@@ -1183,8 +1267,14 @@ export default function Tab({
                     class="stat-input"
                     id={`${index}-asset-atk`}
                     type="radio"
-                    name="atk-change"
-                    value="atk"
+                    {...registerMoveset("atk-change")}
+                    value="asset"
+                    disabled={[
+                      watch("hp-change"),
+                      watch("spd-change"),
+                      watch("def-change"),
+                      watch("res-change"),
+                    ].includes("asset")}
                   />
                   <label class="asset" for={`${index}-asset-atk`}>
                     Asset
@@ -1195,18 +1285,26 @@ export default function Tab({
                 <td>Spd</td>
                 <td>
                   {!!temporaryChoice &&
-                    convertToLevel40(
-                      STATS[temporaryChoice].lv1.spd,
-                      STATS[temporaryChoice].growthRates.spd
-                    )}
+                    getLevel40Stat({
+                      lv1Stat: STATS[temporaryChoice].lv1.spd,
+                      character: temporaryChoice,
+                      stat: "spd",
+                      extraStats,
+                    })}
                 </td>
                 <td>
                   <input
                     class="stat-input"
                     id={`${index}-flaw-spd`}
                     type="radio"
-                    name="spd-change"
-                    value="spd"
+                    {...registerMoveset("spd-change")}
+                    value="flaw"
+                    disabled={[
+                      watch("hp-change"),
+                      watch("atk-change"),
+                      watch("def-change"),
+                      watch("res-change"),
+                    ].includes("flaw")}
                   />
                   <label class="flaw" for={`${index}-flaw-spd`}>
                     Flaw
@@ -1217,9 +1315,8 @@ export default function Tab({
                     class="stat-input"
                     id={`${index}-neutral-spd`}
                     type="radio"
-                    checked
-                    name="spd-change"
-                    value="spd"
+                    {...registerMoveset("spd-change")}
+                    value="neutral"
                   />
                   <label class="neutral" for={`${index}-neutral-spd`}>
                     Neutral
@@ -1230,8 +1327,14 @@ export default function Tab({
                     class="stat-input"
                     id={`${index}-asset-spd`}
                     type="radio"
-                    name="spd-change"
-                    value="spd"
+                    {...registerMoveset("spd-change")}
+                    value="asset"
+                    disabled={[
+                      watch("hp-change"),
+                      watch("atk-change"),
+                      watch("def-change"),
+                      watch("res-change"),
+                    ].includes("asset")}
                   />
                   <label class="asset" for={`${index}-asset-spd`}>
                     Asset
@@ -1242,18 +1345,26 @@ export default function Tab({
                 <td>Def</td>
                 <td>
                   {!!temporaryChoice &&
-                    convertToLevel40(
-                      STATS[temporaryChoice].lv1.def,
-                      STATS[temporaryChoice].growthRates.def
-                    )}
+                    getLevel40Stat({
+                      lv1Stat: STATS[temporaryChoice].lv1.def,
+                      character: temporaryChoice,
+                      stat: "def",
+                      extraStats,
+                    })}
                 </td>
                 <td>
                   <input
                     class="stat-input"
                     id={`${index}-flaw-def`}
                     type="radio"
-                    name="def-change"
-                    value="def"
+                    {...registerMoveset("def-change")}
+                    value="flaw"
+                    disabled={[
+                      watch("hp-change"),
+                      watch("spd-change"),
+                      watch("atk-change"),
+                      watch("res-change"),
+                    ].includes("flaw")}
                   />
                   <label class="flaw" for={`${index}-flaw-def`}>
                     Flaw
@@ -1264,9 +1375,8 @@ export default function Tab({
                     class="stat-input"
                     id={`${index}-neutral-def`}
                     type="radio"
-                    checked
-                    name="def-change"
-                    value="def"
+                    {...registerMoveset("def-change")}
+                    value="neutral"
                   />
                   <label class="neutral" for={`${index}-neutral-def`}>
                     Neutral
@@ -1277,8 +1387,14 @@ export default function Tab({
                     class="stat-input"
                     id={`${index}-asset-def`}
                     type="radio"
-                    name="def-change"
-                    value="def"
+                    {...registerMoveset("def-change")}
+                    value="asset"
+                    disabled={[
+                      watch("hp-change"),
+                      watch("spd-change"),
+                      watch("atk-change"),
+                      watch("res-change"),
+                    ].includes("asset")}
                   />
                   <label class="asset" for={`${index}-asset-def`}>
                     Asset
@@ -1289,18 +1405,26 @@ export default function Tab({
                 <td>Res</td>
                 <td>
                   {!!temporaryChoice &&
-                    convertToLevel40(
-                      STATS[temporaryChoice].lv1.res,
-                      STATS[temporaryChoice].growthRates.res
-                    )}
+                    getLevel40Stat({
+                      lv1Stat: STATS[temporaryChoice].lv1.res,
+                      character: temporaryChoice,
+                      stat: "res",
+                      extraStats,
+                    })}
                 </td>
                 <td>
                   <input
                     class="stat-input"
                     id={`${index}-flaw-res`}
                     type="radio"
-                    name="res-change"
-                    value="res"
+                    {...registerMoveset("res-change")}
+                    value="flaw"
+                    disabled={[
+                      watch("hp-change"),
+                      watch("spd-change"),
+                      watch("atk-change"),
+                      watch("def-change"),
+                    ].includes("flaw")}
                   />
                   <label class="flaw" for={`${index}-flaw-res`}>
                     Flaw
@@ -1311,9 +1435,8 @@ export default function Tab({
                     class="stat-input"
                     id={`${index}-neutral-res`}
                     type="radio"
-                    name="res-change"
-                    value="res"
-                    checked
+                    {...registerMoveset("res-change")}
+                    value="neutral"
                   />
                   <label class="neutral" for={`${index}-neutral-res`}>
                     Neutral
@@ -1324,8 +1447,14 @@ export default function Tab({
                     class="stat-input"
                     id={`${index}-asset-res`}
                     type="radio"
-                    name="res-change"
-                    value="res"
+                    {...registerMoveset("res-change")}
+                    value="asset"
+                    disabled={[
+                      watch("hp-change"),
+                      watch("spd-change"),
+                      watch("atk-change"),
+                      watch("def-change"),
+                    ].includes("asset")}
                   />
                   <label class="asset" for={`${index}-asset-res`}>
                     Asset
