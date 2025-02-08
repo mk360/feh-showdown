@@ -137,7 +137,7 @@ export default function Tab({
     handleSubmit: handleSubmitMoveset,
     watch,
   } = useForm<{
-    [k in keyof (SkillList & StatChangeFields)]: string;
+    [k in keyof (SkillList & StatChangeFields & { merges: number })]: string;
   }>({
     defaultValues: {
       weapons: "",
@@ -152,10 +152,18 @@ export default function Tab({
       "spd-change": "neutral",
       "def-change": "neutral",
       "res-change": "neutral",
+      merges: "",
     },
   });
 
   const getExtraStats = useCallback(() => {
+    console.log(
+      moveset
+        ? moveset.commonSkills.weapons
+            .concat(moveset.exclusiveSkills.weapons)
+            .find(({ name }) => name === watch("weapons"))
+        : 0
+    );
     const stats: { [k in FEH_Stat]?: number } = {
       hp: 0,
       atk: moveset
@@ -185,7 +193,15 @@ export default function Tab({
     }
 
     return stats;
-  }, []);
+  }, [
+    watch("weapons"),
+    watch("assists"),
+    watch("specials"),
+    watch("A"),
+    watch("B"),
+    watch("C"),
+    watch("S"),
+  ]);
 
   const getLevel40Stat = useCallback(
     (options: {
@@ -893,6 +909,7 @@ export default function Tab({
             </div>
           </div>
           <img src={`/portraits/${formatName(temporaryChoice ?? "")}.webp`} />
+          <div />
         </div>
         <div class="weapon-list">
           <h2>
@@ -1464,7 +1481,21 @@ export default function Tab({
             </tbody>
           </table>
         </div>
-        <div class="submit">test</div>
+        {/*add merges */}
+        <div class="blank"></div>
+        <div class="submit">
+          <button class="asset" onClick={() => {}}>
+            Save Teammate
+          </button>
+          <button
+            onClick={() => {
+              setSubTab("list");
+            }}
+            class="flaw"
+          >
+            Return to Unit List
+          </button>
+        </div>
         <div class="moveset-summary">
           <h3>Summary</h3>
           <table>
@@ -1507,15 +1538,6 @@ export default function Tab({
               </tr>
             </tbody>
           </table>
-        </div>
-        <div class="navigation">
-          <button
-            onClick={() => {
-              setSubTab("list");
-            }}
-          >
-            Return to Unit List
-          </button>
         </div>
       </div>
     </>
