@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -38,6 +37,12 @@ func sendRequest(skillName string) string {
 	return response.Cargoquery[0].Title.Icon
 }
 
+func cacheImage(path string, skillName string) {
+	var res, _ = http.Get(path)
+	var byteData, _ = io.ReadAll(res.Body)
+	os.WriteFile("./cache/"+skillName+".png", byteData, 0644)
+}
+
 func main() {
 	_, err := os.Stat("./cache")
 	if err != nil {
@@ -47,7 +52,6 @@ func main() {
 	var server = mux.NewRouter()
 	server.Use(mux.CORSMethodMiddleware(server))
 	server.HandleFunc("/img/{skillname}", func(res http.ResponseWriter, req *http.Request) {
-		fmt.Println(mux.Vars(req))
 		defer func() {
 			if err := recover(); err != nil {
 				res.WriteHeader(404)
@@ -55,8 +59,15 @@ func main() {
 		}()
 		var skillName = strings.ReplaceAll(mux.Vars(req)["skillname"], ";", "/")
 		var icon = strings.ReplaceAll(sendRequest(skillName), " ", "_")
-		res.Header().Add("Location", "https://feheroes.fandom.com/wiki/Special:Redirect/file/"+icon)
-		res.WriteHeader(302)
+		if _, err := os.Stat("./cache/" + skillName + ".png"); err != nil {
+			var imgPath = "https://feheroes.fandom.com/wiki/Special:Redirect/file/" + icon
+			go cacheImage(imgPath, skillName)
+			res.Header().Add("Location", imgPath)
+			res.WriteHeader(302)
+		} else {
+			var fileData, _ = os.ReadFile("./cache/" + skillName + ".png")
+			res.Write(fileData)
+		}
 	}).Methods("GET")
 
 	http.ListenAndServe(":3479", server)
