@@ -7,7 +7,7 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
-		"preact": "^10.25.3",
+		"preact": "10.25.3",
 		"preact-iso": "^2.8.1",
 		"preact-render-to-string": "^6.5.13",
 		"react-hook-form": "^7.54.2"
@@ -15,6 +15,7 @@
 	"devDependencies": {
 		"@preact/preset-vite": "^2.10.0",
 		"@types/node": "^22.10.10",
+		"@welldone-software/why-did-you-render": "^10.0.1",
 		"typescript": "^5.7.3",
 		"vite": "^6.0.4"
 	}

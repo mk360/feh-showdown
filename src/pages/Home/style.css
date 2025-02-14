@@ -208,6 +208,9 @@ td label {
 		td {
 			text-align: start;
 		}
+		table {
+			padding: 10px;
+		}
 	}
 
 	.hero-intro {
@@ -265,7 +268,11 @@ td label {
 	}
 
 	.submit {
-		grid-area: 5 / 1 / 9 / 2;
+		position: fixed;
+		bottom: 2rem;
+		right: 2rem;
+		z-index: 2;
+		background: none;
 	}
 
 	.passive-s-list {
@@ -276,8 +283,75 @@ td label {
 		grid-area: 3 / 2 / 5 / 2;
 	}
 
-	.blank {
-		grid-area: 5 / 2 / 9 / 2;
+	.preview {
+		grid-area: 5 / 1 / 9 / 3;
+		display: grid;
+		grid-template-rows: repeat(4, 1fr);
+		row-gap: 1rem;
+		padding: 10px;
+
+		.unit-preview {
+			position: relative;
+		}
+
+		.banner {
+			height: 100%;
+			position: absolute;
+			left: 0;
+			top: 0;
+			opacity: 0.4;
+		}
+
+		.unit-grid {
+			display: grid;
+			z-index: 1;
+			position: absolute;
+			inset: 0;
+			grid-template-columns: repeat(8, 1fr);
+			grid-template-rows: repeat(3, 1fr);
+
+			.main-skills {
+				grid-area: 2 / 7 / 5 / 9;
+				display: flex;
+				flex-direction: column;
+				text-align: end;
+				div {
+					display: flex;
+					justify-content: space-between;
+					img {
+						width: 25px;
+					}
+				}
+			}
+
+			.banner {
+				position: absolute;
+				top: 0;
+				opacity: 0.5;
+				z-index: 0;
+				height: 100%;
+			}
+
+			.passives-and-seals {
+				grid-area: 1 / 6 / 2 / 9;
+				display: flex;
+				justify-content: flex-end;
+				gap: 1rem;
+			}
+
+			.name {
+				grid-area: 1 / 3 / 2 / 6;
+				font-weight: bold;
+			}
+
+			.stat-grid {
+				grid-area: 2 / 3 / 5 / 6;
+				margin: 0 auto;
+				tr td:nth-child(even) {
+					font-weight: bold;
+				}
+			}
+		}
 	}
 
 	.submit {

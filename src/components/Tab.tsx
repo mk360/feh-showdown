@@ -1,7 +1,24 @@
-import { useCallback, useState } from "preact/hooks";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "preact/hooks";
 import { Fragment } from "preact/jsx-runtime";
 import { useForm } from "react-hook-form";
-import SKILL_STAT_CHANGES, { FEH_Stat } from "../../public/buffs";
+import SKILL_STAT_CHANGES from "../../public/buffs";
+import TeamContext from "../team-context";
+import formatName from "../utils/formatName";
+import UnitPreview from "./unit-preview";
+import WeaponCheckbox from "./weapon-checkbox";
+import Summary from "./summary";
+
+type FEH_Stat = "atk" | "def" | "spd" | "res" | "hp";
+
+type FEHStats = {
+  [k in FEH_Stat]: number;
+};
 
 interface HeroFilters {
   characterName: string;
@@ -38,10 +55,6 @@ type StatChangeFields = {
 interface CharacterMoveset {
   exclusiveSkills: Omit<SkillList, "S">;
   commonSkills: SkillList;
-}
-
-function formatName(name: string) {
-  return name.replace(/[ :]/g, "").toLowerCase();
 }
 
 function capitalize(string: string) {
@@ -109,15 +122,7 @@ function convertToLevel40(stat1: number, growthRate: number) {
   return stat1 + growthValue;
 }
 
-export default function Tab({
-  data,
-  onSave,
-  index,
-}: {
-  data: StoredHero | null;
-  onSave: (newData: StoredHero) => void;
-  index: number;
-}) {
+export default function Tab({ index }: { index: number }) {
   const { register, handleSubmit } = useForm<HeroFilters>({
     defaultValues: {
       characterName: "",
@@ -130,12 +135,14 @@ export default function Tab({
   });
   const [temporaryChoice, setTemporaryChoice] = useState("");
   const [results, setResults] = useState<string[]>([]);
-  const [subTab, setSubTab] = useState<"list" | "detail" | "stats">("list");
+  const [subTab, setSubTab] = useState<"list" | "detail">("list");
   const [moveset, setMoveset] = useState<CharacterMoveset>(null);
+  const { teamPreview, setTeamPreview, tab } = useContext(TeamContext);
   const {
     register: registerMoveset,
     handleSubmit: handleSubmitMoveset,
-    watch,
+    getValues,
+    reset,
   } = useForm<{
     [k in keyof (SkillList & StatChangeFields & { merges: number })]: string;
   }>({
@@ -147,30 +154,85 @@ export default function Tab({
       B: "",
       C: "",
       S: "",
-      "hp-change": "neutral",
-      "atk-change": "neutral",
-      "spd-change": "neutral",
-      "def-change": "neutral",
-      "res-change": "neutral",
-      merges: "",
     },
   });
 
-  const getExtraStats = useCallback(() => {
-    console.log(
-      moveset
-        ? moveset.commonSkills.weapons
-            .concat(moveset.exclusiveSkills.weapons)
-            .find(({ name }) => name === watch("weapons"))
-        : 0
-    );
+  const skillsData = useMemo(() => {
+    return {
+      weapons: !moveset
+        ? []
+        : [{ name: "No Weapon", description: "", might: 0 }]
+            .concat(moveset.exclusiveSkills.weapons || [])
+            .concat(moveset.commonSkills.weapons || []),
+      assists: !moveset
+        ? []
+        : [{ name: "No Assist", description: "" }]
+            .concat(moveset.exclusiveSkills.assists)
+            .concat(moveset.commonSkills.assists),
+      specials: !moveset
+        ? []
+        : [{ name: "No Special", description: "" }]
+            .concat(moveset.exclusiveSkills.specials)
+            .concat(moveset.commonSkills.specials),
+      A: !moveset
+        ? []
+        : [{ name: "No A", description: "" }]
+            .concat(moveset.exclusiveSkills.A)
+            .concat(moveset.commonSkills.A),
+      B: !moveset
+        ? []
+        : [{ name: "No B", description: "" }]
+            .concat(moveset.exclusiveSkills.B)
+            .concat(moveset.commonSkills.B),
+      C: !moveset
+        ? []
+        : [{ name: "No C", description: "" }]
+            .concat(moveset.exclusiveSkills.C)
+            .concat(moveset.commonSkills.C),
+      S: !moveset
+        ? []
+        : [{ name: "No S", description: "" }].concat(moveset.commonSkills.S),
+    };
+  }, [moveset]);
+
+  useEffect(() => {
+    if (temporaryChoice) {
+      reset();
+      scrollTo({
+        top: 0,
+        behavior: "instant",
+      });
+      handleSubmitMoveset((data) => {
+        const copy: StoredHero[] = [];
+        for (let member of teamPreview) {
+          copy.push(member);
+        }
+        copy[index] = {
+          name: temporaryChoice,
+          weapon: data.weapons,
+          assist: data.assists,
+          special: data.specials,
+          merges: +data.merges,
+          passive_a: data.A,
+          passive_b: data.B,
+          passive_c: data.C,
+          passive_s: data.S,
+          stats: {
+            ...stats,
+            ...getAlteredStats(),
+          },
+        };
+        setTeamPreview(copy);
+      })();
+    }
+  }, [temporaryChoice]);
+
+  const extraStats = useMemo(() => {
     const stats: { [k in FEH_Stat]?: number } = {
       hp: 0,
-      atk: moveset
-        ? moveset.commonSkills.weapons
-            .concat(moveset.exclusiveSkills.weapons)
-            .find(({ name }) => name === watch("weapons"))?.might ?? 0
-        : 0,
+      atk:
+        skillsData.weapons.find(({ name }) => name === getValues("weapons"))
+          ?.might ?? 0,
       spd: 0,
       def: 0,
       res: 0,
@@ -185,7 +247,7 @@ export default function Tab({
       "C",
       "S",
     ] as const) {
-      const fieldValue = watch(key);
+      const fieldValue = getValues(key);
       const skillStatChange = SKILL_STAT_CHANGES[fieldValue];
       for (let changedStat in skillStatChange) {
         stats[changedStat] += skillStatChange[changedStat];
@@ -194,14 +256,30 @@ export default function Tab({
 
     return stats;
   }, [
-    watch("weapons"),
-    watch("assists"),
-    watch("specials"),
-    watch("A"),
-    watch("B"),
-    watch("C"),
-    watch("S"),
+    getValues("weapons"),
+    getValues("assists"),
+    getValues("specials"),
+    getValues("A"),
+    getValues("B"),
+    getValues("C"),
+    getValues("S"),
   ]);
+
+  const getAlteredStats = function () {
+    const statChanges = ["hp", "atk", "spd", "def", "res"] as const;
+
+    const asset = statChanges.find(
+      (stat: FEH_Stat) => getValues(`${stat}-change`) === "asset"
+    );
+    const flaw = statChanges.find(
+      (stat: FEH_Stat) => getValues(`${stat}-change`) === "flaw"
+    );
+
+    return {
+      asset,
+      flaw,
+    };
+  };
 
   const getLevel40Stat = useCallback(
     (options: {
@@ -210,7 +288,7 @@ export default function Tab({
       stat: FEH_Stat;
       extraStats: { [k in FEH_Stat]?: number };
     }) => {
-      const trackedStatChange = watch(`${options.stat}-change`);
+      const trackedStatChange = getValues(`${options.stat}-change`);
       const baseGrowthRate = STATS[options.character].growthRates[options.stat];
       const baseLevel1 = STATS[options.character].lv1[options.stat];
       const finalGrowthRate =
@@ -231,10 +309,92 @@ export default function Tab({
     []
   );
 
-  const extraStats = getExtraStats();
+  const withMerges = function (stats: FEHStats, merges: number) {
+    const alteredStats = getAlteredStats();
+    const sortedStats = Object.entries(stats)
+      .sort(([b, stat1], [a, stat2]) => stat2 - stat1)
+      .map(([key, value]) => ({
+        stat: key,
+        value,
+      }));
+    const firstStatChange =
+      alteredStats.asset && alteredStats.flaw ? [0, 1] : [0, 1, 2];
+    const statChanges = [
+      firstStatChange,
+      [2, 3],
+      [4, 0],
+      [1, 2],
+      [3, 4],
+      [0, 1],
+      [2, 3],
+      [4, 0],
+      [1, 2],
+    ];
+    for (let i = 0; i < merges; i++) {
+      let mod5 = i % 5;
+      let increase = statChanges[mod5];
+      for (let index of increase) {
+        sortedStats[index].value++;
+      }
+    }
+
+    const obj: { [k in FEH_Stat]: number } = {
+      hp: sortedStats.find((s) => s.stat === "hp").value,
+      atk: sortedStats.find((s) => s.stat === "atk").value,
+      spd: sortedStats.find((s) => s.stat === "spd").value,
+      def: sortedStats.find((s) => s.stat === "def").value,
+      res: sortedStats.find((s) => s.stat === "res").value,
+    };
+
+    return obj;
+  };
+
+  const stats = !temporaryChoice
+    ? {
+        atk: 0,
+        hp: 0,
+        spd: 0,
+        def: 0,
+        res: 0,
+      }
+    : withMerges(
+        {
+          hp: getLevel40Stat({
+            lv1Stat: STATS[temporaryChoice].lv1.hp,
+            character: temporaryChoice,
+            stat: "hp",
+            extraStats,
+          }),
+          atk: getLevel40Stat({
+            lv1Stat: STATS[temporaryChoice].lv1.atk,
+            character: temporaryChoice,
+            stat: "atk",
+            extraStats,
+          }),
+          spd: getLevel40Stat({
+            lv1Stat: STATS[temporaryChoice].lv1.spd,
+            character: temporaryChoice,
+            stat: "spd",
+            extraStats,
+          }),
+          def: getLevel40Stat({
+            lv1Stat: STATS[temporaryChoice].lv1.def,
+            character: temporaryChoice,
+            stat: "def",
+            extraStats,
+          }),
+          res: getLevel40Stat({
+            lv1Stat: STATS[temporaryChoice].lv1.res,
+            character: temporaryChoice,
+            stat: "res",
+            extraStats,
+          }),
+        },
+        +getValues("merges")
+      );
 
   return (
-    <>
+    <section class={tab !== index ? "hide" : ""}>
       <div class={subTab === "detail" ? "hide" : ""}>
         <form
           onSubmit={handleSubmit((data) => {
@@ -268,16 +428,13 @@ export default function Tab({
               </tr>
               <tr>
                 <td>
-                  <input
-                    type="checkbox"
-                    class="red"
-                    id={`${index}-red`}
-                    value="red"
-                    {...register("color")}
+                  <WeaponCheckbox
+                    register={register}
+                    index={index}
+                    color="red"
+                    weapon="beast"
+                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Red_Beast.png"
                   />
-                  <label for={`${index}-red`}>
-                    <img class="game-asset" src="/red.png" />
-                  </label>
                 </td>
                 <td>
                   <input
@@ -318,44 +475,32 @@ export default function Tab({
               </tr>
               <tr>
                 <td>
-                  <input
-                    type="checkbox"
-                    id="red-sword"
-                    class="red"
-                    value="red-sword"
-                    {...register("weapons")}
+                  <WeaponCheckbox
+                    register={register}
+                    index={index}
+                    color="red"
+                    weapon="sword"
+                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Red_Sword.png"
                   />
-                  <label for="red-sword">
-                    <img
-                      class="game-asset"
-                      src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Red_Sword.png"
-                    />
-                  </label>
+                </td>
+                <td>
+                  <WeaponCheckbox
+                    register={register}
+                    index={index}
+                    color="blue"
+                    weapon="lance"
+                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Blue_Lance.png"
+                  />
                 </td>
                 <td>
                   <input
                     type="checkbox"
-                    id="blue-lance"
-                    class="blue"
-                    value="blue-lance"
-                    {...register("weapons")}
-                  />
-                  <label for="blue-lance">
-                    <img
-                      class="game-asset"
-                      src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Blue_Lance.png"
-                    />
-                  </label>
-                </td>
-                <td>
-                  <input
-                    type="checkbox"
-                    id="green-axe"
+                    id={`${index}-green-axe`}
                     class="green"
                     value="green-axe"
                     {...register("weapons")}
                   />
-                  <label for="green-axe">
+                  <label for={`${index}-green-axe`}>
                     <img
                       class="game-asset"
                       src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Green_Axe.png"
@@ -365,12 +510,12 @@ export default function Tab({
                 <td>
                   <input
                     type="checkbox"
-                    id="colorless-staff"
+                    id={`${index}-colorless-staff`}
                     class="colorless"
                     value="colorless-staff"
                     {...register("weapons")}
                   />
-                  <label for="colorless-staff">
+                  <label for={`${index}-colorless-staff`}>
                     <img
                       class="game-asset"
                       src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Colorless_Staff.png"
@@ -380,312 +525,192 @@ export default function Tab({
               </tr>
               <tr>
                 <td>
-                  <input
-                    type="checkbox"
-                    id="red-tome"
-                    class="red"
-                    value="red-tome"
-                    {...register("weapons")}
+                  <WeaponCheckbox
+                    register={register}
+                    index={index}
+                    color="red"
+                    weapon="tome"
+                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Red_Tome.png"
                   />
-                  <label for="red-tome">
-                    <img
-                      class="game-asset"
-                      src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Red_Tome.png"
-                    />
-                  </label>
                 </td>
                 <td>
-                  <input
-                    type="checkbox"
-                    id="blue-tome"
-                    class="blue"
-                    value="blue-tome"
-                    {...register("weapons")}
+                  <WeaponCheckbox
+                    register={register}
+                    index={index}
+                    color="blue"
+                    weapon="tome"
+                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Blue_Tome.png"
                   />
-                  <label for="blue-tome">
-                    <img
-                      class="game-asset"
-                      src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Blue_Tome.png"
-                    />
-                  </label>
                 </td>
                 <td>
-                  <input
-                    type="checkbox"
-                    id="green-tome"
-                    class="green"
-                    value="green-tome"
-                    {...register("weapons")}
+                  <WeaponCheckbox
+                    register={register}
+                    index={index}
+                    color="green"
+                    weapon="tome"
+                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Green_Tome.png"
                   />
-                  <label for="green-bow">
-                    <img
-                      class="game-asset"
-                      src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Green_Tome.png"
-                    />
-                  </label>
                 </td>
                 <td>
-                  <input
-                    type="checkbox"
-                    id="colorless-tome"
-                    class="colorless"
-                    value="colorless-tome"
-                    {...register("weapons")}
+                  <WeaponCheckbox
+                    register={register}
+                    index={index}
+                    color="colorless"
+                    weapon="tome"
+                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Colorless_Tome.png"
                   />
-                  <label>
-                    <img
-                      class="game-asset"
-                      src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Colorless_Tome.png"
-                    />
-                  </label>
                 </td>
               </tr>
               <tr>
                 <td>
-                  <input
-                    type="checkbox"
-                    id="red-bow"
-                    class="red"
-                    value="red-bow"
-                    {...register("weapons")}
+                  <WeaponCheckbox
+                    register={register}
+                    index={index}
+                    color="red"
+                    weapon="bow"
+                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Red_Bow.png"
                   />
-                  <label for="red-bow">
-                    <img
-                      class="game-asset"
-                      src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Red_Bow.png"
-                    />
-                  </label>
                 </td>
                 <td>
-                  <input
-                    value="blue-bow"
-                    id="blue-bow"
-                    class="blue"
-                    type="checkbox"
-                    {...register("weapons")}
+                  <WeaponCheckbox
+                    register={register}
+                    index={index}
+                    color="blue"
+                    weapon="bow"
+                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Blue_Bow.png"
                   />
-                  <label for="blue-bow">
-                    <img
-                      class="game-asset"
-                      src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Blue_Bow.png"
-                    />
-                  </label>
                 </td>
                 <td>
-                  <input
-                    type="checkbox"
-                    id="green-bow"
-                    class="green"
-                    value="green-bow"
-                    {...register("weapons")}
+                  <WeaponCheckbox
+                    register={register}
+                    index={index}
+                    color="green"
+                    weapon="bow"
+                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Green_Bow.png"
                   />
-                  <label for="green-bow">
-                    <img
-                      class="game-asset"
-                      src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Green_Bow.png"
-                    />
-                  </label>
                 </td>
                 <td>
-                  <input
-                    type="checkbox"
-                    id="colorless-bow"
-                    class="colorless"
-                    value="colorless-bow"
-                    {...register("weapons")}
+                  <WeaponCheckbox
+                    register={register}
+                    index={index}
+                    color="colorless"
+                    weapon="bow"
+                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Colorless_Bow.png"
                   />
-                  <label for="colorless-bow">
-                    <img
-                      class="game-asset"
-                      src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Colorless_Bow.png"
-                    />
-                  </label>
                 </td>
               </tr>
               <tr>
                 <td>
-                  <input
-                    type="checkbox"
-                    id="red-breath"
-                    class="red"
-                    value="red-breath"
-                    {...register("weapons")}
+                  <WeaponCheckbox
+                    register={register}
+                    index={index}
+                    color="red"
+                    weapon="breath"
+                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Red_Breath.png"
                   />
-                  <label for="red-breath">
-                    <img
-                      class="game-asset"
-                      src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Red_Breath.png"
-                    />
-                  </label>
                 </td>
                 <td>
-                  <input
-                    type="checkbox"
-                    id="blue-breath"
-                    class="blue"
-                    {...register("weapons")}
-                    value="blue-breath"
+                  <WeaponCheckbox
+                    register={register}
+                    index={index}
+                    color="blue"
+                    weapon="breath"
+                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Blue_Breath.png"
                   />
-                  <label for="blue-breath">
-                    <img
-                      class="game-asset"
-                      src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Blue_Breath.png"
-                    />
-                  </label>
                 </td>
                 <td>
-                  <input
-                    type="checkbox"
-                    id="green-breath"
-                    class="green"
-                    value="green-breath"
-                    {...register("weapons")}
+                  <WeaponCheckbox
+                    register={register}
+                    index={index}
+                    color="green"
+                    weapon="breath"
+                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Green_Breath.png"
                   />
-                  <label for="green-breath">
-                    <img
-                      class="game-asset"
-                      src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Green_Breath.png"
-                    />
-                  </label>
                 </td>
                 <td>
-                  <input
-                    type="checkbox"
-                    id="colorless-breath"
-                    class="colorless"
-                    {...register("weapons")}
-                    value="colorless-breath"
+                  <WeaponCheckbox
+                    register={register}
+                    index={index}
+                    color="colorless"
+                    weapon="breath"
+                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Colorless_Breath.png"
                   />
-                  <label for="colorless-breath">
-                    <img
-                      class="game-asset"
-                      src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Colorless_Breath.png"
-                    />
-                  </label>
                 </td>
               </tr>
               <tr>
                 <td>
-                  <input
-                    type="checkbox"
-                    id="red-dagger"
-                    class="red"
-                    value="red-dagger"
-                    {...register("weapons")}
+                  <WeaponCheckbox
+                    register={register}
+                    index={index}
+                    color="red"
+                    weapon="dagger"
+                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Red_Dagger.png"
                   />
-                  <label for="red-dagger">
-                    <img
-                      class="game-asset"
-                      src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Red_Dagger.png"
-                    />
-                  </label>
                 </td>
                 <td>
-                  <input
-                    type="checkbox"
-                    id="blue-dagger"
-                    class="blue"
-                    value="blue-dagger"
-                    {...register("weapons")}
+                  <WeaponCheckbox
+                    register={register}
+                    index={index}
+                    color="blue"
+                    weapon="dagger"
+                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Blue_Dagger.png"
                   />
-                  <label for="blue-dagger">
-                    <img
-                      class="game-asset"
-                      src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Blue_Dagger.png"
-                    />
-                  </label>
                 </td>
                 <td>
-                  <input
-                    type="checkbox"
-                    id="green-dagger"
-                    class="green"
-                    value="green-dagger"
-                    {...register("weapons")}
+                  <WeaponCheckbox
+                    register={register}
+                    index={index}
+                    color="green"
+                    weapon="dagger"
+                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Green_Dagger.png"
                   />
-                  <label for="green-dagger">
-                    <img
-                      class="game-asset"
-                      src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Green_Dagger.png"
-                    />
-                  </label>
                 </td>
                 <td>
-                  <input
-                    type="checkbox"
-                    id="colorless-dagger"
-                    class="colorless"
-                    value="colorless-dagger"
-                    {...register("weapons")}
+                  <WeaponCheckbox
+                    register={register}
+                    index={index}
+                    color="colorless"
+                    weapon="dagger"
+                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Colorless_Dagger.png"
                   />
-                  <label for="colorless-dagger">
-                    <img
-                      class="game-asset"
-                      src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Colorless_Dagger.png"
-                    />
-                  </label>
                 </td>
               </tr>
               <tr>
                 <td>
-                  <input
-                    type="checkbox"
-                    id="red-beast"
-                    class="red"
-                    value="red-beast"
-                    {...register("weapons")}
+                  <WeaponCheckbox
+                    register={register}
+                    index={index}
+                    color="red"
+                    weapon="beast"
+                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Red_Beast.png"
                   />
-                  <label for="red-beast">
-                    <img
-                      class="game-asset"
-                      src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Red_Beast.png"
-                    />
-                  </label>
                 </td>
                 <td>
-                  <input
-                    type="checkbox"
-                    id="blue-beast"
-                    class="blue"
-                    value="blue-beast"
-                    {...register("weapons")}
+                  <WeaponCheckbox
+                    register={register}
+                    index={index}
+                    color="blue"
+                    weapon="beast"
+                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Blue_Beast.png"
                   />
-                  <label for="blue-beast">
-                    <img
-                      class="game-asset"
-                      src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Blue_Beast.png"
-                    />
-                  </label>
                 </td>
                 <td>
-                  <input
-                    type="checkbox"
-                    id="green-beast"
-                    class="green"
-                    value="green-beast"
-                    {...register("weapons")}
+                  <WeaponCheckbox
+                    register={register}
+                    index={index}
+                    color="green"
+                    weapon="beast"
+                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Green_Beast.png"
                   />
-                  <label for="green-beast">
-                    <img
-                      class="game-asset"
-                      src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Green_Beast.png"
-                    />
-                  </label>
                 </td>
                 <td>
-                  <input
-                    type="checkbox"
-                    id="colorless-beast"
-                    class="colorless"
-                    value="colorless-beast"
-                    {...register("weapons")}
+                  <WeaponCheckbox
+                    register={register}
+                    index={index}
+                    color="colorless"
+                    weapon="beast"
+                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Colorless_Beast.png"
                   />
-                  <label for="colorless-beast">
-                    <img
-                      class="game-asset"
-                      src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Colorless_Beast.png"
-                    />
-                  </label>
                 </td>
               </tr>
               <tr>
@@ -702,10 +727,10 @@ export default function Tab({
                     type="checkbox"
                     class="movement"
                     {...register("movement")}
-                    id="infantry"
+                    id={`${index}-infantry`}
                     value="infantry"
                   />
-                  <label for="infantry">
+                  <label for={`${index}-infantry`}>
                     <img
                       class="game-asset"
                       src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Move_Infantry.png"
@@ -717,10 +742,10 @@ export default function Tab({
                     type="checkbox"
                     class="movement"
                     {...register("movement")}
-                    id="armored"
+                    id={`${index}-armored`}
                     value="armored"
                   />
-                  <label for="armored">
+                  <label for={`${index}-armored`}>
                     <img
                       class="game-asset"
                       src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Move_Armored.png"
@@ -732,10 +757,10 @@ export default function Tab({
                     type="checkbox"
                     class="movement"
                     {...register("movement")}
-                    id="cavalry"
+                    id={`${index}-cavalry`}
                     value="cavalry"
                   />
-                  <label for="cavalry">
+                  <label for={`${index}-cavalry`}>
                     <img
                       class="game-asset"
                       src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Move_Cavalry.png"
@@ -747,10 +772,10 @@ export default function Tab({
                     type="checkbox"
                     class="movement"
                     {...register("movement")}
-                    id="flier"
+                    id={`${index}-flier`}
                     value="flier"
                   />
-                  <label for="flier">
+                  <label for={`${index}-flier`}>
                     <img
                       class="game-asset"
                       src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Move_Flier.png"
@@ -760,27 +785,27 @@ export default function Tab({
               </tr>
             </tbody>
           </table>
-          <fieldset id="options">
+          {/* <fieldset id={`${index}-options`}>
             <div>Search Mode</div>
             <div>
-              <label for="union">Match any criteria</label>
+              <label for={`${index}-union`}>Match any criteria</label>
               <input
-                id="union"
+                id={`${index}-union`}
                 type="radio"
                 {...register("searchMode")}
                 value="union"
               />
             </div>
             <div>
-              <label for="intersection">Match every criteria</label>
+              <label for={`${index}-intersection`}>Match every criteria</label>
               <input
-                id="intersection"
+                id={`${index}-intersection`}
                 type="radio"
                 {...register("searchMode")}
                 value="intersection"
               />
             </div>
-          </fieldset>
+          </fieldset> */}
           <input type="submit" />
         </form>
         <div class="results">
@@ -884,7 +909,31 @@ export default function Tab({
           </table>
         </div>
       </div>
-      <div class={(subTab === "list" ? "hide " : "") + "detail-list"}>
+      <div
+        onChange={handleSubmitMoveset((data) => {
+          const copy: StoredHero[] = [];
+          for (let member of teamPreview) {
+            copy.push(member);
+          }
+          copy[index] = {
+            name: temporaryChoice,
+            weapon: data.weapons,
+            assist: data.assists,
+            special: data.specials,
+            merges: +data.merges,
+            passive_a: data.A,
+            passive_b: data.B,
+            passive_c: data.C,
+            passive_s: data.S,
+            stats: {
+              ...stats,
+              ...getAlteredStats(),
+            },
+          };
+          setTeamPreview(copy);
+        })}
+        class={(subTab === "list" ? "hide " : "") + "detail-list"}
+      >
         <div class="hero-portrait">
           <div class="hero-intro">
             <span>{temporaryChoice}</span>
@@ -915,264 +964,241 @@ export default function Tab({
           <h2>
             <img class="game-asset" src="/weapon-icon.png" /> Weapons
           </h2>
-          {moveset &&
-            [{ name: "No Weapon", description: "", might: 0 }]
-              .concat(moveset.exclusiveSkills.weapons)
-              .concat(moveset.commonSkills.weapons)
-              .map((weaponData) => {
-                return (
-                  <Fragment key={weaponData.name}>
-                    <input
-                      value={weaponData.name}
-                      id={`${index}-weapon-${weaponData.name}`}
-                      type="radio"
-                      class="hide"
-                      {...registerMoveset("weapons")}
-                    />
-                    <label
-                      class={`skill-label ${STATS[temporaryChoice].color}`}
-                      for={`${index}-weapon-${weaponData.name}`}
-                    >
-                      <div>
-                        <h3>
-                          <img class="game-asset" src="/weapon-icon.png" />
-                          {weaponData.name}
-                        </h3>
-                        {!!weaponData.might && <h4>{weaponData.might}</h4>}
-                      </div>
-                      {!!weaponData.description && (
-                        <p>{weaponData.description}</p>
-                      )}
-                    </label>
-                  </Fragment>
-                );
-              })}
+          {skillsData.weapons.map((weaponData) => {
+            return (
+              <Fragment key={weaponData.name}>
+                <input
+                  value={weaponData.name}
+                  id={`${index}-weapon-${weaponData.name}`}
+                  type="radio"
+                  class="hide"
+                  {...registerMoveset("weapons")}
+                />
+                <label
+                  class={`skill-label ${STATS[temporaryChoice].color}`}
+                  for={`${index}-weapon-${weaponData.name}`}
+                >
+                  <div>
+                    <h3>
+                      <img class="game-asset" src="/weapon-icon.png" />
+                      {weaponData.name}
+                    </h3>
+                    {!!weaponData.might && <h4>{weaponData.might}</h4>}
+                  </div>
+                  {!!weaponData.description && <p>{weaponData.description}</p>}
+                </label>
+              </Fragment>
+            );
+          })}
         </div>
-        <div class="assist-list">
+        <div class="assists-list">
           <h2>
-            <img class="game-asset" src="/assist-icon.png" />
+            <img class="game-asset" src="/assists-icon.png" />
             Assists
           </h2>
-          {moveset &&
-            [{ name: "No Assist", description: "" }]
-              .concat(moveset.exclusiveSkills.assists)
-              .concat(moveset.commonSkills.assists)
-              .map((assistData) => {
-                return (
-                  <Fragment key={assistData.name}>
-                    <input
-                      value={assistData.name}
-                      id={`${index}-assist-${assistData.name}`}
-                      type="radio"
-                      class="hide"
-                      {...registerMoveset("assists")}
-                    />
-                    <label
-                      class={`skill-label ${STATS[temporaryChoice].color}`}
-                      for={`${index}-assist-${assistData.name}`}
-                    >
-                      <h3>
-                        <img class="game-asset" src="/assist-icon.png" />
-                        {assistData.name}
-                      </h3>
-                      {!!assistData.description && (
-                        <p>{assistData.description}</p>
-                      )}
-                    </label>
-                  </Fragment>
-                );
-              })}
+          {skillsData.assists.map((assistData) => {
+            return (
+              <Fragment key={assistData.name}>
+                <input
+                  value={assistData.name}
+                  id={`${index}-assists-${assistData.name}`}
+                  type="radio"
+                  class="hide"
+                  {...registerMoveset("assists")}
+                />
+                <label
+                  class={`skill-label ${STATS[temporaryChoice].color}`}
+                  for={`${index}-assists-${assistData.name}`}
+                >
+                  <h3>
+                    <img class="game-asset" src="/assist-icon.png" />
+                    {assistData.name}
+                  </h3>
+                  {!!assistData.description && <p>{assistData.description}</p>}
+                </label>
+              </Fragment>
+            );
+          })}
         </div>
         <div class="specials-list">
           <h2>
             <img class="game-asset" src="/special-icon.png" />
             Specials
           </h2>
-          {moveset &&
-            [{ name: "No Special", description: "" }]
-              .concat(moveset.exclusiveSkills.specials)
-              .concat(moveset.commonSkills.specials)
-              .map((specialsData) => {
-                return (
-                  <Fragment key={specialsData.name}>
-                    <input
-                      value={specialsData.name}
-                      id={`${index}-special-${specialsData.name}`}
-                      type="radio"
-                      class="hide"
-                      {...registerMoveset("specials")}
-                    />
-                    <label
-                      class={`skill-label ${STATS[temporaryChoice].color}`}
-                      for={`${index}-special-${specialsData.name}`}
-                    >
-                      <h3>
-                        <img class="game-asset" src="/special-icon.png" />
-                        {specialsData.name}
-                      </h3>
-                      {!!specialsData.description && (
-                        <p>{specialsData.description}</p>
-                      )}
-                    </label>
-                  </Fragment>
-                );
-              })}
+          {skillsData.specials.map((specialsData) => {
+            return (
+              <Fragment key={specialsData.name}>
+                <input
+                  value={specialsData.name}
+                  id={`${index}-special-${specialsData.name}`}
+                  type="radio"
+                  class="hide"
+                  {...registerMoveset("specials")}
+                />
+                <label
+                  class={`skill-label ${STATS[temporaryChoice].color}`}
+                  for={`${index}-special-${specialsData.name}`}
+                >
+                  <h3>
+                    <img class="game-asset" src="/special-icon.png" />
+                    {specialsData.name}
+                  </h3>
+                  {!!specialsData.description && (
+                    <p>{specialsData.description}</p>
+                  )}
+                </label>
+              </Fragment>
+            );
+          })}
         </div>
         <div class="passive-a-list">
           <h2>
             <img class="game-asset" src="/A.png" />
             Skill
           </h2>
-          {moveset &&
-            [{ name: "No A", description: "" }]
-              .concat(moveset.exclusiveSkills.A)
-              .concat(moveset.commonSkills.A)
-              .map((passive) => {
-                return (
-                  <Fragment key={passive.name}>
-                    <input
-                      value={passive.name}
-                      id={`${index}-A-${passive.name}`}
-                      type="radio"
-                      class="hide"
-                      {...registerMoveset("A")}
-                    />
-                    <label
-                      class={`skill-label ${STATS[temporaryChoice].color}`}
-                      for={`${index}-A-${passive.name}`}
-                    >
-                      <h3>
-                        <img
-                          loading="lazy"
-                          class="game-asset"
-                          src={`http://localhost:3479/img/${passive.name.replace(
-                            "/",
-                            ";"
-                          )}`}
-                        />
-                        {passive.name}
-                      </h3>
-                      {!!passive.description && <p>{passive.description}</p>}
-                    </label>
-                  </Fragment>
-                );
-              })}
+          {skillsData.A.map((passive) => {
+            return (
+              <Fragment key={passive.name}>
+                <input
+                  value={passive.name}
+                  id={`${index}-A-${passive.name}`}
+                  type="radio"
+                  class="hide"
+                  {...registerMoveset("A")}
+                />
+                <label
+                  class={`skill-label ${STATS[temporaryChoice].color}`}
+                  for={`${index}-A-${passive.name}`}
+                >
+                  <h3>
+                    {passive.name !== "No A" && (
+                      <img
+                        loading="lazy"
+                        class="game-asset"
+                        src={`http://localhost:3479/img/${passive.name.replace(
+                          "/",
+                          ";"
+                        )}`}
+                      />
+                    )}
+                    {passive.name}
+                  </h3>
+                  {!!passive.description && <p>{passive.description}</p>}
+                </label>
+              </Fragment>
+            );
+          })}
         </div>
         <div class="passive-b-list">
           <h2>
             <img class="game-asset" src="/B.png" />
             Skill
           </h2>
-          {moveset &&
-            [{ name: "No B", description: "" }]
-              .concat(moveset.exclusiveSkills.B)
-              .concat(moveset.commonSkills.B)
-              .map((passive) => {
-                return (
-                  <Fragment key={passive.name}>
-                    <input
-                      type="radio"
-                      class="hide"
-                      value={passive.name}
-                      id={`${index}-B-${passive.name}`}
-                      {...registerMoveset("B")}
-                    />
-                    <label
-                      class={`skill-label ${STATS[temporaryChoice].color}`}
-                      for={`${index}-B-${passive.name}`}
-                    >
-                      <h3>
-                        <img
-                          loading="lazy"
-                          class="game-asset"
-                          src={`http://localhost:3479/img/${passive.name.replace(
-                            "/",
-                            ";"
-                          )}`}
-                        />
-                        {passive.name}
-                      </h3>
-                      {!!passive.description && <p>{passive.description}</p>}
-                    </label>
-                  </Fragment>
-                );
-              })}
+          {skillsData.B.map((passive) => {
+            return (
+              <Fragment key={passive.name}>
+                <input
+                  type="radio"
+                  class="hide"
+                  value={passive.name}
+                  id={`${index}-B-${passive.name}`}
+                  {...registerMoveset("B")}
+                />
+                <label
+                  class={`skill-label ${STATS[temporaryChoice].color}`}
+                  for={`${index}-B-${passive.name}`}
+                >
+                  <h3>
+                    {passive.name !== "No B" && (
+                      <img
+                        loading="lazy"
+                        class="game-asset"
+                        src={`http://localhost:3479/img/${passive.name.replace(
+                          "/",
+                          ";"
+                        )}`}
+                      />
+                    )}
+                    {passive.name}
+                  </h3>
+                  {!!passive.description && <p>{passive.description}</p>}
+                </label>
+              </Fragment>
+            );
+          })}
         </div>
         <div class="passive-c-list">
           <h2>
             <img class="game-asset" src="/C.png" />
             Skill C
           </h2>
-          {moveset &&
-            [{ name: "No C", description: "" }]
-              .concat(moveset.exclusiveSkills.C)
-              .concat(moveset.commonSkills.C)
-              .map((passive) => {
-                return (
-                  <Fragment key={passive.name}>
-                    <input
-                      type="radio"
-                      class="hide"
-                      value={passive.name}
-                      id={`${index}-C-${passive.name}`}
-                      {...registerMoveset("C")}
-                    />
-                    <label
-                      class={`skill-label ${STATS[temporaryChoice].color}`}
-                      for={`${index}-C-${passive.name}`}
-                    >
-                      <h3>
-                        <img
-                          loading="lazy"
-                          class="game-asset"
-                          src={`http://localhost:3479/img/${passive.name.replace(
-                            "/",
-                            ";"
-                          )}`}
-                        />
-                        {passive.name}
-                      </h3>
-                      {!!passive.description && <p>{passive.description}</p>}
-                    </label>
-                  </Fragment>
-                );
-              })}
+          {skillsData.C.map((passive) => {
+            return (
+              <Fragment key={passive.name}>
+                <input
+                  type="radio"
+                  class="hide"
+                  value={passive.name}
+                  id={`${index}-C-${passive.name}`}
+                  {...registerMoveset("C")}
+                />
+                <label
+                  class={`skill-label ${STATS[temporaryChoice].color}`}
+                  for={`${index}-C-${passive.name}`}
+                >
+                  <h3>
+                    {passive.name !== "No C" && (
+                      <img
+                        loading="lazy"
+                        class="game-asset"
+                        src={`http://localhost:3479/img/${passive.name.replace(
+                          "/",
+                          ";"
+                        )}`}
+                      />
+                    )}
+                    {passive.name}
+                  </h3>
+                  {!!passive.description && <p>{passive.description}</p>}
+                </label>
+              </Fragment>
+            );
+          })}
         </div>
         <div class="passive-s-list">
           <h2>Sacred Seal</h2>
-          {moveset &&
-            [{ name: "No S", description: "" }]
-              .concat(moveset.commonSkills.S)
-              .map((passive) => {
-                return (
-                  <Fragment key={passive.name}>
-                    <input
-                      value={passive.name}
-                      id={`${index}-S-${passive.name}`}
-                      type="radio"
-                      class="hide"
-                      {...registerMoveset("S")}
-                    />
-                    <label
-                      class={`skill-label ${STATS[temporaryChoice].color}`}
-                      for={`${index}-S-${passive.name}`}
-                    >
-                      <h3>
-                        <img
-                          class="game-asset"
-                          loading="lazy"
-                          src={`http://localhost:3479/img/${passive.name.replace(
-                            "/",
-                            ";"
-                          )}`}
-                        />
-                        {passive.name}
-                      </h3>
-                      {!!passive.description && <p>{passive.description}</p>}
-                    </label>
-                  </Fragment>
-                );
-              })}
+          {skillsData.S.map((passive) => {
+            return (
+              <Fragment key={passive.name}>
+                <input
+                  value={passive.name}
+                  id={`${index}-S-${passive.name}`}
+                  type="radio"
+                  class="hide"
+                  {...registerMoveset("S")}
+                />
+                <label
+                  class={`skill-label ${STATS[temporaryChoice].color}`}
+                  for={`${index}-S-${passive.name}`}
+                >
+                  <h3>
+                    {passive.name !== "No S" && (
+                      <img
+                        loading="lazy"
+                        class="game-asset"
+                        src={`http://localhost:3479/img/${passive.name.replace(
+                          "/",
+                          ";"
+                        )}`}
+                      />
+                    )}
+                    {passive.name}
+                  </h3>
+                  {!!passive.description && <p>{passive.description}</p>}
+                </label>
+              </Fragment>
+            );
+          })}
         </div>
         <div class="stats">
           <h2>Stats</h2>
@@ -1180,15 +1206,7 @@ export default function Tab({
             <tbody>
               <tr>
                 <td>HP</td>
-                <td>
-                  {!!temporaryChoice &&
-                    getLevel40Stat({
-                      lv1Stat: STATS[temporaryChoice].lv1.hp,
-                      character: temporaryChoice,
-                      stat: "hp",
-                      extraStats,
-                    })}
-                </td>
+                <td>{!!temporaryChoice && stats.hp}</td>
                 <td>
                   <input
                     class="stat-input"
@@ -1197,10 +1215,10 @@ export default function Tab({
                     {...registerMoveset("hp-change")}
                     value="flaw"
                     disabled={[
-                      watch("atk-change"),
-                      watch("spd-change"),
-                      watch("def-change"),
-                      watch("res-change"),
+                      getValues("atk-change"),
+                      getValues("spd-change"),
+                      getValues("def-change"),
+                      getValues("res-change"),
                     ].includes("flaw")}
                   />
                   <label class="flaw" for={`${index}-flaw-hp`}>
@@ -1226,10 +1244,10 @@ export default function Tab({
                     type="radio"
                     {...registerMoveset("hp-change")}
                     disabled={[
-                      watch("atk-change"),
-                      watch("spd-change"),
-                      watch("def-change"),
-                      watch("res-change"),
+                      getValues("atk-change"),
+                      getValues("spd-change"),
+                      getValues("def-change"),
+                      getValues("res-change"),
                     ].includes("asset")}
                     value="asset"
                   />
@@ -1240,15 +1258,7 @@ export default function Tab({
               </tr>
               <tr>
                 <td>Atk</td>
-                <td>
-                  {!!temporaryChoice &&
-                    getLevel40Stat({
-                      lv1Stat: STATS[temporaryChoice].lv1.atk,
-                      character: temporaryChoice,
-                      stat: "atk",
-                      extraStats,
-                    })}
-                </td>
+                <td>{!!temporaryChoice && stats.atk}</td>
                 <td>
                   <input
                     class="stat-input"
@@ -1256,10 +1266,10 @@ export default function Tab({
                     type="radio"
                     {...registerMoveset("atk-change")}
                     disabled={[
-                      watch("hp-change"),
-                      watch("spd-change"),
-                      watch("def-change"),
-                      watch("res-change"),
+                      getValues("hp-change"),
+                      getValues("spd-change"),
+                      getValues("def-change"),
+                      getValues("res-change"),
                     ].includes("flaw")}
                     value="flaw"
                   />
@@ -1287,10 +1297,10 @@ export default function Tab({
                     {...registerMoveset("atk-change")}
                     value="asset"
                     disabled={[
-                      watch("hp-change"),
-                      watch("spd-change"),
-                      watch("def-change"),
-                      watch("res-change"),
+                      getValues("hp-change"),
+                      getValues("spd-change"),
+                      getValues("def-change"),
+                      getValues("res-change"),
                     ].includes("asset")}
                   />
                   <label class="asset" for={`${index}-asset-atk`}>
@@ -1300,15 +1310,7 @@ export default function Tab({
               </tr>
               <tr>
                 <td>Spd</td>
-                <td>
-                  {!!temporaryChoice &&
-                    getLevel40Stat({
-                      lv1Stat: STATS[temporaryChoice].lv1.spd,
-                      character: temporaryChoice,
-                      stat: "spd",
-                      extraStats,
-                    })}
-                </td>
+                <td>{!!temporaryChoice && stats.spd}</td>
                 <td>
                   <input
                     class="stat-input"
@@ -1317,10 +1319,10 @@ export default function Tab({
                     {...registerMoveset("spd-change")}
                     value="flaw"
                     disabled={[
-                      watch("hp-change"),
-                      watch("atk-change"),
-                      watch("def-change"),
-                      watch("res-change"),
+                      getValues("hp-change"),
+                      getValues("atk-change"),
+                      getValues("def-change"),
+                      getValues("res-change"),
                     ].includes("flaw")}
                   />
                   <label class="flaw" for={`${index}-flaw-spd`}>
@@ -1347,10 +1349,10 @@ export default function Tab({
                     {...registerMoveset("spd-change")}
                     value="asset"
                     disabled={[
-                      watch("hp-change"),
-                      watch("atk-change"),
-                      watch("def-change"),
-                      watch("res-change"),
+                      getValues("hp-change"),
+                      getValues("atk-change"),
+                      getValues("def-change"),
+                      getValues("res-change"),
                     ].includes("asset")}
                   />
                   <label class="asset" for={`${index}-asset-spd`}>
@@ -1360,15 +1362,7 @@ export default function Tab({
               </tr>
               <tr>
                 <td>Def</td>
-                <td>
-                  {!!temporaryChoice &&
-                    getLevel40Stat({
-                      lv1Stat: STATS[temporaryChoice].lv1.def,
-                      character: temporaryChoice,
-                      stat: "def",
-                      extraStats,
-                    })}
-                </td>
+                <td>{!!temporaryChoice && stats.def}</td>
                 <td>
                   <input
                     class="stat-input"
@@ -1377,10 +1371,10 @@ export default function Tab({
                     {...registerMoveset("def-change")}
                     value="flaw"
                     disabled={[
-                      watch("hp-change"),
-                      watch("spd-change"),
-                      watch("atk-change"),
-                      watch("res-change"),
+                      getValues("hp-change"),
+                      getValues("spd-change"),
+                      getValues("atk-change"),
+                      getValues("res-change"),
                     ].includes("flaw")}
                   />
                   <label class="flaw" for={`${index}-flaw-def`}>
@@ -1407,10 +1401,10 @@ export default function Tab({
                     {...registerMoveset("def-change")}
                     value="asset"
                     disabled={[
-                      watch("hp-change"),
-                      watch("spd-change"),
-                      watch("atk-change"),
-                      watch("res-change"),
+                      getValues("hp-change"),
+                      getValues("spd-change"),
+                      getValues("atk-change"),
+                      getValues("res-change"),
                     ].includes("asset")}
                   />
                   <label class="asset" for={`${index}-asset-def`}>
@@ -1420,15 +1414,7 @@ export default function Tab({
               </tr>
               <tr>
                 <td>Res</td>
-                <td>
-                  {!!temporaryChoice &&
-                    getLevel40Stat({
-                      lv1Stat: STATS[temporaryChoice].lv1.res,
-                      character: temporaryChoice,
-                      stat: "res",
-                      extraStats,
-                    })}
-                </td>
+                <td>{!!temporaryChoice && stats.res}</td>
                 <td>
                   <input
                     class="stat-input"
@@ -1436,12 +1422,9 @@ export default function Tab({
                     type="radio"
                     {...registerMoveset("res-change")}
                     value="flaw"
-                    disabled={[
-                      watch("hp-change"),
-                      watch("spd-change"),
-                      watch("atk-change"),
-                      watch("def-change"),
-                    ].includes("flaw")}
+                    disabled={["hp", "spd", "atk", "def"].includes(
+                      getAlteredStats().flaw
+                    )}
                   />
                   <label class="flaw" for={`${index}-flaw-res`}>
                     Flaw
@@ -1466,29 +1449,43 @@ export default function Tab({
                     type="radio"
                     {...registerMoveset("res-change")}
                     value="asset"
-                    disabled={[
-                      watch("hp-change"),
-                      watch("spd-change"),
-                      watch("atk-change"),
-                      watch("def-change"),
-                    ].includes("asset")}
+                    disabled={["hp", "spd", "atk", "def"].includes(
+                      getAlteredStats().asset
+                    )}
                   />
                   <label class="asset" for={`${index}-asset-res`}>
                     Asset
                   </label>
                 </td>
               </tr>
+              <tr>
+                <td>Merges</td>
+                <td>{getValues("merges")}</td>
+                <td colSpan={3}>
+                  <input
+                    type="range"
+                    min={0}
+                    max={10}
+                    step={1}
+                    {...registerMoveset("merges")}
+                  />
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
-        {/*add merges */}
-        <div class="blank"></div>
+        <div class="preview">
+          {teamPreview.map((preview, index) => {
+            return <UnitPreview data={preview} key={index} />;
+          })}
+        </div>
         <div class="submit">
           <button class="asset" onClick={() => {}}>
             Save Teammate
           </button>
           <button
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation();
               setSubTab("list");
             }}
             class="flaw"
@@ -1497,49 +1494,10 @@ export default function Tab({
           </button>
         </div>
         <div class="moveset-summary">
-          <h3>Summary</h3>
-          <table>
-            <tbody>
-              <tr>
-                <td>
-                  <img class="game-asset" src="/weapon-icon.png" />
-                </td>
-                <td>{watch("weapons")}</td>
-              </tr>
-              <tr>
-                <td>
-                  <img class="game-asset" src="/assist-icon.png" />
-                </td>
-                <td>{watch("assists")}</td>
-              </tr>
-              <tr>
-                <td>
-                  <img class="game-asset" src="/special-icon.png" />
-                </td>
-                <td>{watch("specials")}</td>
-              </tr>
-              <tr>
-                <td>
-                  <img class="game-asset" src="/A.png" />
-                </td>
-                <td>{watch("A")}</td>
-              </tr>
-              <tr>
-                <td>
-                  <img class="game-asset" src="/B.png" />
-                </td>
-                <td>{watch("B")}</td>
-              </tr>
-              <tr>
-                <td>
-                  <img class="game-asset" src="/C.png" />
-                </td>
-                <td>{watch("C")}</td>
-              </tr>
-            </tbody>
-          </table>
+          <h2>Summary</h2>
+          <Summary data={teamPreview[index]} />
         </div>
       </div>
-    </>
+    </section>
   );
 }
