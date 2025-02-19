@@ -1,8 +1,6 @@
-import { memo } from "preact/compat";
-import formatName from "../../utils/formatName";
+import { formatName } from "../utils/strings";
 
 function UnitPreview(summary: { data: StoredHero }) {
-  console.log("bonjour");
   return (
     <div class="unit-preview">
       {!!summary.data?.name && (
@@ -142,4 +140,4 @@ function UnitPreview(summary: { data: StoredHero }) {
   );
 }
 
-export default memo(UnitPreview);
+export default UnitPreview;

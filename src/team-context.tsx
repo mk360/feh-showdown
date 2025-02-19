@@ -1,6 +1,6 @@
 import { createContext } from "preact";
 import { SetStateAction } from "preact/compat";
-import { Dispatch, useState } from "preact/hooks";
+import { Dispatch, useMemo, useState } from "preact/hooks";
 
 const TeamContext = createContext<{
   teamPreview: StoredHero[];
@@ -10,7 +10,26 @@ const TeamContext = createContext<{
 }>(null);
 
 export const TeamProvider = ({ children }) => {
-  const [teamPreview, setTeamPreview] = useState<StoredHero[]>([]);
+  const [teamPreview, setTeamPreview] = useState<StoredHero[]>(
+    Array.from<StoredHero>({ length: 4 }).fill({
+      name: "",
+      weapon: "",
+      assist: "",
+      special: "",
+      passive_a: "",
+      passive_b: "",
+      passive_c: "",
+      passive_s: "",
+      stats: {
+        hp: 0,
+        atk: 0,
+        spd: 0,
+        def: 0,
+        res: 0,
+      },
+      merges: 0,
+    })
+  );
   const [tab, setTab] = useState(0);
 
   return (

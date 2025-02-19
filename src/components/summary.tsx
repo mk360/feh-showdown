@@ -1,5 +1,3 @@
-import { memo } from "preact/compat";
-
 function Summary({ data }: { data: StoredHero }) {
   return (
     <table>
@@ -28,7 +26,7 @@ function Summary({ data }: { data: StoredHero }) {
               loading="lazy"
               class="game-asset"
               src={
-                data?.passive_a !== "No A"
+                data?.passive_a !== ""
                   ? `http://localhost:3479/img/${data?.passive_a.replace(
                       "/",
                       ";"
@@ -45,7 +43,7 @@ function Summary({ data }: { data: StoredHero }) {
               loading="lazy"
               class="game-asset"
               src={
-                data?.passive_b !== "No B"
+                data?.passive_b !== ""
                   ? `http://localhost:3479/img/${data?.passive_b.replace(
                       "/",
                       ";"
@@ -62,7 +60,7 @@ function Summary({ data }: { data: StoredHero }) {
               loading="lazy"
               class="game-asset"
               src={
-                data?.passive_c !== "No C"
+                data?.passive_c !== ""
                   ? `http://localhost:3479/img/${data?.passive_c.replace(
                       "/",
                       ";"
@@ -73,9 +71,26 @@ function Summary({ data }: { data: StoredHero }) {
           </td>
           <td>{data?.passive_c}</td>
         </tr>
+        <tr>
+          <td>
+            <img
+              loading="lazy"
+              class="game-asset"
+              src={
+                data?.passive_s !== ""
+                  ? `http://localhost:3479/img/${data?.passive_s.replace(
+                      "/",
+                      ";"
+                    )}`
+                  : "/C.png"
+              }
+            />
+          </td>
+          <td>{data?.passive_s}</td>
+        </tr>
       </tbody>
     </table>
   );
 }
 
-export default memo(Summary);
+export default Summary;

@@ -9,16 +9,12 @@ import { Fragment } from "preact/jsx-runtime";
 import { useForm } from "react-hook-form";
 import SKILL_STAT_CHANGES from "../../public/buffs";
 import TeamContext from "../team-context";
-import formatName from "../utils/formatName";
-import UnitPreview from "./unit-preview";
-import WeaponCheckbox from "./weapon-checkbox";
+import fetchMovesets from "../utils/fetch-moveset";
+import getSortingFunction from "../utils/sort-functions";
+import { formatName } from "../utils/strings";
 import Summary from "./summary";
-
-type FEH_Stat = "atk" | "def" | "spd" | "res" | "hp";
-
-type FEHStats = {
-  [k in FEH_Stat]: number;
-};
+import TeamPreview from "./team-preview";
+import UnitList from "./unit-list";
 
 interface HeroFilters {
   characterName: string;
@@ -44,12 +40,7 @@ interface SkillList {
 }
 
 type StatChangeFields = {
-  [k in
-    | "hp-change"
-    | "atk-change"
-    | "spd-change"
-    | "def-change"
-    | "res-change"]: "asset" | "flaw" | "neutral";
+  [k in `${FEH_Stat}-change`]: "asset" | "flaw" | "neutral";
 };
 
 interface CharacterMoveset {
@@ -57,64 +48,7 @@ interface CharacterMoveset {
   commonSkills: SkillList;
 }
 
-function capitalize(string: string) {
-  return string[0].toUpperCase() + string.substring(1, string.length);
-}
-
-function getResultsFromFilters(filters: HeroFilters) {
-  let collectedResults: string[] = [];
-
-  if (filters.searchMode === "union") {
-    if (filters.color) {
-      for (let color of filters.color) {
-        const fullRoster = Object.values<string>(WEAPON_TREE[color]).flat();
-        collectedResults = collectedResults.concat(fullRoster);
-      }
-    }
-
-    if (filters.weapons) {
-      for (let weapon of filters.weapons) {
-        const [color, weaponType] = weapon.split("-");
-        const units = WEAPON_TREE[color][weaponType] ?? [];
-        collectedResults = collectedResults.concat(units);
-      }
-    }
-
-    if (filters.movement) {
-      for (let movement of filters.movement) {
-        const units = MOVEMENT_TREE[movement] ?? [];
-        collectedResults = collectedResults.concat(units);
-      }
-    }
-  } else {
-    if (filters.characterName) {
-      const formattedSearch = formatName(filters.characterName);
-      collectedResults = collectedResults.filter((result) => {
-        return result.startsWith(formattedSearch);
-      });
-    }
-
-    if (filters.color.length) {
-      collectedResults = collectedResults.filter((result) => {
-        return filters.color.includes(STATS[result].color);
-      });
-    }
-
-    if (filters.weapons.length) {
-      collectedResults = collectedResults.filter((result) => {
-        return filters.color.includes(STATS[result].weaponType);
-      });
-    }
-
-    if (filters.movement.length) {
-      collectedResults = collectedResults.filter((result) => {
-        return filters.color.includes(STATS[result].movementType);
-      });
-    }
-  }
-
-  return Array.from(new Set(collectedResults));
-}
+const statLabels = ["hp", "atk", "spd", "def", "res"];
 
 function convertToLevel40(stat1: number, growthRate: number) {
   const appliedGrowthRate = Math.floor(growthRate * 1.14 + 1e-10);
@@ -123,18 +57,7 @@ function convertToLevel40(stat1: number, growthRate: number) {
 }
 
 export default function Tab({ index }: { index: number }) {
-  const { register, handleSubmit } = useForm<HeroFilters>({
-    defaultValues: {
-      characterName: "",
-      color: [],
-      weapons: [],
-      movement: [],
-      searchMode: "union",
-    },
-    mode: "onTouched",
-  });
   const [temporaryChoice, setTemporaryChoice] = useState("");
-  const [results, setResults] = useState<string[]>([]);
   const [subTab, setSubTab] = useState<"list" | "detail">("list");
   const [moveset, setMoveset] = useState<CharacterMoveset>(null);
   const { teamPreview, setTeamPreview, tab } = useContext(TeamContext);
@@ -154,46 +77,55 @@ export default function Tab({ index }: { index: number }) {
       B: "",
       C: "",
       S: "",
+      merges: "0",
     },
   });
 
   const skillsData = useMemo(() => {
+    const isDisplayed = tab === index;
     return {
-      weapons: !moveset
-        ? []
-        : [{ name: "No Weapon", description: "", might: 0 }]
-            .concat(moveset.exclusiveSkills.weapons || [])
-            .concat(moveset.commonSkills.weapons || []),
-      assists: !moveset
-        ? []
-        : [{ name: "No Assist", description: "" }]
-            .concat(moveset.exclusiveSkills.assists)
-            .concat(moveset.commonSkills.assists),
-      specials: !moveset
-        ? []
-        : [{ name: "No Special", description: "" }]
-            .concat(moveset.exclusiveSkills.specials)
-            .concat(moveset.commonSkills.specials),
-      A: !moveset
-        ? []
-        : [{ name: "No A", description: "" }]
-            .concat(moveset.exclusiveSkills.A)
-            .concat(moveset.commonSkills.A),
-      B: !moveset
-        ? []
-        : [{ name: "No B", description: "" }]
-            .concat(moveset.exclusiveSkills.B)
-            .concat(moveset.commonSkills.B),
-      C: !moveset
-        ? []
-        : [{ name: "No C", description: "" }]
-            .concat(moveset.exclusiveSkills.C)
-            .concat(moveset.commonSkills.C),
-      S: !moveset
-        ? []
-        : [{ name: "No S", description: "" }].concat(moveset.commonSkills.S),
+      weapons:
+        !moveset || !isDisplayed
+          ? []
+          : [{ name: "No Weapon", description: "", might: 0 }]
+              .concat(moveset.exclusiveSkills.weapons || [])
+              .concat(moveset.commonSkills.weapons || []),
+      assists:
+        !moveset || !isDisplayed
+          ? []
+          : [{ name: "No Assist", description: "" }]
+              .concat(moveset.exclusiveSkills.assists)
+              .concat(moveset.commonSkills.assists),
+      specials:
+        !moveset || !isDisplayed
+          ? []
+          : [{ name: "No Special", description: "" }]
+              .concat(moveset.exclusiveSkills.specials)
+              .concat(moveset.commonSkills.specials),
+      A:
+        !moveset || !isDisplayed
+          ? []
+          : [{ name: "No A", description: "" }]
+              .concat(moveset.exclusiveSkills.A)
+              .concat(moveset.commonSkills.A),
+      B:
+        !moveset || !isDisplayed
+          ? []
+          : [{ name: "No B", description: "" }]
+              .concat(moveset.exclusiveSkills.B)
+              .concat(moveset.commonSkills.B),
+      C:
+        !moveset || !isDisplayed
+          ? []
+          : [{ name: "No C", description: "" }]
+              .concat(moveset.exclusiveSkills.C)
+              .concat(moveset.commonSkills.C),
+      S:
+        !moveset || !isDisplayed
+          ? []
+          : [{ name: "No S", description: "" }].concat(moveset.commonSkills.S),
     };
-  }, [moveset]);
+  }, [moveset, tab]);
 
   useEffect(() => {
     if (temporaryChoice) {
@@ -227,7 +159,7 @@ export default function Tab({ index }: { index: number }) {
     }
   }, [temporaryChoice]);
 
-  const extraStats = useMemo(() => {
+  const getExtraStats = () => {
     const stats: { [k in FEH_Stat]?: number } = {
       hp: 0,
       atk:
@@ -255,15 +187,7 @@ export default function Tab({ index }: { index: number }) {
     }
 
     return stats;
-  }, [
-    getValues("weapons"),
-    getValues("assists"),
-    getValues("specials"),
-    getValues("A"),
-    getValues("B"),
-    getValues("C"),
-    getValues("S"),
-  ]);
+  };
 
   const getAlteredStats = function () {
     const statChanges = ["hp", "atk", "spd", "def", "res"] as const;
@@ -312,7 +236,12 @@ export default function Tab({ index }: { index: number }) {
   const withMerges = function (stats: FEHStats, merges: number) {
     const alteredStats = getAlteredStats();
     const sortedStats = Object.entries(stats)
-      .sort(([b, stat1], [a, stat2]) => stat2 - stat1)
+      .sort(([b, stat1], [a, stat2]) => {
+        const statDifference = stat2 - stat1;
+        if (!statDifference)
+          return statLabels.indexOf(b) - statLabels.indexOf(a);
+        return statDifference;
+      })
       .map(([key, value]) => ({
         stat: key,
         value,
@@ -349,6 +278,47 @@ export default function Tab({ index }: { index: number }) {
     return obj;
   };
 
+  const baseStats = !temporaryChoice
+    ? {
+        atk: 0,
+        hp: 0,
+        spd: 0,
+        def: 0,
+        res: 0,
+      }
+    : {
+        hp: getLevel40Stat({
+          lv1Stat: STATS[temporaryChoice].lv1.hp,
+          character: temporaryChoice,
+          stat: "hp",
+          extraStats: getExtraStats(),
+        }),
+        atk: getLevel40Stat({
+          lv1Stat: STATS[temporaryChoice].lv1.atk,
+          character: temporaryChoice,
+          stat: "atk",
+          extraStats: getExtraStats(),
+        }),
+        spd: getLevel40Stat({
+          lv1Stat: STATS[temporaryChoice].lv1.spd,
+          character: temporaryChoice,
+          stat: "spd",
+          extraStats: getExtraStats(),
+        }),
+        def: getLevel40Stat({
+          lv1Stat: STATS[temporaryChoice].lv1.def,
+          character: temporaryChoice,
+          stat: "def",
+          extraStats: getExtraStats(),
+        }),
+        res: getLevel40Stat({
+          lv1Stat: STATS[temporaryChoice].lv1.res,
+          character: temporaryChoice,
+          stat: "res",
+          extraStats: getExtraStats(),
+        }),
+      };
+
   const stats = !temporaryChoice
     ? {
         atk: 0,
@@ -357,560 +327,79 @@ export default function Tab({ index }: { index: number }) {
         def: 0,
         res: 0,
       }
-    : withMerges(
-        {
-          hp: getLevel40Stat({
-            lv1Stat: STATS[temporaryChoice].lv1.hp,
-            character: temporaryChoice,
-            stat: "hp",
-            extraStats,
-          }),
-          atk: getLevel40Stat({
-            lv1Stat: STATS[temporaryChoice].lv1.atk,
-            character: temporaryChoice,
-            stat: "atk",
-            extraStats,
-          }),
-          spd: getLevel40Stat({
-            lv1Stat: STATS[temporaryChoice].lv1.spd,
-            character: temporaryChoice,
-            stat: "spd",
-            extraStats,
-          }),
-          def: getLevel40Stat({
-            lv1Stat: STATS[temporaryChoice].lv1.def,
-            character: temporaryChoice,
-            stat: "def",
-            extraStats,
-          }),
-          res: getLevel40Stat({
-            lv1Stat: STATS[temporaryChoice].lv1.res,
-            character: temporaryChoice,
-            stat: "res",
-            extraStats,
-          }),
-        },
-        +getValues("merges")
-      );
+    : withMerges(baseStats, +getValues("merges"));
 
   return (
-    <section class={tab !== index ? "hide" : ""}>
-      <div class={subTab === "detail" ? "hide" : ""}>
-        <form
-          onSubmit={handleSubmit((data) => {
-            setResults(getResultsFromFilters(data));
-          })}
-        >
-          <table>
-            <thead>
-              <tr>
-                <td
-                  colSpan={4}
-                  style="text-align: center; color: white; padding: 10px"
-                >
-                  Character Name
-                </td>
-              </tr>
-              <tr>
-                <td colSpan={4}>
-                  <input {...register("characterName")} />
-                </td>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td
-                  colSpan={4}
-                  style="text-align: center; color: white; padding: 10px"
-                >
-                  Weapon Type
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <WeaponCheckbox
-                    register={register}
-                    index={index}
-                    color="red"
-                    weapon="beast"
-                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Red_Beast.png"
-                  />
-                </td>
-                <td>
-                  <input
-                    value="blue"
-                    class="blue"
-                    id={`${index}-blue`}
-                    type="checkbox"
-                    {...register("color")}
-                  />
-                  <label for={`${index}-blue`}>
-                    <img class="game-asset" src="/blue.png" />
-                  </label>
-                </td>
-                <td>
-                  <input
-                    value="green"
-                    class="green"
-                    id={`${index}-green`}
-                    type="checkbox"
-                    {...register("color")}
-                  />
-                  <label for={`${index}-green`}>
-                    <img class="game-asset" src="/green.png" />
-                  </label>
-                </td>
-                <td>
-                  <input
-                    value="colorless"
-                    class="colorless"
-                    id={`${index}-colorless`}
-                    type="checkbox"
-                    {...register("color")}
-                  />
-                  <label for={`${index}-colorless`}>
-                    <img class="game-asset" src="/colorless.png" />
-                  </label>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <WeaponCheckbox
-                    register={register}
-                    index={index}
-                    color="red"
-                    weapon="sword"
-                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Red_Sword.png"
-                  />
-                </td>
-                <td>
-                  <WeaponCheckbox
-                    register={register}
-                    index={index}
-                    color="blue"
-                    weapon="lance"
-                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Blue_Lance.png"
-                  />
-                </td>
-                <td>
-                  <input
-                    type="checkbox"
-                    id={`${index}-green-axe`}
-                    class="green"
-                    value="green-axe"
-                    {...register("weapons")}
-                  />
-                  <label for={`${index}-green-axe`}>
-                    <img
-                      class="game-asset"
-                      src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Green_Axe.png"
-                    />
-                  </label>
-                </td>
-                <td>
-                  <input
-                    type="checkbox"
-                    id={`${index}-colorless-staff`}
-                    class="colorless"
-                    value="colorless-staff"
-                    {...register("weapons")}
-                  />
-                  <label for={`${index}-colorless-staff`}>
-                    <img
-                      class="game-asset"
-                      src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Colorless_Staff.png"
-                    />
-                  </label>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <WeaponCheckbox
-                    register={register}
-                    index={index}
-                    color="red"
-                    weapon="tome"
-                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Red_Tome.png"
-                  />
-                </td>
-                <td>
-                  <WeaponCheckbox
-                    register={register}
-                    index={index}
-                    color="blue"
-                    weapon="tome"
-                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Blue_Tome.png"
-                  />
-                </td>
-                <td>
-                  <WeaponCheckbox
-                    register={register}
-                    index={index}
-                    color="green"
-                    weapon="tome"
-                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Green_Tome.png"
-                  />
-                </td>
-                <td>
-                  <WeaponCheckbox
-                    register={register}
-                    index={index}
-                    color="colorless"
-                    weapon="tome"
-                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Colorless_Tome.png"
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <WeaponCheckbox
-                    register={register}
-                    index={index}
-                    color="red"
-                    weapon="bow"
-                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Red_Bow.png"
-                  />
-                </td>
-                <td>
-                  <WeaponCheckbox
-                    register={register}
-                    index={index}
-                    color="blue"
-                    weapon="bow"
-                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Blue_Bow.png"
-                  />
-                </td>
-                <td>
-                  <WeaponCheckbox
-                    register={register}
-                    index={index}
-                    color="green"
-                    weapon="bow"
-                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Green_Bow.png"
-                  />
-                </td>
-                <td>
-                  <WeaponCheckbox
-                    register={register}
-                    index={index}
-                    color="colorless"
-                    weapon="bow"
-                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Colorless_Bow.png"
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <WeaponCheckbox
-                    register={register}
-                    index={index}
-                    color="red"
-                    weapon="breath"
-                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Red_Breath.png"
-                  />
-                </td>
-                <td>
-                  <WeaponCheckbox
-                    register={register}
-                    index={index}
-                    color="blue"
-                    weapon="breath"
-                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Blue_Breath.png"
-                  />
-                </td>
-                <td>
-                  <WeaponCheckbox
-                    register={register}
-                    index={index}
-                    color="green"
-                    weapon="breath"
-                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Green_Breath.png"
-                  />
-                </td>
-                <td>
-                  <WeaponCheckbox
-                    register={register}
-                    index={index}
-                    color="colorless"
-                    weapon="breath"
-                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Colorless_Breath.png"
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <WeaponCheckbox
-                    register={register}
-                    index={index}
-                    color="red"
-                    weapon="dagger"
-                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Red_Dagger.png"
-                  />
-                </td>
-                <td>
-                  <WeaponCheckbox
-                    register={register}
-                    index={index}
-                    color="blue"
-                    weapon="dagger"
-                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Blue_Dagger.png"
-                  />
-                </td>
-                <td>
-                  <WeaponCheckbox
-                    register={register}
-                    index={index}
-                    color="green"
-                    weapon="dagger"
-                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Green_Dagger.png"
-                  />
-                </td>
-                <td>
-                  <WeaponCheckbox
-                    register={register}
-                    index={index}
-                    color="colorless"
-                    weapon="dagger"
-                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Colorless_Dagger.png"
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <WeaponCheckbox
-                    register={register}
-                    index={index}
-                    color="red"
-                    weapon="beast"
-                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Red_Beast.png"
-                  />
-                </td>
-                <td>
-                  <WeaponCheckbox
-                    register={register}
-                    index={index}
-                    color="blue"
-                    weapon="beast"
-                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Blue_Beast.png"
-                  />
-                </td>
-                <td>
-                  <WeaponCheckbox
-                    register={register}
-                    index={index}
-                    color="green"
-                    weapon="beast"
-                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Green_Beast.png"
-                  />
-                </td>
-                <td>
-                  <WeaponCheckbox
-                    register={register}
-                    index={index}
-                    color="colorless"
-                    weapon="beast"
-                    url="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Colorless_Beast.png"
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td
-                  colSpan={4}
-                  style="text-align: center; color: white; padding: 10px"
-                >
-                  Movement Type
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <input
-                    type="checkbox"
-                    class="movement"
-                    {...register("movement")}
-                    id={`${index}-infantry`}
-                    value="infantry"
-                  />
-                  <label for={`${index}-infantry`}>
-                    <img
-                      class="game-asset"
-                      src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Move_Infantry.png"
-                    />
-                  </label>
-                </td>
-                <td>
-                  <input
-                    type="checkbox"
-                    class="movement"
-                    {...register("movement")}
-                    id={`${index}-armored`}
-                    value="armored"
-                  />
-                  <label for={`${index}-armored`}>
-                    <img
-                      class="game-asset"
-                      src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Move_Armored.png"
-                    />
-                  </label>
-                </td>
-                <td>
-                  <input
-                    type="checkbox"
-                    class="movement"
-                    {...register("movement")}
-                    id={`${index}-cavalry`}
-                    value="cavalry"
-                  />
-                  <label for={`${index}-cavalry`}>
-                    <img
-                      class="game-asset"
-                      src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Move_Cavalry.png"
-                    />
-                  </label>
-                </td>
-                <td>
-                  <input
-                    type="checkbox"
-                    class="movement"
-                    {...register("movement")}
-                    id={`${index}-flier`}
-                    value="flier"
-                  />
-                  <label for={`${index}-flier`}>
-                    <img
-                      class="game-asset"
-                      src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Move_Flier.png"
-                    />
-                  </label>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          {/* <fieldset id={`${index}-options`}>
-            <div>Search Mode</div>
-            <div>
-              <label for={`${index}-union`}>Match any criteria</label>
-              <input
-                id={`${index}-union`}
-                type="radio"
-                {...register("searchMode")}
-                value="union"
-              />
-            </div>
-            <div>
-              <label for={`${index}-intersection`}>Match every criteria</label>
-              <input
-                id={`${index}-intersection`}
-                type="radio"
-                {...register("searchMode")}
-                value="intersection"
-              />
-            </div>
-          </fieldset> */}
-          <input type="submit" />
-        </form>
-        <div class="results">
-          <table>
-            <thead>
-              <tr>
-                <th rowSpan={2}>Name</th>
-                <th colSpan={6}>5 Stars Level 40</th>
-              </tr>
-              <tr>
-                <th class="HP">HP</th>
-                <th class="Atk">Atk</th>
-                <th class="Spd">Spd</th>
-                <th class="Def">Def</th>
-                <th class="Res">Res</th>
-                <th class="BST">BST</th>
-              </tr>
-            </thead>
-            <tbody
-              onClick={(e) => {
-                let target = e.target as HTMLElement;
-                while (target.nodeName !== "TR") {
-                  target = target.parentElement;
-                }
-                const urlParams = new URLSearchParams();
-                urlParams.append("name", encodeURIComponent(target.id));
-                fetch(`http://localhost:3800/moveset?${urlParams.toString()}`)
-                  .then((resp) => {
-                    return resp.json();
-                  })
-                  .then((moveset) => {
-                    setTemporaryChoice(target.id);
-                    setSubTab("detail");
-                    setMoveset(moveset);
-                  });
-              }}
-            >
-              {results.map((result) => {
-                const formattedName = formatName(result);
-                const stats = STATS[result] ?? "";
-
-                return (
-                  <tr id={result} key={result}>
-                    <td class="portrait-cell">
-                      <div class="thumbnail">
-                        <img
-                          class="portrait loading"
-                          src={`/thumbnails/${formattedName}.webp`}
-                          alt={result}
-                          onLoad={function (e) {
-                            (e.target as HTMLImageElement).classList.remove(
-                              "loading"
-                            );
-                          }}
-                        />
-                        <img
-                          class="movement-icon"
-                          src={`https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Move_${capitalize(
-                            stats.movementType
-                          )}.png`}
-                        />
-                        <img
-                          class="weapon-icon"
-                          src={`https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_${[
-                            stats.color,
-                            stats.weaponType,
-                          ]
-                            .map(capitalize)
-                            .join("_")}.png`}
-                        />
-                      </div>
-                      {result}
-                      <div />
-                    </td>
-                    <td class="HP">
-                      {convertToLevel40(stats.lv1.hp, stats.growthRates.hp)}
-                    </td>
-                    <td class="Atk">
-                      {convertToLevel40(stats.lv1.atk, stats.growthRates.atk)}
-                    </td>
-                    <td class="Spd">
-                      {convertToLevel40(stats.lv1.spd, stats.growthRates.spd)}
-                    </td>
-                    <td class="Def">
-                      {convertToLevel40(stats.lv1.def, stats.growthRates.def)}
-                    </td>
-                    <td class="Res">
-                      {convertToLevel40(stats.lv1.res, stats.growthRates.res)}
-                    </td>
-                    <td class="BST">
-                      {convertToLevel40(stats.lv1.hp, stats.growthRates.hp) +
-                        convertToLevel40(stats.lv1.atk, stats.growthRates.atk) +
-                        convertToLevel40(stats.lv1.spd, stats.growthRates.spd) +
-                        convertToLevel40(stats.lv1.def, stats.growthRates.def) +
-                        convertToLevel40(stats.lv1.res, stats.growthRates.res)}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+    <>
+      <div class={tab !== index || subTab === "detail" ? "hide" : ""}>
+        <UnitList
+          onUnitClick={(e) => {
+            let target = e.target as HTMLElement;
+            while (target.nodeName !== "TR") {
+              target = target.parentElement;
+            }
+            fetchMovesets(target.id).then((moveset) => {
+              setTemporaryChoice(target.id);
+              setSubTab("detail");
+              setMoveset(moveset);
+            });
+          }}
+          index={index}
+        />
       </div>
       <div
         onChange={handleSubmitMoveset((data) => {
+          console.log(getExtraStats);
+          const baseStats = !temporaryChoice
+            ? {
+                atk: 0,
+                hp: 0,
+                spd: 0,
+                def: 0,
+                res: 0,
+              }
+            : {
+                hp: getLevel40Stat({
+                  lv1Stat: STATS[temporaryChoice].lv1.hp,
+                  character: temporaryChoice,
+                  stat: "hp",
+                  extraStats: getExtraStats(),
+                }),
+                atk: getLevel40Stat({
+                  lv1Stat: STATS[temporaryChoice].lv1.atk,
+                  character: temporaryChoice,
+                  stat: "atk",
+                  extraStats: getExtraStats(),
+                }),
+                spd: getLevel40Stat({
+                  lv1Stat: STATS[temporaryChoice].lv1.spd,
+                  character: temporaryChoice,
+                  stat: "spd",
+                  extraStats: getExtraStats(),
+                }),
+                def: getLevel40Stat({
+                  lv1Stat: STATS[temporaryChoice].lv1.def,
+                  character: temporaryChoice,
+                  stat: "def",
+                  extraStats: getExtraStats(),
+                }),
+                res: getLevel40Stat({
+                  lv1Stat: STATS[temporaryChoice].lv1.res,
+                  character: temporaryChoice,
+                  stat: "res",
+                  extraStats: getExtraStats(),
+                }),
+              };
+
+          const stats = !temporaryChoice
+            ? {
+                atk: 0,
+                hp: 0,
+                spd: 0,
+                def: 0,
+                res: 0,
+              }
+            : withMerges(baseStats, +getValues("merges"));
           const copy: StoredHero[] = [];
           for (let member of teamPreview) {
             copy.push(member);
@@ -930,33 +419,15 @@ export default function Tab({ index }: { index: number }) {
               ...getAlteredStats(),
             },
           };
+          console.log(copy[index].stats, stats);
           setTeamPreview(copy);
         })}
-        class={(subTab === "list" ? "hide " : "") + "detail-list"}
+        class={
+          (subTab === "list" || tab !== index ? "hide " : "") + "detail-list"
+        }
       >
         <div class="hero-portrait">
-          <div class="hero-intro">
-            <span>{temporaryChoice}</span>
-            <div>
-              {temporaryChoice && (
-                <>
-                  <img
-                    src={`https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_${[
-                      STATS[temporaryChoice].color,
-                      STATS[temporaryChoice].weaponType,
-                    ]
-                      .map(capitalize)
-                      .join("_")}.png`}
-                  />
-                  <img
-                    src={`https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Move_${capitalize(
-                      STATS[temporaryChoice ?? ""].movementType
-                    )}.png`}
-                  />
-                </>
-              )}
-            </div>
-          </div>
+          <h2>{temporaryChoice}</h2>
           <img src={`/portraits/${formatName(temporaryChoice ?? "")}.webp`} />
           <div />
         </div>
@@ -991,9 +462,9 @@ export default function Tab({ index }: { index: number }) {
             );
           })}
         </div>
-        <div class="assists-list">
+        <div class="assist-list">
           <h2>
-            <img class="game-asset" src="/assists-icon.png" />
+            <img class="game-asset" src="/assist-icon.png" />
             Assists
           </h2>
           {skillsData.assists.map((assistData) => {
@@ -1475,14 +946,9 @@ export default function Tab({ index }: { index: number }) {
           </table>
         </div>
         <div class="preview">
-          {teamPreview.map((preview, index) => {
-            return <UnitPreview data={preview} key={index} />;
-          })}
+          <TeamPreview />
         </div>
         <div class="submit">
-          <button class="asset" onClick={() => {}}>
-            Save Teammate
-          </button>
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -1498,6 +964,6 @@ export default function Tab({ index }: { index: number }) {
           <Summary data={teamPreview[index]} />
         </div>
       </div>
-    </section>
+    </>
   );
 }

@@ -1,8 +1,7 @@
-import { useState } from "preact/hooks";
-import "./style.css";
+import Navigation from "../../components/navigation";
 import Tab from "../../components/Tab";
 import { TeamProvider } from "../../team-context";
-import Navigation from "../../components/navigation";
+import "./style.css";
 
 export default function Teambuilder() {
   return (

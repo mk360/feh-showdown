@@ -118,6 +118,13 @@ td label {
 	outline: none;
 	border: none;
 	cursor: pointer;
+	display: grid;
+	align-items: center;
+	grid-template-columns: 1fr auto;
+	grid-template-rows: 6rem;
+	img {
+		height: 100%;
+	}
 }
 
 .results {
@@ -475,6 +482,7 @@ ul {
 }
 
 .game-asset {
+	height: 35px;
 	width: 35px;
 }
 
