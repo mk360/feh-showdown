@@ -51,9 +51,7 @@ label {
 
 form {
 	display: grid;
-	grid-template-columns: 2fr 1fr;
-	grid-template-rows: 1fr 3fr 1fr;
-	column-gap: 1rem;
+	row-gap: 1rem;
 
 	#options {
 		border: 2px solid #66727E;
@@ -141,6 +139,13 @@ td label {
 			&:hover {
 				filter: drop-shadow(0 0 2em #673ab8aa);
 			}
+		}
+
+		th {
+			&:hover {
+				filter: brightness(150%);
+			}
+			cursor: pointer;
 		}
 
 		.HP, .Atk, .Spd, .Def, .Res, .BST {
@@ -389,6 +394,31 @@ td label {
 	}
 }
 
+@media screen and (max-width: 1500px) {
+	 .detail-list {
+		&.hide {
+			display: none;
+		}
+		display: grid;
+		grid-template-columns: 1fr;
+		grid-template-rows: auto repeat(10, 30rem);
+		width: 100%;
+		.hero-portrait, .preview, .moveset-summary, .weapon-list, .assist-list, .specials-list, .passive-a-list, .passive-b-list, .passive-c-list, .passive-s-list, .stats {
+			grid-area: unset;
+		}
+		padding: 0;
+
+		.hero-portrait img {
+			width: 40%;
+			margin: auto;
+		}
+	}
+
+	div.hide .detail-list {
+		display: none;
+	}
+}
+
 td.portrait-cell {
 	display: flex;
 	align-items: center;
@@ -498,4 +528,13 @@ h2, h3 {
 	justify-content: center;
 	padding: 10px;
 	gap: 10px;
+}
+
+.summary-grid {
+	display: grid;
+	grid-template-columns: 3rem auto;
+	grid-template-rows: auto 2rem;
+	text-align: start;
+	align-items: center;
+	padding: 2rem	
 }

@@ -349,7 +349,6 @@ export default function Tab({ index }: { index: number }) {
       </div>
       <div
         onChange={handleSubmitMoveset((data) => {
-          console.log(getExtraStats);
           const baseStats = !temporaryChoice
             ? {
                 atk: 0,
@@ -419,7 +418,6 @@ export default function Tab({ index }: { index: number }) {
               ...getAlteredStats(),
             },
           };
-          console.log(copy[index].stats, stats);
           setTeamPreview(copy);
         })}
         class={
@@ -430,246 +428,6 @@ export default function Tab({ index }: { index: number }) {
           <h2>{temporaryChoice}</h2>
           <img src={`/portraits/${formatName(temporaryChoice ?? "")}.webp`} />
           <div />
-        </div>
-        <div class="weapon-list">
-          <h2>
-            <img class="game-asset" src="/weapon-icon.png" /> Weapons
-          </h2>
-          {skillsData.weapons.map((weaponData) => {
-            return (
-              <Fragment key={weaponData.name}>
-                <input
-                  value={weaponData.name}
-                  id={`${index}-weapon-${weaponData.name}`}
-                  type="radio"
-                  class="hide"
-                  {...registerMoveset("weapons")}
-                />
-                <label
-                  class={`skill-label ${STATS[temporaryChoice].color}`}
-                  for={`${index}-weapon-${weaponData.name}`}
-                >
-                  <div>
-                    <h3>
-                      <img class="game-asset" src="/weapon-icon.png" />
-                      {weaponData.name}
-                    </h3>
-                    {!!weaponData.might && <h4>{weaponData.might}</h4>}
-                  </div>
-                  {!!weaponData.description && <p>{weaponData.description}</p>}
-                </label>
-              </Fragment>
-            );
-          })}
-        </div>
-        <div class="assist-list">
-          <h2>
-            <img class="game-asset" src="/assist-icon.png" />
-            Assists
-          </h2>
-          {skillsData.assists.map((assistData) => {
-            return (
-              <Fragment key={assistData.name}>
-                <input
-                  value={assistData.name}
-                  id={`${index}-assists-${assistData.name}`}
-                  type="radio"
-                  class="hide"
-                  {...registerMoveset("assists")}
-                />
-                <label
-                  class={`skill-label ${STATS[temporaryChoice].color}`}
-                  for={`${index}-assists-${assistData.name}`}
-                >
-                  <h3>
-                    <img class="game-asset" src="/assist-icon.png" />
-                    {assistData.name}
-                  </h3>
-                  {!!assistData.description && <p>{assistData.description}</p>}
-                </label>
-              </Fragment>
-            );
-          })}
-        </div>
-        <div class="specials-list">
-          <h2>
-            <img class="game-asset" src="/special-icon.png" />
-            Specials
-          </h2>
-          {skillsData.specials.map((specialsData) => {
-            return (
-              <Fragment key={specialsData.name}>
-                <input
-                  value={specialsData.name}
-                  id={`${index}-special-${specialsData.name}`}
-                  type="radio"
-                  class="hide"
-                  {...registerMoveset("specials")}
-                />
-                <label
-                  class={`skill-label ${STATS[temporaryChoice].color}`}
-                  for={`${index}-special-${specialsData.name}`}
-                >
-                  <h3>
-                    <img class="game-asset" src="/special-icon.png" />
-                    {specialsData.name}
-                  </h3>
-                  {!!specialsData.description && (
-                    <p>{specialsData.description}</p>
-                  )}
-                </label>
-              </Fragment>
-            );
-          })}
-        </div>
-        <div class="passive-a-list">
-          <h2>
-            <img class="game-asset" src="/A.png" />
-            Skill
-          </h2>
-          {skillsData.A.map((passive) => {
-            return (
-              <Fragment key={passive.name}>
-                <input
-                  value={passive.name}
-                  id={`${index}-A-${passive.name}`}
-                  type="radio"
-                  class="hide"
-                  {...registerMoveset("A")}
-                />
-                <label
-                  class={`skill-label ${STATS[temporaryChoice].color}`}
-                  for={`${index}-A-${passive.name}`}
-                >
-                  <h3>
-                    {passive.name !== "No A" && (
-                      <img
-                        loading="lazy"
-                        class="game-asset"
-                        src={`http://localhost:3479/img/${passive.name.replace(
-                          "/",
-                          ";"
-                        )}`}
-                      />
-                    )}
-                    {passive.name}
-                  </h3>
-                  {!!passive.description && <p>{passive.description}</p>}
-                </label>
-              </Fragment>
-            );
-          })}
-        </div>
-        <div class="passive-b-list">
-          <h2>
-            <img class="game-asset" src="/B.png" />
-            Skill
-          </h2>
-          {skillsData.B.map((passive) => {
-            return (
-              <Fragment key={passive.name}>
-                <input
-                  type="radio"
-                  class="hide"
-                  value={passive.name}
-                  id={`${index}-B-${passive.name}`}
-                  {...registerMoveset("B")}
-                />
-                <label
-                  class={`skill-label ${STATS[temporaryChoice].color}`}
-                  for={`${index}-B-${passive.name}`}
-                >
-                  <h3>
-                    {passive.name !== "No B" && (
-                      <img
-                        loading="lazy"
-                        class="game-asset"
-                        src={`http://localhost:3479/img/${passive.name.replace(
-                          "/",
-                          ";"
-                        )}`}
-                      />
-                    )}
-                    {passive.name}
-                  </h3>
-                  {!!passive.description && <p>{passive.description}</p>}
-                </label>
-              </Fragment>
-            );
-          })}
-        </div>
-        <div class="passive-c-list">
-          <h2>
-            <img class="game-asset" src="/C.png" />
-            Skill C
-          </h2>
-          {skillsData.C.map((passive) => {
-            return (
-              <Fragment key={passive.name}>
-                <input
-                  type="radio"
-                  class="hide"
-                  value={passive.name}
-                  id={`${index}-C-${passive.name}`}
-                  {...registerMoveset("C")}
-                />
-                <label
-                  class={`skill-label ${STATS[temporaryChoice].color}`}
-                  for={`${index}-C-${passive.name}`}
-                >
-                  <h3>
-                    {passive.name !== "No C" && (
-                      <img
-                        loading="lazy"
-                        class="game-asset"
-                        src={`http://localhost:3479/img/${passive.name.replace(
-                          "/",
-                          ";"
-                        )}`}
-                      />
-                    )}
-                    {passive.name}
-                  </h3>
-                  {!!passive.description && <p>{passive.description}</p>}
-                </label>
-              </Fragment>
-            );
-          })}
-        </div>
-        <div class="passive-s-list">
-          <h2>Sacred Seal</h2>
-          {skillsData.S.map((passive) => {
-            return (
-              <Fragment key={passive.name}>
-                <input
-                  value={passive.name}
-                  id={`${index}-S-${passive.name}`}
-                  type="radio"
-                  class="hide"
-                  {...registerMoveset("S")}
-                />
-                <label
-                  class={`skill-label ${STATS[temporaryChoice].color}`}
-                  for={`${index}-S-${passive.name}`}
-                >
-                  <h3>
-                    {passive.name !== "No S" && (
-                      <img
-                        loading="lazy"
-                        class="game-asset"
-                        src={`http://localhost:3479/img/${passive.name.replace(
-                          "/",
-                          ";"
-                        )}`}
-                      />
-                    )}
-                    {passive.name}
-                  </h3>
-                  {!!passive.description && <p>{passive.description}</p>}
-                </label>
-              </Fragment>
-            );
-          })}
         </div>
         <div class="stats">
           <h2>Stats</h2>
@@ -944,6 +702,246 @@ export default function Tab({ index }: { index: number }) {
               </tr>
             </tbody>
           </table>
+        </div>
+        <div class="weapon-list">
+          <h2>
+            <img class="game-asset" src="/weapon-icon.png" /> Weapons
+          </h2>
+          {skillsData.weapons.map((weaponData) => {
+            return (
+              <Fragment key={weaponData.name}>
+                <input
+                  value={weaponData.name}
+                  id={`${index}-weapon-${weaponData.name}`}
+                  type="radio"
+                  class="hide"
+                  {...registerMoveset("weapons")}
+                />
+                <label
+                  class={`skill-label ${STATS[temporaryChoice].color}`}
+                  for={`${index}-weapon-${weaponData.name}`}
+                >
+                  <div>
+                    <h3>
+                      <img class="game-asset" src="/weapon-icon.png" />
+                      {weaponData.name}
+                    </h3>
+                    {!!weaponData.might && <h4>{weaponData.might}</h4>}
+                  </div>
+                  {!!weaponData.description && <p>{weaponData.description}</p>}
+                </label>
+              </Fragment>
+            );
+          })}
+        </div>
+        <div class="assist-list">
+          <h2>
+            <img class="game-asset" src="/assist-icon.png" />
+            Assists
+          </h2>
+          {skillsData.assists.map((assistData) => {
+            return (
+              <Fragment key={assistData.name}>
+                <input
+                  value={assistData.name}
+                  id={`${index}-assists-${assistData.name}`}
+                  type="radio"
+                  class="hide"
+                  {...registerMoveset("assists")}
+                />
+                <label
+                  class={`skill-label ${STATS[temporaryChoice].color}`}
+                  for={`${index}-assists-${assistData.name}`}
+                >
+                  <h3>
+                    <img class="game-asset" src="/assist-icon.png" />
+                    {assistData.name}
+                  </h3>
+                  {!!assistData.description && <p>{assistData.description}</p>}
+                </label>
+              </Fragment>
+            );
+          })}
+        </div>
+        <div class="specials-list">
+          <h2>
+            <img class="game-asset" src="/special-icon.png" />
+            Specials
+          </h2>
+          {skillsData.specials.map((specialsData) => {
+            return (
+              <Fragment key={specialsData.name}>
+                <input
+                  value={specialsData.name}
+                  id={`${index}-special-${specialsData.name}`}
+                  type="radio"
+                  class="hide"
+                  {...registerMoveset("specials")}
+                />
+                <label
+                  class={`skill-label ${STATS[temporaryChoice].color}`}
+                  for={`${index}-special-${specialsData.name}`}
+                >
+                  <h3>
+                    <img class="game-asset" src="/special-icon.png" />
+                    {specialsData.name}
+                  </h3>
+                  {!!specialsData.description && (
+                    <p>{specialsData.description}</p>
+                  )}
+                </label>
+              </Fragment>
+            );
+          })}
+        </div>
+        <div class="passive-a-list">
+          <h2>
+            <img class="game-asset" src="/A.png" />
+            Skill
+          </h2>
+          {skillsData.A.map((passive) => {
+            return (
+              <Fragment key={passive.name}>
+                <input
+                  value={passive.name}
+                  id={`${index}-A-${passive.name}`}
+                  type="radio"
+                  class="hide"
+                  {...registerMoveset("A")}
+                />
+                <label
+                  class={`skill-label ${STATS[temporaryChoice].color}`}
+                  for={`${index}-A-${passive.name}`}
+                >
+                  <h3>
+                    {passive.name !== "No A" && (
+                      <img
+                        loading="lazy"
+                        class="game-asset"
+                        src={`http://localhost:3479/img/${passive.name.replace(
+                          "/",
+                          ";"
+                        )}`}
+                      />
+                    )}
+                    {passive.name}
+                  </h3>
+                  {!!passive.description && <p>{passive.description}</p>}
+                </label>
+              </Fragment>
+            );
+          })}
+        </div>
+        <div class="passive-b-list">
+          <h2>
+            <img class="game-asset" src="/B.png" />
+            Skill
+          </h2>
+          {skillsData.B.map((passive) => {
+            return (
+              <Fragment key={passive.name}>
+                <input
+                  type="radio"
+                  class="hide"
+                  value={passive.name}
+                  id={`${index}-B-${passive.name}`}
+                  {...registerMoveset("B")}
+                />
+                <label
+                  class={`skill-label ${STATS[temporaryChoice].color}`}
+                  for={`${index}-B-${passive.name}`}
+                >
+                  <h3>
+                    {passive.name !== "No B" && (
+                      <img
+                        loading="lazy"
+                        class="game-asset"
+                        src={`http://localhost:3479/img/${passive.name.replace(
+                          "/",
+                          ";"
+                        )}`}
+                      />
+                    )}
+                    {passive.name}
+                  </h3>
+                  {!!passive.description && <p>{passive.description}</p>}
+                </label>
+              </Fragment>
+            );
+          })}
+        </div>
+        <div class="passive-c-list">
+          <h2>
+            <img class="game-asset" src="/C.png" />
+            Skill C
+          </h2>
+          {skillsData.C.map((passive) => {
+            return (
+              <Fragment key={passive.name}>
+                <input
+                  type="radio"
+                  class="hide"
+                  value={passive.name}
+                  id={`${index}-C-${passive.name}`}
+                  {...registerMoveset("C")}
+                />
+                <label
+                  class={`skill-label ${STATS[temporaryChoice].color}`}
+                  for={`${index}-C-${passive.name}`}
+                >
+                  <h3>
+                    {passive.name !== "No C" && (
+                      <img
+                        loading="lazy"
+                        class="game-asset"
+                        src={`http://localhost:3479/img/${passive.name.replace(
+                          "/",
+                          ";"
+                        )}`}
+                      />
+                    )}
+                    {passive.name}
+                  </h3>
+                  {!!passive.description && <p>{passive.description}</p>}
+                </label>
+              </Fragment>
+            );
+          })}
+        </div>
+        <div class="passive-s-list">
+          <h2>Sacred Seal</h2>
+          {skillsData.S.map((passive) => {
+            return (
+              <Fragment key={passive.name}>
+                <input
+                  value={passive.name}
+                  id={`${index}-S-${passive.name}`}
+                  type="radio"
+                  class="hide"
+                  {...registerMoveset("S")}
+                />
+                <label
+                  class={`skill-label ${STATS[temporaryChoice].color}`}
+                  for={`${index}-S-${passive.name}`}
+                >
+                  <h3>
+                    {passive.name !== "No S" && (
+                      <img
+                        loading="lazy"
+                        class="game-asset"
+                        src={`http://localhost:3479/img/${passive.name.replace(
+                          "/",
+                          ";"
+                        )}`}
+                      />
+                    )}
+                    {passive.name}
+                  </h3>
+                  {!!passive.description && <p>{passive.description}</p>}
+                </label>
+              </Fragment>
+            );
+          })}
         </div>
         <div class="preview">
           <TeamPreview />

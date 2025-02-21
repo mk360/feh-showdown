@@ -71,9 +71,9 @@ function UnitList({
   });
 
   function sort(key: FEH_Stat | "name" | "bst") {
-    const newDirection = ["descending", ""].includes(sorting[key])
-      ? "ascending"
-      : "descending";
+    const newDirection = ["ascending", ""].includes(sorting[key])
+      ? "descending"
+      : "ascending";
     setSorting({
       name: "",
       hp: "",
@@ -104,12 +104,13 @@ function UnitList({
               >
                 Character Name
               </td>
-            </tr> */}
+            </tr>
             <tr>
               <td colSpan={4}>
                 <input {...register("characterName")} />
               </td>
             </tr>
+            */}
           </thead>
           <tbody>
             <tr>
@@ -458,9 +459,16 @@ function UnitList({
                 </label>
               </td>
             </tr>
+            <tr>
+              <td colSpan={4}>
+                <input
+                  type="submit"
+                  style="height: 100%; padding: 30px; width: 100%"
+                />
+              </td>
+            </tr>
           </tbody>
         </table>
-        <input type="submit" />
       </form>
       <div class="results">
         <table>
