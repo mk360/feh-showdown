@@ -16,25 +16,27 @@ interface HeroFilters {
 function getResultsFromFilters(filters: HeroFilters) {
   let collectedResults: string[] = [];
 
-  if (filters.color) {
-    for (let color of filters.color) {
-      const fullRoster = Object.values<string>(WEAPON_TREE[color]).flat();
-      collectedResults = collectedResults.concat(fullRoster);
-    }
-  }
+  for (let hero in STATS) {
+    const heroData = STATS[hero as keyof typeof STATS];
 
-  if (filters.weapons) {
-    for (let weapon of filters.weapons) {
-      const [color, weaponType] = weapon.split("-");
-      const units = WEAPON_TREE[color][weaponType] ?? [];
-      collectedResults = collectedResults.concat(units);
-    }
-  }
+    const conditions: boolean[] = [];
 
-  if (filters.movement) {
-    for (let movement of filters.movement) {
-      const units = MOVEMENT_TREE[movement] ?? [];
-      collectedResults = collectedResults.concat(units);
+    if (filters.color.length) {
+      conditions.push(filters.color.includes(heroData.color));
+    }
+
+    if (filters.weapons.length) {
+      conditions.push(
+        filters.weapons.includes(heroData.color + "-" + heroData.weaponType)
+      );
+    }
+
+    if (filters.movement.length) {
+      conditions.push(filters.movement.includes(heroData.movementType));
+    }
+
+    if (conditions.every((val) => val === true)) {
+      collectedResults.push(hero);
     }
   }
 

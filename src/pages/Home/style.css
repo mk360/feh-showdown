@@ -444,6 +444,10 @@ ul {
 	display: none;
 }
 
+.loading {
+	background-color: gray;
+}
+
 .thumbnail {
 	height: 150px;
 	width: 150px;
@@ -454,9 +458,6 @@ ul {
 	position: relative;
 	height: 100%;
 	width: 100%;
-	&.loading {
-		background-color: gray;
-	}
 }
 
 .skill-label {
@@ -533,8 +534,11 @@ h2, h3 {
 .summary-grid {
 	display: grid;
 	grid-template-columns: 3rem auto;
-	grid-template-rows: auto 2rem;
+	grid-template-rows: 2rem;
 	text-align: start;
+	& > div {
+		height: 100%;
+	}
 	align-items: center;
 	padding: 2rem	
 }

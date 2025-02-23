@@ -10,19 +10,10 @@ import { useForm } from "react-hook-form";
 import SKILL_STAT_CHANGES from "../../public/buffs";
 import TeamContext from "../team-context";
 import fetchMovesets from "../utils/fetch-moveset";
-import getSortingFunction from "../utils/sort-functions";
 import { formatName } from "../utils/strings";
 import Summary from "./summary";
 import TeamPreview from "./team-preview";
 import UnitList from "./unit-list";
-
-interface HeroFilters {
-  characterName: string;
-  color: string[];
-  weapons: string[];
-  movement: string[];
-  searchMode: "union" | "intersection";
-}
 
 interface SkillWithDescription {
   name: string;
@@ -200,8 +191,8 @@ export default function Tab({ index }: { index: number }) {
     );
 
     return {
-      asset,
-      flaw,
+      asset: asset ?? ("" as const),
+      flaw: flaw ?? ("" as const),
     };
   };
 
@@ -212,19 +203,19 @@ export default function Tab({ index }: { index: number }) {
       stat: FEH_Stat;
       extraStats: { [k in FEH_Stat]?: number };
     }) => {
-      const trackedStatChange = getValues(`${options.stat}-change`);
+      const alteredStats = getAlteredStats();
       const baseGrowthRate = STATS[options.character].growthRates[options.stat];
       const baseLevel1 = STATS[options.character].lv1[options.stat];
       const finalGrowthRate =
-        trackedStatChange === "asset"
+        alteredStats.asset === options.stat
           ? baseGrowthRate + 5
-          : trackedStatChange === "flaw"
+          : alteredStats.asset === options.stat
           ? baseGrowthRate - 5
           : baseGrowthRate;
       const finalLevel1 =
-        trackedStatChange === "asset"
+        alteredStats.asset === options.stat
           ? baseLevel1 + 1
-          : trackedStatChange === "flaw"
+          : alteredStats.flaw === options.stat
           ? baseLevel1 - 1
           : baseLevel1;
       const level40Stat = convertToLevel40(finalLevel1, finalGrowthRate);
