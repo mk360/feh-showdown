@@ -1,6 +1,6 @@
 import { createContext } from "preact";
 import { SetStateAction } from "preact/compat";
-import { Dispatch, useMemo, useState } from "preact/hooks";
+import { Dispatch, useState } from "preact/hooks";
 
 const TeamContext = createContext<{
   teamPreview: StoredHero[];

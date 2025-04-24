@@ -62,7 +62,7 @@ function UnitPreview(summary: { data: StoredHero }) {
                 loading="lazy"
                 title={summary.data?.passive_b}
                 class="game-asset"
-                src="/no-skill.png"
+                src="/teambuilder/no-skill.png"
               />
             )}
             {!!summary.data?.passive_b && summary.data?.passive_b !== "No B" ? (
@@ -80,7 +80,7 @@ function UnitPreview(summary: { data: StoredHero }) {
                 loading="lazy"
                 title={summary.data?.passive_b}
                 class="game-asset"
-                src="/no-skill.png"
+                src="/teambuilder/no-skill.png"
               />
             )}
             {!!summary.data?.passive_c && summary.data?.passive_c !== "No C" ? (
@@ -98,7 +98,7 @@ function UnitPreview(summary: { data: StoredHero }) {
                 loading="lazy"
                 title={summary.data?.passive_c}
                 class="game-asset"
-                src="/no-skill.png"
+                src="/teambuilder/no-skill.png"
               />
             )}
             {!!summary.data?.passive_s && summary.data?.passive_s !== "No S" ? (
@@ -116,22 +116,22 @@ function UnitPreview(summary: { data: StoredHero }) {
                 loading="lazy"
                 title={summary.data?.passive_b}
                 class="game-asset"
-                src="/no-skill.png"
+                src="/teambuilder/no-skill.png"
               />
             )}
           </div>
         </div>
         <div class="main-skills">
           <div>
-            <img src="/weapon-icon.png" />
+            <img src="/teambuilder/weapon-icon.png" />
             {summary.data?.weapon}
           </div>
           <div>
-            <img src="/assist-icon.png" />
+            <img src="/teambuilder/assist-icon.png" />
             {summary.data?.assist}
           </div>
           <div>
-            <img src="/special-icon.png" />
+            <img src="/teambuilder/special-icon.png" />
             {summary.data?.special}
           </div>
         </div>

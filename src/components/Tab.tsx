@@ -7,13 +7,14 @@ import {
 } from "preact/hooks";
 import { Fragment } from "preact/jsx-runtime";
 import { useForm } from "react-hook-form";
-import SKILL_STAT_CHANGES from "../../public/buffs";
+import SKILL_STAT_CHANGES from "../buffs";
 import TeamContext from "../team-context";
 import fetchMovesets from "../utils/fetch-moveset";
 import { formatName } from "../utils/strings";
 import Summary from "./summary";
 import TeamPreview from "./team-preview";
 import UnitList from "./unit-list";
+import STATS from "../stats";
 
 interface SkillWithDescription {
   name: string;

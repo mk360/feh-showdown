@@ -5,6 +5,7 @@ import WeaponCheckbox from "./weapon-checkbox";
 import { capitalize, formatName } from "../utils/strings";
 import { memo, MouseEventHandler } from "preact/compat";
 import getSortingFunction from "../utils/sort-functions";
+import STATS from "../stats";
 
 interface HeroFilters {
   characterName: string;
@@ -133,7 +134,7 @@ function UnitList({
                   {...register("color")}
                 />
                 <label for={`${index}-red`}>
-                  <img class="game-asset" src="/red.png" />
+                  <img class="game-asset" src="/teambuilder/red.png" />
                 </label>
               </td>
               <td>
@@ -145,7 +146,7 @@ function UnitList({
                   {...register("color")}
                 />
                 <label for={`${index}-blue`}>
-                  <img class="game-asset" src="/blue.png" />
+                  <img class="game-asset" src="/teambuilder/blue.png" />
                 </label>
               </td>
               <td>
@@ -157,7 +158,7 @@ function UnitList({
                   {...register("color")}
                 />
                 <label for={`${index}-green`}>
-                  <img class="game-asset" src="/green.png" />
+                  <img class="game-asset" src="/teambuilder/green.png" />
                 </label>
               </td>
               <td>
@@ -169,7 +170,7 @@ function UnitList({
                   {...register("color")}
                 />
                 <label for={`${index}-colorless`}>
-                  <img class="game-asset" src="/colorless.png" />
+                  <img class="game-asset" src="/teambuilder/colorless.png" />
                 </label>
               </td>
             </tr>
@@ -579,7 +580,7 @@ function UnitList({
                       <div class="thumbnail">
                         <img
                           class="portrait loading"
-                          src={`/thumbnails/${formattedName}.webp`}
+                          src={`/teambuilder/thumbnails/${formattedName}.webp`}
                           alt={result}
                           onLoad={function (e) {
                             (e.target as HTMLImageElement).classList.remove(

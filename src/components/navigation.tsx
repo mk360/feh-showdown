@@ -3,6 +3,7 @@ import TeamContext from "../team-context";
 import { formatName } from "../utils/strings";
 import MovementIcon from "./movement-icon";
 import WeaponIcon from "./weapon-icon";
+import STATS from "../stats";
 
 function Navigation() {
   const { setTab, teamPreview } = useContext(TeamContext);
@@ -40,7 +41,9 @@ function NavButton({
       {!!teamPreview[index].name ? (
         <>
           <img
-            src={`/thumbnails/${formatName(teamPreview[index].name)}.webp`}
+            src={`/teambuilder/thumbnails/${formatName(
+              teamPreview[index].name
+            )}.webp`}
           />
           <div>
             <WeaponIcon

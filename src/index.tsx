@@ -16,7 +16,7 @@ export function App() {
       <Header />
       <main>
         <Router>
-          <Route path="/" component={Teambuilder} />
+          <Route path="/teambuilder/" component={Teambuilder} />
           <Route default component={NotFound} />
         </Router>
       </main>

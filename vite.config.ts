@@ -1,19 +1,30 @@
 import { defineConfig } from 'vite';
 import preact from '@preact/preset-vite';
+import viteTsconfigPaths from 'vite-tsconfig-paths';
+
+console.log("---------------this is being read ----------------------------------")
 
 // https://vitejs.dev/config/
 export default defineConfig({
+	base: "/teambuilder/",
 	plugins: [
 		preact({
 			prerender: {
 				enabled: true,
 				renderTarget: '#app',
-				additionalPrerenderRoutes: ['/404'],
+				additionalPrerenderRoutes: ['/'],
 				previewMiddlewareEnabled: true,
-				previewMiddlewareFallback: '/404',
+				previewMiddlewareFallback: '/teambuilder/404',
 			},
 			reactAliasesEnabled: true
 		}),
-
+		viteTsconfigPaths()
 	],
+	// experimental: {
+	// 	renderBuiltUrl() {
+	// 		return {
+	// 			relative: true
+	// 		}
+	// 	}
+	// }
 });
