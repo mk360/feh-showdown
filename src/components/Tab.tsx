@@ -948,6 +948,7 @@ export default function Tab() {
               fetch(`http://localhost:3800/team`, {
                 method: "POST",
                 headers: {
+                  "Authorization": localStorage.getItem("pid"),
                   "Content-Type": "application/json"
                 },
                 signal: lastAbortController.current.signal,
