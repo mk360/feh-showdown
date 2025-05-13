@@ -7,10 +7,7 @@ export default function Teambuilder() {
   return (
     <TeamProvider>
       <Navigation />
-      <Tab index={0} />
-      <Tab index={1} />
-      <Tab index={2} />
-      <Tab index={3} />
+      <Tab />
     </TeamProvider>
   );
 }

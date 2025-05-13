@@ -1,6 +1,6 @@
 import { createContext } from "preact";
 import { SetStateAction } from "preact/compat";
-import { Dispatch, useState } from "preact/hooks";
+import { Dispatch, useEffect, useState } from "preact/hooks";
 
 const TeamContext = createContext<{
   teamPreview: StoredHero[];
@@ -31,6 +31,13 @@ export const TeamProvider = ({ children }) => {
     })
   );
   const [tab, setTab] = useState(0);
+
+  useEffect(() => {
+    if (localStorage.getItem("saved-team")) {
+      const parsedTeam = JSON.parse(localStorage.getItem("saved-team"));
+      setTeamPreview(parsedTeam);
+    }
+  }, []);
 
   return (
     <TeamContext.Provider value={{ teamPreview, setTeamPreview, tab, setTab }}>

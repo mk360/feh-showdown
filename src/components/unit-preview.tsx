@@ -6,7 +6,7 @@ function UnitPreview(summary: { data: StoredHero }) {
       {!!summary.data?.name && (
         <img
           class="banner"
-          src={`/banners/${formatName(summary.data?.name)}.webp`}
+          src={`/teambuilder/banners/${formatName(summary.data?.name)}.webp`}
         />
       )}
       <div class="unit-grid">
@@ -114,7 +114,7 @@ function UnitPreview(summary: { data: StoredHero }) {
             ) : (
               <img
                 loading="lazy"
-                title={summary.data?.passive_b}
+                title={summary.data?.passive_s}
                 class="game-asset"
                 src="/teambuilder/no-skill.png"
               />

@@ -2,8 +2,6 @@ import { defineConfig } from 'vite';
 import preact from '@preact/preset-vite';
 import viteTsconfigPaths from 'vite-tsconfig-paths';
 
-console.log("---------------this is being read ----------------------------------")
-
 // https://vitejs.dev/config/
 export default defineConfig({
 	base: "/teambuilder/",

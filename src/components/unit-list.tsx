@@ -466,7 +466,7 @@ function UnitList({
               <td colSpan={4}>
                 <input
                   type="submit"
-                  style="height: 100%; padding: 30px; width: 100%"
+                  style="height: 100%; padding: 30px; width: 100%; background-color: #FF6A3D; border: none"
                 />
               </td>
             </tr>

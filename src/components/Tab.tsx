@@ -3,6 +3,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "preact/hooks";
 import { Fragment } from "preact/jsx-runtime";
@@ -48,16 +49,18 @@ function convertToLevel40(stat1: number, growthRate: number) {
   return stat1 + growthValue;
 }
 
-export default function Tab({ index }: { index: number }) {
+export default function Tab() {
   const [temporaryChoice, setTemporaryChoice] = useState("");
-  const [subTab, setSubTab] = useState<"list" | "detail">("list");
+  const lastAbortController = useRef(new AbortController());
   const [moveset, setMoveset] = useState<CharacterMoveset>(null);
   const { teamPreview, setTeamPreview, tab } = useContext(TeamContext);
+  const [subTab, setSubTab] = useState<"list" | "detail">();
   const {
     register: registerMoveset,
     handleSubmit: handleSubmitMoveset,
     getValues,
     reset,
+    setValue,
   } = useForm<{
     [k in keyof (SkillList & StatChangeFields & { merges: number })]: string;
   }>({
@@ -74,82 +77,71 @@ export default function Tab({ index }: { index: number }) {
   });
 
   const skillsData = useMemo(() => {
-    const isDisplayed = tab === index;
+    const unitName = teamPreview[tab].name;
+    if (!unitName || !moveset) {
+      return {
+        weapons: [],
+        assists: [],
+        specials: [],
+        A: [],
+        B: [],
+        C: [],
+        S: []
+      }
+    }
     return {
-      weapons:
-        !moveset || !isDisplayed
-          ? []
-          : [{ name: "No Weapon", description: "", might: 0 }]
+      weapons: [{ name: "No Weapon", description: "", might: 0 }]
               .concat(moveset.exclusiveSkills.weapons || [])
               .concat(moveset.commonSkills.weapons || []),
-      assists:
-        !moveset || !isDisplayed
-          ? []
-          : [{ name: "No Assist", description: "" }]
+      assists: [{ name: "No Assist", description: "" }]
               .concat(moveset.exclusiveSkills.assists)
               .concat(moveset.commonSkills.assists),
-      specials:
-        !moveset || !isDisplayed
-          ? []
-          : [{ name: "No Special", description: "" }]
+      specials: [{ name: "No Special", description: "" }]
               .concat(moveset.exclusiveSkills.specials)
               .concat(moveset.commonSkills.specials),
-      A:
-        !moveset || !isDisplayed
-          ? []
-          : [{ name: "No A", description: "" }]
+      A: [{ name: "No A", description: "" }]
               .concat(moveset.exclusiveSkills.A)
               .concat(moveset.commonSkills.A),
-      B:
-        !moveset || !isDisplayed
-          ? []
-          : [{ name: "No B", description: "" }]
+      B: [{ name: "No B", description: "" }]
               .concat(moveset.exclusiveSkills.B)
               .concat(moveset.commonSkills.B),
-      C:
-        !moveset || !isDisplayed
-          ? []
-          : [{ name: "No C", description: "" }]
+      C: [{ name: "No C", description: "" }]
               .concat(moveset.exclusiveSkills.C)
               .concat(moveset.commonSkills.C),
-      S:
-        !moveset || !isDisplayed
-          ? []
-          : [{ name: "No S", description: "" }].concat(moveset.commonSkills.S),
+      S: [{ name: "No S", description: "" }].concat(moveset.commonSkills.S),
     };
   }, [moveset, tab]);
 
   useEffect(() => {
-    if (temporaryChoice) {
-      reset();
-      scrollTo({
-        top: 0,
-        behavior: "instant",
+    if (teamPreview[tab].name) {
+      fetchMovesets(teamPreview[tab].name).then((moveset) => {
+        const tabData = teamPreview[tab];
+        setTemporaryChoice(teamPreview[tab].name);
+        setValue("merges", tabData.merges.toString());
+        setValue("hp-change", tabData.stats.asset === "hp" ? "asset" : tabData.stats.flaw === "hp" ? "flaw" : "");
+        setValue("atk-change", tabData.stats.asset === "atk" ? "asset" : tabData.stats.flaw === "atk" ? "flaw" : "");
+        setValue("spd-change", tabData.stats.asset === "spd" ? "asset" : tabData.stats.flaw === "spd" ? "flaw" : "");
+        setValue("def-change", tabData.stats.asset === "def" ? "asset" : tabData.stats.flaw === "def" ? "flaw" : "");
+        setValue("res-change", tabData.stats.asset === "res" ? "asset" : tabData.stats.flaw === "res" ? "flaw" : "");
+        setValue("weapons", tabData.weapon);
+        setValue("assists", tabData.assist);
+        setValue("specials", tabData.special);
+        setValue("A", tabData.passive_a);
+        setValue("B", tabData.passive_b);
+        setValue("C", tabData.passive_c);
+        setValue("S", tabData.passive_s);
+        setMoveset(moveset);
       });
-      handleSubmitMoveset((data) => {
-        const copy: StoredHero[] = [];
-        for (let member of teamPreview) {
-          copy.push(member);
-        }
-        copy[index] = {
-          name: temporaryChoice,
-          weapon: data.weapons,
-          assist: data.assists,
-          special: data.specials,
-          merges: +data.merges,
-          passive_a: data.A,
-          passive_b: data.B,
-          passive_c: data.C,
-          passive_s: data.S,
-          stats: {
-            ...stats,
-            ...getAlteredStats(),
-          },
-        };
-        setTeamPreview(copy);
-      })();
     }
-  }, [temporaryChoice]);
+  }, [teamPreview[tab].name]);
+
+  useEffect(() => {
+    if (teamPreview[tab].name) {
+      setSubTab("detail");
+    } else {
+      setSubTab("list");
+    }
+  }, [teamPreview[tab].name]);
 
   const getExtraStats = () => {
     const stats: { [k in FEH_Stat]?: number } = {
@@ -191,9 +183,16 @@ export default function Tab({ index }: { index: number }) {
       (stat: FEH_Stat) => getValues(`${stat}-change`) === "flaw"
     );
 
+    if (asset && flaw) {
+      return {
+        asset,
+        flaw,
+      };
+    }
+
     return {
-      asset: asset ?? ("" as const),
-      flaw: flaw ?? ("" as const),
+      asset: "" as const,
+      flaw: "" as const
     };
   };
 
@@ -234,8 +233,8 @@ export default function Tab({ index }: { index: number }) {
           return statLabels.indexOf(b) - statLabels.indexOf(a);
         return statDifference;
       })
-      .map(([key, value]) => ({
-        stat: key,
+      .map(([stat, value]) => ({
+        stat,
         value,
       }));
     const firstStatChange =
@@ -251,6 +250,7 @@ export default function Tab({ index }: { index: number }) {
       [4, 0],
       [1, 2],
     ];
+
     for (let i = 0; i < merges; i++) {
       let mod5 = i % 5;
       let increase = statChanges[mod5];
@@ -259,12 +259,14 @@ export default function Tab({ index }: { index: number }) {
       }
     }
 
+    const splitStats = Object.groupBy(sortedStats, (s) => s.stat);
+
     const obj: { [k in FEH_Stat]: number } = {
-      hp: sortedStats.find((s) => s.stat === "hp").value,
-      atk: sortedStats.find((s) => s.stat === "atk").value,
-      spd: sortedStats.find((s) => s.stat === "spd").value,
-      def: sortedStats.find((s) => s.stat === "def").value,
-      res: sortedStats.find((s) => s.stat === "res").value,
+      hp: splitStats["hp"][0]?.value,
+      atk: splitStats["atk"][0]?.value,
+      spd: splitStats["spd"][0]?.value,
+      def: splitStats["def"][0]?.value,
+      res: splitStats["res"][0]?.value,
     };
 
     return obj;
@@ -323,7 +325,7 @@ export default function Tab({ index }: { index: number }) {
 
   return (
     <>
-      <div class={tab !== index || subTab === "detail" ? "hide" : ""}>
+      <div class={subTab === "detail" ? "hide" : ""}>
         <UnitList
           onUnitClick={(e) => {
             let target = e.target as HTMLElement;
@@ -336,7 +338,7 @@ export default function Tab({ index }: { index: number }) {
               setMoveset(moveset);
             });
           }}
-          index={index}
+          index={tab}
         />
       </div>
       <div
@@ -395,7 +397,7 @@ export default function Tab({ index }: { index: number }) {
           for (let member of teamPreview) {
             copy.push(member);
           }
-          copy[index] = {
+          copy[tab] = {
             name: temporaryChoice,
             weapon: data.weapons,
             assist: data.assists,
@@ -413,12 +415,12 @@ export default function Tab({ index }: { index: number }) {
           setTeamPreview(copy);
         })}
         class={
-          (subTab === "list" || tab !== index ? "hide " : "") + "detail-list"
+          (subTab === "list" ? "hide " : "") + "detail-list"
         }
       >
         <div class="hero-portrait">
           <h2>{temporaryChoice}</h2>
-          <img src={`/portraits/${formatName(temporaryChoice ?? "")}.webp`} />
+          <img src={`/teambuilder/portraits/${formatName(temporaryChoice ?? "")}.webp`} />
           <div />
         </div>
         <div class="stats">
@@ -431,7 +433,7 @@ export default function Tab({ index }: { index: number }) {
                 <td>
                   <input
                     class="stat-input"
-                    id={`${index}-flaw-hp`}
+                    id={`flaw-hp`}
                     type="radio"
                     {...registerMoveset("hp-change")}
                     value="flaw"
@@ -442,26 +444,26 @@ export default function Tab({ index }: { index: number }) {
                       getValues("res-change"),
                     ].includes("flaw")}
                   />
-                  <label class="flaw" for={`${index}-flaw-hp`}>
+                  <label class="flaw" for={`flaw-hp`}>
                     Flaw
                   </label>
                 </td>
                 <td>
                   <input
                     class="stat-input"
-                    id={`${index}-neutral-hp`}
+                    id={`neutral-hp`}
                     type="radio"
                     {...registerMoveset("hp-change")}
                     value="neutral"
                   />
-                  <label class="neutral" for={`${index}-neutral-hp`}>
+                  <label class="neutral" for={`neutral-hp`}>
                     Neutral
                   </label>
                 </td>
                 <td>
                   <input
                     class="stat-input"
-                    id={`${index}-asset-hp`}
+                    id={`asset-hp`}
                     type="radio"
                     {...registerMoveset("hp-change")}
                     disabled={[
@@ -472,7 +474,7 @@ export default function Tab({ index }: { index: number }) {
                     ].includes("asset")}
                     value="asset"
                   />
-                  <label class="asset" for={`${index}-asset-hp`}>
+                  <label class="asset" for={`asset-hp`}>
                     Asset
                   </label>
                 </td>
@@ -483,7 +485,7 @@ export default function Tab({ index }: { index: number }) {
                 <td>
                   <input
                     class="stat-input"
-                    id={`${index}-flaw-atk`}
+                    id={`flaw-atk`}
                     type="radio"
                     {...registerMoveset("atk-change")}
                     disabled={[
@@ -494,26 +496,26 @@ export default function Tab({ index }: { index: number }) {
                     ].includes("flaw")}
                     value="flaw"
                   />
-                  <label class="flaw" for={`${index}-flaw-atk`}>
+                  <label class="flaw" for={`flaw-atk`}>
                     Flaw
                   </label>
                 </td>
                 <td>
                   <input
                     class="stat-input"
-                    id={`${index}-neutral-atk`}
+                    id={`neutral-atk`}
                     type="radio"
                     {...registerMoveset("atk-change")}
                     value="neutral"
                   />
-                  <label class="neutral" for={`${index}-neutral-atk`}>
+                  <label class="neutral" for={`neutral-atk`}>
                     Neutral
                   </label>
                 </td>
                 <td>
                   <input
                     class="stat-input"
-                    id={`${index}-asset-atk`}
+                    id={`asset-atk`}
                     type="radio"
                     {...registerMoveset("atk-change")}
                     value="asset"
@@ -524,7 +526,7 @@ export default function Tab({ index }: { index: number }) {
                       getValues("res-change"),
                     ].includes("asset")}
                   />
-                  <label class="asset" for={`${index}-asset-atk`}>
+                  <label class="asset" for={`asset-atk`}>
                     Asset
                   </label>
                 </td>
@@ -535,7 +537,7 @@ export default function Tab({ index }: { index: number }) {
                 <td>
                   <input
                     class="stat-input"
-                    id={`${index}-flaw-spd`}
+                    id={`flaw-spd`}
                     type="radio"
                     {...registerMoveset("spd-change")}
                     value="flaw"
@@ -546,26 +548,26 @@ export default function Tab({ index }: { index: number }) {
                       getValues("res-change"),
                     ].includes("flaw")}
                   />
-                  <label class="flaw" for={`${index}-flaw-spd`}>
+                  <label class="flaw" for={`flaw-spd`}>
                     Flaw
                   </label>
                 </td>
                 <td>
                   <input
                     class="stat-input"
-                    id={`${index}-neutral-spd`}
+                    id={`neutral-spd`}
                     type="radio"
                     {...registerMoveset("spd-change")}
                     value="neutral"
                   />
-                  <label class="neutral" for={`${index}-neutral-spd`}>
+                  <label class="neutral" for={`neutral-spd`}>
                     Neutral
                   </label>
                 </td>
                 <td>
                   <input
                     class="stat-input"
-                    id={`${index}-asset-spd`}
+                    id={`asset-spd`}
                     type="radio"
                     {...registerMoveset("spd-change")}
                     value="asset"
@@ -576,7 +578,7 @@ export default function Tab({ index }: { index: number }) {
                       getValues("res-change"),
                     ].includes("asset")}
                   />
-                  <label class="asset" for={`${index}-asset-spd`}>
+                  <label class="asset" for={`asset-spd`}>
                     Asset
                   </label>
                 </td>
@@ -587,7 +589,7 @@ export default function Tab({ index }: { index: number }) {
                 <td>
                   <input
                     class="stat-input"
-                    id={`${index}-flaw-def`}
+                    id={`flaw-def`}
                     type="radio"
                     {...registerMoveset("def-change")}
                     value="flaw"
@@ -598,26 +600,26 @@ export default function Tab({ index }: { index: number }) {
                       getValues("res-change"),
                     ].includes("flaw")}
                   />
-                  <label class="flaw" for={`${index}-flaw-def`}>
+                  <label class="flaw" for={`flaw-def`}>
                     Flaw
                   </label>
                 </td>
                 <td>
                   <input
                     class="stat-input"
-                    id={`${index}-neutral-def`}
+                    id={`neutral-def`}
                     type="radio"
                     {...registerMoveset("def-change")}
                     value="neutral"
                   />
-                  <label class="neutral" for={`${index}-neutral-def`}>
+                  <label class="neutral" for={`neutral-def`}>
                     Neutral
                   </label>
                 </td>
                 <td>
                   <input
                     class="stat-input"
-                    id={`${index}-asset-def`}
+                    id={`asset-def`}
                     type="radio"
                     {...registerMoveset("def-change")}
                     value="asset"
@@ -628,7 +630,7 @@ export default function Tab({ index }: { index: number }) {
                       getValues("res-change"),
                     ].includes("asset")}
                   />
-                  <label class="asset" for={`${index}-asset-def`}>
+                  <label class="asset" for={`asset-def`}>
                     Asset
                   </label>
                 </td>
@@ -639,7 +641,7 @@ export default function Tab({ index }: { index: number }) {
                 <td>
                   <input
                     class="stat-input"
-                    id={`${index}-flaw-res`}
+                    id={`flaw-res`}
                     type="radio"
                     {...registerMoveset("res-change")}
                     value="flaw"
@@ -647,26 +649,26 @@ export default function Tab({ index }: { index: number }) {
                       getAlteredStats().flaw
                     )}
                   />
-                  <label class="flaw" for={`${index}-flaw-res`}>
+                  <label class="flaw" for={`flaw-res`}>
                     Flaw
                   </label>
                 </td>
                 <td>
                   <input
                     class="stat-input"
-                    id={`${index}-neutral-res`}
+                    id={`neutral-res`}
                     type="radio"
                     {...registerMoveset("res-change")}
                     value="neutral"
                   />
-                  <label class="neutral" for={`${index}-neutral-res`}>
+                  <label class="neutral" for={`neutral-res`}>
                     Neutral
                   </label>
                 </td>
                 <td>
                   <input
                     class="stat-input"
-                    id={`${index}-asset-res`}
+                    id={`asset-res`}
                     type="radio"
                     {...registerMoveset("res-change")}
                     value="asset"
@@ -674,7 +676,7 @@ export default function Tab({ index }: { index: number }) {
                       getAlteredStats().asset
                     )}
                   />
-                  <label class="asset" for={`${index}-asset-res`}>
+                  <label class="asset" for={`asset-res`}>
                     Asset
                   </label>
                 </td>
@@ -697,25 +699,25 @@ export default function Tab({ index }: { index: number }) {
         </div>
         <div class="weapon-list">
           <h2>
-            <img class="game-asset" src="/weapon-icon.png" /> Weapons
+            <img class="game-asset" src="/teambuilder/weapon-icon.png" /> Weapons
           </h2>
           {skillsData.weapons.map((weaponData) => {
             return (
               <Fragment key={weaponData.name}>
                 <input
                   value={weaponData.name}
-                  id={`${index}-weapon-${weaponData.name}`}
+                  id={`weapon-${weaponData.name}`}
                   type="radio"
                   class="hide"
                   {...registerMoveset("weapons")}
                 />
                 <label
                   class={`skill-label ${STATS[temporaryChoice].color}`}
-                  for={`${index}-weapon-${weaponData.name}`}
+                  for={`weapon-${weaponData.name}`}
                 >
                   <div>
                     <h3>
-                      <img class="game-asset" src="/weapon-icon.png" />
+                      <img class="game-asset" src="/teambuilder/weapon-icon.png" />
                       {weaponData.name}
                     </h3>
                     {!!weaponData.might && <h4>{weaponData.might}</h4>}
@@ -728,7 +730,7 @@ export default function Tab({ index }: { index: number }) {
         </div>
         <div class="assist-list">
           <h2>
-            <img class="game-asset" src="/assist-icon.png" />
+            <img class="game-asset" src="/teambuilder/assist-icon.png" />
             Assists
           </h2>
           {skillsData.assists.map((assistData) => {
@@ -736,17 +738,17 @@ export default function Tab({ index }: { index: number }) {
               <Fragment key={assistData.name}>
                 <input
                   value={assistData.name}
-                  id={`${index}-assists-${assistData.name}`}
+                  id={`assists-${assistData.name}`}
                   type="radio"
                   class="hide"
                   {...registerMoveset("assists")}
                 />
                 <label
                   class={`skill-label ${STATS[temporaryChoice].color}`}
-                  for={`${index}-assists-${assistData.name}`}
+                  for={`assists-${assistData.name}`}
                 >
                   <h3>
-                    <img class="game-asset" src="/assist-icon.png" />
+                    <img class="game-asset" src="/teambuilder/assist-icon.png" />
                     {assistData.name}
                   </h3>
                   {!!assistData.description && <p>{assistData.description}</p>}
@@ -757,7 +759,7 @@ export default function Tab({ index }: { index: number }) {
         </div>
         <div class="specials-list">
           <h2>
-            <img class="game-asset" src="/special-icon.png" />
+            <img class="game-asset" src="/teambuilder/special-icon.png" />
             Specials
           </h2>
           {skillsData.specials.map((specialsData) => {
@@ -765,17 +767,17 @@ export default function Tab({ index }: { index: number }) {
               <Fragment key={specialsData.name}>
                 <input
                   value={specialsData.name}
-                  id={`${index}-special-${specialsData.name}`}
+                  id={`special-${specialsData.name}`}
                   type="radio"
                   class="hide"
                   {...registerMoveset("specials")}
                 />
                 <label
                   class={`skill-label ${STATS[temporaryChoice].color}`}
-                  for={`${index}-special-${specialsData.name}`}
+                  for={`special-${specialsData.name}`}
                 >
                   <h3>
-                    <img class="game-asset" src="/special-icon.png" />
+                    <img class="game-asset" src="/teambuilder/special-icon.png" />
                     {specialsData.name}
                   </h3>
                   {!!specialsData.description && (
@@ -788,7 +790,7 @@ export default function Tab({ index }: { index: number }) {
         </div>
         <div class="passive-a-list">
           <h2>
-            <img class="game-asset" src="/A.png" />
+            <img class="game-asset" src="/teambuilder/A.png" />
             Skill
           </h2>
           {skillsData.A.map((passive) => {
@@ -796,14 +798,14 @@ export default function Tab({ index }: { index: number }) {
               <Fragment key={passive.name}>
                 <input
                   value={passive.name}
-                  id={`${index}-A-${passive.name}`}
+                  id={`A-${passive.name}`}
                   type="radio"
                   class="hide"
                   {...registerMoveset("A")}
                 />
                 <label
                   class={`skill-label ${STATS[temporaryChoice].color}`}
-                  for={`${index}-A-${passive.name}`}
+                  for={`A-${passive.name}`}
                 >
                   <h3>
                     {passive.name !== "No A" && (
@@ -826,7 +828,7 @@ export default function Tab({ index }: { index: number }) {
         </div>
         <div class="passive-b-list">
           <h2>
-            <img class="game-asset" src="/B.png" />
+            <img class="game-asset" src="/teambuilder/B.png" />
             Skill
           </h2>
           {skillsData.B.map((passive) => {
@@ -836,12 +838,12 @@ export default function Tab({ index }: { index: number }) {
                   type="radio"
                   class="hide"
                   value={passive.name}
-                  id={`${index}-B-${passive.name}`}
+                  id={`B-${passive.name}`}
                   {...registerMoveset("B")}
                 />
                 <label
                   class={`skill-label ${STATS[temporaryChoice].color}`}
-                  for={`${index}-B-${passive.name}`}
+                  for={`B-${passive.name}`}
                 >
                   <h3>
                     {passive.name !== "No B" && (
@@ -864,8 +866,8 @@ export default function Tab({ index }: { index: number }) {
         </div>
         <div class="passive-c-list">
           <h2>
-            <img class="game-asset" src="/C.png" />
-            Skill C
+            <img class="game-asset" src="/teambuilder/C.png" />
+            Skill
           </h2>
           {skillsData.C.map((passive) => {
             return (
@@ -874,12 +876,12 @@ export default function Tab({ index }: { index: number }) {
                   type="radio"
                   class="hide"
                   value={passive.name}
-                  id={`${index}-C-${passive.name}`}
+                  id={`C-${passive.name}`}
                   {...registerMoveset("C")}
                 />
                 <label
                   class={`skill-label ${STATS[temporaryChoice].color}`}
-                  for={`${index}-C-${passive.name}`}
+                  for={`C-${passive.name}`}
                 >
                   <h3>
                     {passive.name !== "No C" && (
@@ -907,14 +909,14 @@ export default function Tab({ index }: { index: number }) {
               <Fragment key={passive.name}>
                 <input
                   value={passive.name}
-                  id={`${index}-S-${passive.name}`}
+                  id={`S-${passive.name}`}
                   type="radio"
                   class="hide"
                   {...registerMoveset("S")}
                 />
                 <label
                   class={`skill-label ${STATS[temporaryChoice].color}`}
-                  for={`${index}-S-${passive.name}`}
+                  for={`S-${passive.name}`}
                 >
                   <h3>
                     {passive.name !== "No S" && (
@@ -939,6 +941,26 @@ export default function Tab({ index }: { index: number }) {
           <TeamPreview />
         </div>
         <div class="submit">
+        <button
+            onClick={() => {
+              lastAbortController.current.abort();
+              lastAbortController.current = new AbortController();
+              fetch(`http://localhost:3800/team`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                signal: lastAbortController.current.signal,
+                body: JSON.stringify(teamPreview.filter((i) => i.name))
+              }).then((resp) => {
+                console.log(resp.ok);
+                return resp.json()
+              }).then(console.log)
+            }}
+            class="save"
+          >
+            Save Team
+          </button>
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -951,7 +973,7 @@ export default function Tab({ index }: { index: number }) {
         </div>
         <div class="moveset-summary">
           <h2>Summary</h2>
-          <Summary data={teamPreview[index]} />
+          <Summary data={teamPreview[tab]} />
         </div>
       </div>
     </>

@@ -2,15 +2,15 @@ function Summary({ data }: { data: StoredHero }) {
   return (
     <div class="summary-grid">
       <div>
-        <img class="game-asset" src="/weapon-icon.png" />
+        <img class="game-asset" src="/teambuilder/weapon-icon.png" />
       </div>
       <div>{data?.weapon}</div>
       <div>
-        <img class="game-asset" src="/assist-icon.png" />
+        <img class="game-asset" src="/teambuilder/assist-icon.png" />
       </div>
       <div>{data?.assist}</div>
       <div>
-        <img class="game-asset" src="/special-icon.png" />
+        <img class="game-asset" src="/teambuilder/special-icon.png" />
       </div>
       <div>{data?.special}</div>
       <div>
@@ -20,7 +20,7 @@ function Summary({ data }: { data: StoredHero }) {
           src={
             data?.passive_a !== ""
               ? `http://localhost:3479/img/${data?.passive_a.replace("/", ";")}`
-              : "/A.png"
+              : "/teambuilder/A.png"
           }
         />
       </div>
@@ -32,7 +32,7 @@ function Summary({ data }: { data: StoredHero }) {
           src={
             data?.passive_b !== ""
               ? `http://localhost:3479/img/${data?.passive_b.replace("/", ";")}`
-              : "/B.png"
+              : "/teambuilder/B.png"
           }
         />
       </div>
@@ -44,7 +44,7 @@ function Summary({ data }: { data: StoredHero }) {
           src={
             data?.passive_c !== ""
               ? `http://localhost:3479/img/${data?.passive_c.replace("/", ";")}`
-              : "/C.png"
+              : "/teambuilder/C.png"
           }
         />
       </div>
@@ -56,7 +56,7 @@ function Summary({ data }: { data: StoredHero }) {
           src={
             data?.passive_s !== ""
               ? `http://localhost:3479/img/${data?.passive_s.replace("/", ";")}`
-              : "/C.png"
+              : "/teambuilder/S.png"
           }
         />
       </div>
