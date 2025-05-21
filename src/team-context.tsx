@@ -33,8 +33,8 @@ export const TeamProvider = ({ children }) => {
   const [tab, setTab] = useState(0);
 
   useEffect(() => {
-    if (localStorage.getItem("saved-team")) {
-      const parsedTeam = JSON.parse(localStorage.getItem("saved-team"));
+    if (localStorage.getItem("team")) {
+      const parsedTeam = JSON.parse(localStorage.getItem("team"));
       setTeamPreview(parsedTeam);
     }
   }, []);

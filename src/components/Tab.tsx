@@ -77,7 +77,7 @@ export default function Tab() {
   });
 
   const skillsData = useMemo(() => {
-    const unitName = teamPreview[tab].name;
+    const unitName = teamPreview[tab]?.name;
     if (!unitName || !moveset) {
       return {
         weapons: [],
@@ -113,7 +113,7 @@ export default function Tab() {
   }, [moveset, tab]);
 
   useEffect(() => {
-    if (teamPreview[tab].name) {
+    if (teamPreview[tab]?.name) {
       fetchMovesets(teamPreview[tab].name).then((moveset) => {
         const tabData = teamPreview[tab];
         setTemporaryChoice(teamPreview[tab].name);
@@ -133,21 +133,20 @@ export default function Tab() {
         setMoveset(moveset);
       });
     }
-  }, [teamPreview[tab].name]);
+  }, [teamPreview[tab]?.name]);
 
   useEffect(() => {
-    if (teamPreview[tab].name) {
+    if (teamPreview[tab]?.name) {
       setSubTab("detail");
     } else {
       setSubTab("list");
     }
-  }, [teamPreview[tab].name]);
+  }, [teamPreview[tab]?.name]);
 
   const getExtraStats = () => {
     const stats: { [k in FEH_Stat]?: number } = {
       hp: 0,
-      atk:
-        skillsData.weapons.find(({ name }) => name === getValues("weapons"))
+      atk: skillsData.weapons.find(({ name }) => name === getValues("weapons"))
           ?.might ?? 0,
       spd: 0,
       def: 0,
@@ -334,6 +333,12 @@ export default function Tab() {
             }
             fetchMovesets(target.id).then((moveset) => {
               setTemporaryChoice(target.id);
+              const copy = [...teamPreview];
+              copy[tab] = {
+                ...copy[tab],
+                name: target.id,
+              };
+              setTeamPreview(copy);
               setSubTab("detail");
               setMoveset(moveset);
             });
@@ -945,7 +950,7 @@ export default function Tab() {
             onClick={() => {
               lastAbortController.current.abort();
               lastAbortController.current = new AbortController();
-              fetch(`http://localhost:3800/team`, {
+              fetch(`${import.meta.env.VITE_API_URL}/team`, {
                 method: "POST",
                 headers: {
                   "Authorization": localStorage.getItem("pid"),
@@ -954,9 +959,23 @@ export default function Tab() {
                 signal: lastAbortController.current.signal,
                 body: JSON.stringify(teamPreview.filter((i) => i.name))
               }).then((resp) => {
-                console.log(resp.ok);
+                if (resp.ok) {
+                  localStorage.setItem("team", JSON.stringify(teamPreview.filter((i) => i.name)));
+                  return {};
+                }
                 return resp.json()
-              }).then(console.log)
+              }).then((errors) => {
+                if (!Object.keys(errors).length) {
+                  alert("Your team is ready. You will be redirected to the main page.");
+                  location.href = "/";
+                } else {
+                  let str = "";
+                  for (let key in errors) {
+                    str += errors[key].join(". ");
+                  }
+                  alert(str);
+                }
+              })
             }}
             class="save"
           >

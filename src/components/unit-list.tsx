@@ -51,7 +51,7 @@ function UnitList({
   index: number;
   onUnitClick: MouseEventHandler<HTMLTableSectionElement>;
 }) {
-  const { register, handleSubmit } = useForm<HeroFilters>({
+  const { register, handleSubmit, reset } = useForm<HeroFilters>({
     defaultValues: {
       characterName: "",
       color: [],
@@ -538,7 +538,11 @@ function UnitList({
               </th>
             </tr>
           </thead>
-          <tbody onClick={onUnitClick}>
+          <tbody onClick={(e) => {
+            setResults([]);
+            onUnitClick(e);
+            reset();
+          }}>
             {results
               .map((result) => {
                 const stats = STATS[result];
