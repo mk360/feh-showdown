@@ -12,28 +12,28 @@ function UnitPreview(summary: { data: StoredHero }) {
       <div class="unit-grid">
         <div class="name">{summary.data?.name}</div>
         <div class="stat-grid">
-          {!!summary.data?.stats.atk && (
+          {!!summary.data?.stats?.atk && (
             <table>
               <tbody>
                 <tr>
                   <td colSpan={2} style={{ textAlign: "end" }}>
                     HP
                   </td>
-                  <td colSpan={2} style={{ textAlign: "start" }}>
+                  <td class={summary.data.stats.asset === "hp" ? "asset-stat" : summary.data.stats.flaw === "hp" ? "flaw-stat" : ""} colSpan={2} style={{ textAlign: "start" }}>
                     {summary.data?.stats.hp}
                   </td>
                 </tr>
                 <tr>
                   <td>Atk</td>
-                  <td>{summary.data?.stats.atk}</td>
+                  <td class={summary.data.stats.asset === "atk" ? "asset-stat" : summary.data.stats.flaw === "atk" ? "flaw-stat" : ""}>{summary.data?.stats.atk}</td>
                   <td>Spd</td>
-                  <td>{summary.data?.stats.spd}</td>
+                  <td class={summary.data.stats.asset === "spd" ? "asset-stat" : summary.data.stats.flaw === "spd" ? "flaw-stat" : ""}>{summary.data?.stats.spd}</td>
                 </tr>
                 <tr>
                   <td>Def</td>
-                  <td>{summary.data?.stats.def}</td>
+                  <td class={summary.data.stats.asset === "def" ? "asset-stat" : summary.data.stats.flaw === "def" ? "flaw-stat" : ""}>{summary.data?.stats.def}</td>
                   <td>Res</td>
-                  <td>{summary.data?.stats.res}</td>
+                  <td class={summary.data.stats.asset === "res" ? "asset-stat" : summary.data.stats.flaw === "res" ? "flaw-stat" : ""}>{summary.data?.stats.res}</td>
                 </tr>
               </tbody>
             </table>

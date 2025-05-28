@@ -7,6 +7,36 @@ interface StatChanges {
 }
 
 const SKILL_STAT_CHANGES: StatChanges = {
+    "Brave Axe": {
+        spd: -5
+    },
+    "Brave Axe+": {
+        spd: -5
+    },
+    "Brave Bow": {
+        spd: -5
+    },
+    "Brave Bow+": {
+        spd: -5
+    },
+    "Brave Lance": {
+        spd: -5
+    },
+    "Brave Lance+": {
+        spd: -5
+    },
+    "Brave Sword": {
+        spd: -5
+    },
+    "Brave Sword+": {
+        spd: -5
+    },
+    "Cordelia's Lance": {
+        spd: -2
+    },
+    "Dire Thunder": {
+        spd: -5
+    },
     "Attack +1": {
         atk: 1,
     },

@@ -59,7 +59,6 @@ export default function Tab() {
     register: registerMoveset,
     handleSubmit: handleSubmitMoveset,
     getValues,
-    reset,
     setValue,
   } = useForm<{
     [k in keyof (SkillList & StatChangeFields & { merges: number })]: string;
@@ -110,7 +109,7 @@ export default function Tab() {
               .concat(moveset.commonSkills.C),
       S: [{ name: "No S", description: "" }].concat(moveset.commonSkills.S),
     };
-  }, [moveset, tab]);
+  }, [moveset, tab, teamPreview[tab]?.name]);
 
   useEffect(() => {
     if (teamPreview[tab]?.name) {
@@ -335,8 +334,22 @@ export default function Tab() {
               setTemporaryChoice(target.id);
               const copy = [...teamPreview];
               copy[tab] = {
-                ...copy[tab],
                 name: target.id,
+                merges: 0,
+                stats: {
+                  atk: 0,
+                  def: 0,
+                  spd: 0,
+                  res: 0,
+                  hp: 0,
+                },
+                weapon: "",
+                assist: "",
+                special: "",
+                passive_a: "",
+                passive_b: "",
+                passive_c: "",
+                passive_s: "",
               };
               setTeamPreview(copy);
               setSubTab("detail");
@@ -691,6 +704,7 @@ export default function Tab() {
                 <td>{getValues("merges")}</td>
                 <td colSpan={3}>
                   <input
+                    style={{ width: "100%" }}
                     type="range"
                     min={0}
                     max={10}
@@ -957,7 +971,23 @@ export default function Tab() {
                   "Content-Type": "application/json"
                 },
                 signal: lastAbortController.current.signal,
-                body: JSON.stringify(teamPreview.filter((i) => i.name))
+                body: JSON.stringify(teamPreview.filter((i) => i.name).map((rec) => {
+                  const payload = {
+                    name: rec.name,
+                    weapon: rec.weapon,
+                    assist: rec.assist,
+                    special: rec.special,
+                    A: rec.passive_a,
+                    B: rec.passive_b,
+                    C: rec.passive_c,
+                    S: rec.passive_s,
+                    asset: rec.stats.asset,
+                    flaw: rec.stats.flaw,
+                    merges: rec.merges,
+                  };
+
+                  return payload;
+                }))
               }).then((resp) => {
                 if (resp.ok) {
                   localStorage.setItem("team", JSON.stringify(teamPreview.filter((i) => i.name)));

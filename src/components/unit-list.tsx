@@ -1,11 +1,12 @@
-import { useState } from "preact/hooks";
-import { useForm } from "react-hook-form";
-import convertToSingleLevel40 from "../utils/convert-to-level-40";
-import WeaponCheckbox from "./weapon-checkbox";
-import { capitalize, formatName } from "../utils/strings";
 import { memo, MouseEventHandler } from "preact/compat";
-import getSortingFunction from "../utils/sort-functions";
+import { useContext, useState } from "preact/hooks";
+import { useForm } from "react-hook-form";
 import STATS from "../stats";
+import TeamContext from "../team-context";
+import convertToSingleLevel40 from "../utils/convert-to-level-40";
+import getSortingFunction from "../utils/sort-functions";
+import { capitalize, formatName } from "../utils/strings";
+import WeaponCheckbox from "./weapon-checkbox";
 
 interface HeroFilters {
   characterName: string;
@@ -14,7 +15,7 @@ interface HeroFilters {
   movement: string[];
 }
 
-function getResultsFromFilters(filters: HeroFilters) {
+function getResultsFromFilters(filters: HeroFilters, currentTeam: string[]) {
   let collectedResults: string[] = [];
 
   for (let hero in STATS) {
@@ -36,12 +37,14 @@ function getResultsFromFilters(filters: HeroFilters) {
       conditions.push(filters.movement.includes(heroData.movementType));
     }
 
+    conditions.push(!currentTeam.includes(hero));
+
     if (conditions.every((val) => val === true)) {
       collectedResults.push(hero);
     }
   }
 
-  return Array.from(new Set(collectedResults));
+  return collectedResults;
 }
 
 function UnitList({
@@ -60,6 +63,7 @@ function UnitList({
     },
     mode: "onTouched",
   });
+  const { teamPreview } = useContext(TeamContext);
   const [results, setResults] = useState<string[]>([]);
   const [sorting, setSorting] = useState<{
     [k in FEH_Stat | "name" | "bst"]: "ascending" | "descending" | "";
@@ -95,26 +99,10 @@ function UnitList({
     <div>
       <form
         onSubmit={handleSubmit((data) => {
-          setResults(getResultsFromFilters(data));
+          setResults(getResultsFromFilters(data, teamPreview.map((i) => i.name).filter((i) => i)));
         })}
       >
         <table>
-          <thead>
-            {/* <tr>
-              <td
-                colSpan={4}
-                style="text-align: center; color: white; padding: 10px"
-              >
-                Character Name
-              </td>
-            </tr>
-            <tr>
-              <td colSpan={4}>
-                <input {...register("characterName")} />
-              </td>
-            </tr>
-            */}
-          </thead>
           <tbody>
             <tr>
               <td

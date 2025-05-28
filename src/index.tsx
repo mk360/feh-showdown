@@ -1,11 +1,10 @@
 import {
   LocationProvider,
-  Router,
   Route,
+  Router,
   hydrate,
   prerender as ssr,
 } from "preact-iso";
-import { Header } from "./components/Header.jsx";
 import Teambuilder from "./pages/Home/index.jsx";
 import { NotFound } from "./pages/_404.jsx";
 import "./style.css";
@@ -13,7 +12,6 @@ import "./style.css";
 export function App() {
   return (
     <LocationProvider>
-      <Header />
       <main>
         <Router>
           <Route path="/teambuilder/" component={Teambuilder} />

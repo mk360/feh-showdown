@@ -18,7 +18,7 @@ function Summary({ data }: { data: StoredHero }) {
           loading="lazy"
           class="game-asset"
           src={
-            data?.passive_a !== ""
+            data?.passive_a
               ? `http://localhost:3479/img/${data?.passive_a.replace("/", ";")}`
               : "/teambuilder/A.png"
           }
@@ -30,7 +30,7 @@ function Summary({ data }: { data: StoredHero }) {
           loading="lazy"
           class="game-asset"
           src={
-            data?.passive_b !== ""
+            data?.passive_b 
               ? `http://localhost:3479/img/${data?.passive_b.replace("/", ";")}`
               : "/teambuilder/B.png"
           }
@@ -42,7 +42,7 @@ function Summary({ data }: { data: StoredHero }) {
           loading="lazy"
           class="game-asset"
           src={
-            data?.passive_c !== ""
+            data?.passive_c 
               ? `http://localhost:3479/img/${data?.passive_c.replace("/", ";")}`
               : "/teambuilder/C.png"
           }
@@ -54,7 +54,7 @@ function Summary({ data }: { data: StoredHero }) {
           loading="lazy"
           class="game-asset"
           src={
-            data?.passive_s !== ""
+            data?.passive_s 
               ? `http://localhost:3479/img/${data?.passive_s.replace("/", ";")}`
               : "/teambuilder/S.png"
           }
