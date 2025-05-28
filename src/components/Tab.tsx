@@ -663,9 +663,12 @@ export default function Tab() {
                     type="radio"
                     {...registerMoveset("res-change")}
                     value="flaw"
-                    disabled={["hp", "spd", "atk", "def"].includes(
-                      getAlteredStats().flaw
-                    )}
+                    disabled={[
+                      getValues("hp-change"),
+                      getValues("spd-change"),
+                      getValues("atk-change"),
+                      getValues("def-change"),
+                    ].includes("flaw")}
                   />
                   <label class="flaw" for={`flaw-res`}>
                     Flaw
@@ -690,9 +693,12 @@ export default function Tab() {
                     type="radio"
                     {...registerMoveset("res-change")}
                     value="asset"
-                    disabled={["hp", "spd", "atk", "def"].includes(
-                      getAlteredStats().asset
-                    )}
+                    disabled={[
+                      getValues("hp-change"),
+                      getValues("spd-change"),
+                      getValues("atk-change"),
+                      getValues("def-change"),
+                    ].includes("asset")}
                   />
                   <label class="asset" for={`asset-res`}>
                     Asset
