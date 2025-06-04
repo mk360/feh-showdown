@@ -1,39 +1,40 @@
 import { formatName } from "../utils/strings";
 
-function UnitPreview(summary: { data: StoredHero }) {
+function UnitPreview({ data }: { data: StoredHero }) {
+  console.log({ data })
   return (
     <div class="unit-preview">
-      {!!summary.data?.name && (
+      {!!data?.name && (
         <img
           class="banner"
-          src={`/teambuilder/banners/${formatName(summary.data?.name)}.webp`}
+          src={`/teambuilder/banners/${formatName(data?.name)}.webp`}
         />
       )}
       <div class="unit-grid">
-        <div class="name">{summary.data?.name}</div>
+        <div class="name">{data?.name}</div>
         <div class="stat-grid">
-          {!!summary.data?.stats?.atk && (
+          {!!data?.stats?.atk && (
             <table>
               <tbody>
                 <tr>
                   <td colSpan={2} style={{ textAlign: "end" }}>
                     HP
                   </td>
-                  <td class={summary.data.stats.asset === "hp" ? "asset-stat" : summary.data.stats.flaw === "hp" ? "flaw-stat" : ""} colSpan={2} style={{ textAlign: "start" }}>
-                    {summary.data?.stats.hp}
+                  <td class={data.asset === "hp" ? "asset-stat" : data.flaw === "hp" ? "flaw-stat" : ""} colSpan={2} style={{ textAlign: "start" }}>
+                    {data?.stats.hp}
                   </td>
                 </tr>
                 <tr>
                   <td>Atk</td>
-                  <td class={summary.data.stats.asset === "atk" ? "asset-stat" : summary.data.stats.flaw === "atk" ? "flaw-stat" : ""}>{summary.data?.stats.atk}</td>
+                  <td class={data.asset === "atk" ? "asset-stat" : data.flaw === "atk" ? "flaw-stat" : ""}>{data?.stats.atk}</td>
                   <td>Spd</td>
-                  <td class={summary.data.stats.asset === "spd" ? "asset-stat" : summary.data.stats.flaw === "spd" ? "flaw-stat" : ""}>{summary.data?.stats.spd}</td>
+                  <td class={data.asset === "spd" ? "asset-stat" : data.flaw === "spd" ? "flaw-stat" : ""}>{data?.stats.spd}</td>
                 </tr>
                 <tr>
                   <td>Def</td>
-                  <td class={summary.data.stats.asset === "def" ? "asset-stat" : summary.data.stats.flaw === "def" ? "flaw-stat" : ""}>{summary.data?.stats.def}</td>
+                  <td class={data.asset === "def" ? "asset-stat" : data.flaw === "def" ? "flaw-stat" : ""}>{data?.stats.def}</td>
                   <td>Res</td>
-                  <td class={summary.data.stats.asset === "res" ? "asset-stat" : summary.data.stats.flaw === "res" ? "flaw-stat" : ""}>{summary.data?.stats.res}</td>
+                  <td class={data.asset === "res" ? "asset-stat" : data.flaw === "res" ? "flaw-stat" : ""}>{data?.stats.res}</td>
                 </tr>
               </tbody>
             </table>
@@ -41,18 +42,18 @@ function UnitPreview(summary: { data: StoredHero }) {
         </div>
         <div class="passives-and-seals">
           <span>
-            {!!summary.data?.name &&
+            {!!data?.name &&
               `Lv. 40${
-                summary.data?.merges !== 0 ? `+${summary.data?.merges}` : ""
+                data?.merges !== 0 ? `+${data?.merges}` : ""
               }`}
           </span>
           <div>
-            {!!summary.data?.passive_a && summary.data?.passive_a !== "No A" ? (
+            {!!data?.passive_a && data?.passive_a !== "No A" ? (
               <img
                 loading="lazy"
-                title={summary.data?.passive_a}
+                title={data?.passive_a}
                 class="game-asset"
-                src={`http://localhost:3479/img/${summary.data?.passive_a.replace(
+                src={`http://localhost:3479/img/${data?.passive_a.replace(
                   "/",
                   ";"
                 )}`}
@@ -60,17 +61,17 @@ function UnitPreview(summary: { data: StoredHero }) {
             ) : (
               <img
                 loading="lazy"
-                title={summary.data?.passive_b}
+                title={data?.passive_b}
                 class="game-asset"
                 src="/teambuilder/no-skill.png"
               />
             )}
-            {!!summary.data?.passive_b && summary.data?.passive_b !== "No B" ? (
+            {!!data?.passive_b && data?.passive_b !== "No B" ? (
               <img
-                title={summary.data?.passive_b}
+                title={data?.passive_b}
                 loading="lazy"
                 class="game-asset"
-                src={`http://localhost:3479/img/${summary.data?.passive_b.replace(
+                src={`http://localhost:3479/img/${data?.passive_b.replace(
                   "/",
                   ";"
                 )}`}
@@ -78,17 +79,17 @@ function UnitPreview(summary: { data: StoredHero }) {
             ) : (
               <img
                 loading="lazy"
-                title={summary.data?.passive_b}
+                title={data?.passive_b}
                 class="game-asset"
                 src="/teambuilder/no-skill.png"
               />
             )}
-            {!!summary.data?.passive_c && summary.data?.passive_c !== "No C" ? (
+            {!!data?.passive_c && data?.passive_c !== "No C" ? (
               <img
-                title={summary.data?.passive_c}
+                title={data?.passive_c}
                 loading="lazy"
                 class="game-asset"
-                src={`http://localhost:3479/img/${summary.data?.passive_c.replace(
+                src={`http://localhost:3479/img/${data?.passive_c.replace(
                   "/",
                   ";"
                 )}`}
@@ -96,17 +97,17 @@ function UnitPreview(summary: { data: StoredHero }) {
             ) : (
               <img
                 loading="lazy"
-                title={summary.data?.passive_c}
+                title={data?.passive_c}
                 class="game-asset"
                 src="/teambuilder/no-skill.png"
               />
             )}
-            {!!summary.data?.passive_s && summary.data?.passive_s !== "No S" ? (
+            {!!data?.passive_s && data?.passive_s !== "No S" ? (
               <img
-                title={summary.data?.passive_s}
+                title={data?.passive_s}
                 loading="lazy"
                 class="game-asset"
-                src={`http://localhost:3479/img/${summary.data?.passive_s.replace(
+                src={`http://localhost:3479/img/${data?.passive_s.replace(
                   "/",
                   ";"
                 )}`}
@@ -114,7 +115,7 @@ function UnitPreview(summary: { data: StoredHero }) {
             ) : (
               <img
                 loading="lazy"
-                title={summary.data?.passive_s}
+                title={data?.passive_s}
                 class="game-asset"
                 src="/teambuilder/no-skill.png"
               />
@@ -124,15 +125,15 @@ function UnitPreview(summary: { data: StoredHero }) {
         <div class="main-skills">
           <div>
             <img src="/teambuilder/weapon-icon.png" />
-            {summary.data?.weapon}
+            {data?.weapon}
           </div>
           <div>
             <img src="/teambuilder/assist-icon.png" />
-            {summary.data?.assist}
+            {data?.assist}
           </div>
           <div>
             <img src="/teambuilder/special-icon.png" />
-            {summary.data?.special}
+            {data?.special}
           </div>
         </div>
       </div>

@@ -117,11 +117,11 @@ export default function Tab() {
         const tabData = teamPreview[tab];
         setTemporaryChoice(teamPreview[tab].name);
         setValue("merges", tabData.merges.toString());
-        setValue("hp-change", tabData.stats.asset === "hp" ? "asset" : tabData.stats.flaw === "hp" ? "flaw" : "");
-        setValue("atk-change", tabData.stats.asset === "atk" ? "asset" : tabData.stats.flaw === "atk" ? "flaw" : "");
-        setValue("spd-change", tabData.stats.asset === "spd" ? "asset" : tabData.stats.flaw === "spd" ? "flaw" : "");
-        setValue("def-change", tabData.stats.asset === "def" ? "asset" : tabData.stats.flaw === "def" ? "flaw" : "");
-        setValue("res-change", tabData.stats.asset === "res" ? "asset" : tabData.stats.flaw === "res" ? "flaw" : "");
+        setValue("hp-change", tabData.asset === "hp" ? "asset" : tabData.flaw === "hp" ? "flaw" : "");
+        setValue("atk-change", tabData.asset === "atk" ? "asset" : tabData.flaw === "atk" ? "flaw" : "");
+        setValue("spd-change", tabData.asset === "spd" ? "asset" : tabData.flaw === "spd" ? "flaw" : "");
+        setValue("def-change", tabData.asset === "def" ? "asset" : tabData.flaw === "def" ? "flaw" : "");
+        setValue("res-change", tabData.asset === "res" ? "asset" : tabData.flaw === "res" ? "flaw" : "");
         setValue("weapons", tabData.weapon);
         setValue("assists", tabData.assist);
         setValue("specials", tabData.special);
@@ -172,12 +172,10 @@ export default function Tab() {
   };
 
   const getAlteredStats = function () {
-    const statChanges = ["hp", "atk", "spd", "def", "res"] as const;
-
-    const asset = statChanges.find(
+    const asset = statLabels.find(
       (stat: FEH_Stat) => getValues(`${stat}-change`) === "asset"
     );
-    const flaw = statChanges.find(
+    const flaw = statLabels.find(
       (stat: FEH_Stat) => getValues(`${stat}-change`) === "flaw"
     );
 
@@ -207,7 +205,7 @@ export default function Tab() {
       const finalGrowthRate =
         alteredStats.asset === options.stat
           ? baseGrowthRate + 5
-          : alteredStats.asset === options.stat
+          : alteredStats.flaw === options.stat
           ? baseGrowthRate - 5
           : baseGrowthRate;
       const finalLevel1 =
@@ -336,6 +334,8 @@ export default function Tab() {
               copy[tab] = {
                 name: target.id,
                 merges: 0,
+                asset: "",
+                flaw: "",
                 stats: {
                   atk: 0,
                   def: 0,
@@ -417,6 +417,8 @@ export default function Tab() {
           }
           copy[tab] = {
             name: temporaryChoice,
+            asset: "",
+            flaw: "",
             weapon: data.weapons,
             assist: data.assists,
             special: data.specials,
@@ -526,7 +528,7 @@ export default function Tab() {
                     {...registerMoveset("atk-change")}
                     value="neutral"
                   />
-                  <label class="neutral" for={`neutral-atk`}>
+                  <label class="neutral" for="neutral-atk">
                     Neutral
                   </label>
                 </td>
@@ -544,7 +546,7 @@ export default function Tab() {
                       getValues("res-change"),
                     ].includes("asset")}
                   />
-                  <label class="asset" for={`asset-atk`}>
+                  <label class="asset" for="asset-atk">
                     Asset
                   </label>
                 </td>
@@ -987,8 +989,8 @@ export default function Tab() {
                     B: rec.passive_b,
                     C: rec.passive_c,
                     S: rec.passive_s,
-                    asset: rec.stats.asset,
-                    flaw: rec.stats.flaw,
+                    asset: rec.asset,
+                    flaw: rec.flaw,
                     merges: rec.merges,
                   };
 

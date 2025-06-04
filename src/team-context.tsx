@@ -28,6 +28,8 @@ export const TeamProvider = ({ children }) => {
         res: 0,
       },
       merges: 0,
+      asset: "",
+      flaw: "",
     })
   );
   const [tab, setTab] = useState(0);

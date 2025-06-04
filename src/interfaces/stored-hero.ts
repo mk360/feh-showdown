@@ -14,5 +14,7 @@ interface StoredHero {
     passive_b: string;
     passive_c: string;
     passive_s: string;
-    stats: FEHStats & Partial<{ asset: FEH_Stat | ""; flaw: FEH_Stat | "" }>;
+    asset: FEH_Stat | "";
+    flaw: FEH_Stat | "";
+    stats: FEHStats;
 }
