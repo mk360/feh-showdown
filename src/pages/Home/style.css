@@ -131,6 +131,20 @@ td label {
 	}
 }
 
+li:has(> .tab) {
+	&:first-child .tab {
+		border-radius: 1rem 0 0 1rem;
+	}
+
+	&:last-child .tab {
+		border-radius: 0 1rem 1rem 0;
+	}
+}
+
+.currentTab {
+	background-color: #908bfa;
+}
+
 .results {
 	max-height: 900px;
 	overflow-y: auto;

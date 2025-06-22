@@ -47,6 +47,10 @@ header a:hover {
 	background-color: #0008;
 }
 
+.pad {
+	margin: 0 2rem;
+}
+
 main {
 	flex: auto;
 	width: auto;

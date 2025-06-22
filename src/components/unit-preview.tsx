@@ -1,7 +1,7 @@
 import { formatName } from "../utils/strings";
+import SKILL_ICON_DEX, { getSkillUrl } from "../data/skill-icon-dex";
 
 function UnitPreview({ data }: { data: StoredHero }) {
-  console.log({ data })
   return (
     <div class="unit-preview">
       {!!data?.name && (
@@ -53,10 +53,7 @@ function UnitPreview({ data }: { data: StoredHero }) {
                 loading="lazy"
                 title={data?.passive_a}
                 class="game-asset"
-                src={`http://localhost:3479/img/${data?.passive_a.replace(
-                  "/",
-                  ";"
-                )}`}
+                src={getSkillUrl(data.passive_a)}
               />
             ) : (
               <img
@@ -71,10 +68,7 @@ function UnitPreview({ data }: { data: StoredHero }) {
                 title={data?.passive_b}
                 loading="lazy"
                 class="game-asset"
-                src={`http://localhost:3479/img/${data?.passive_b.replace(
-                  "/",
-                  ";"
-                )}`}
+                src={getSkillUrl(data.passive_b)}
               />
             ) : (
               <img
@@ -89,10 +83,7 @@ function UnitPreview({ data }: { data: StoredHero }) {
                 title={data?.passive_c}
                 loading="lazy"
                 class="game-asset"
-                src={`http://localhost:3479/img/${data?.passive_c.replace(
-                  "/",
-                  ";"
-                )}`}
+                src={getSkillUrl(data.passive_c)}
               />
             ) : (
               <img
@@ -107,10 +98,7 @@ function UnitPreview({ data }: { data: StoredHero }) {
                 title={data?.passive_s}
                 loading="lazy"
                 class="game-asset"
-                src={`http://localhost:3479/img/${data?.passive_s.replace(
-                  "/",
-                  ";"
-                )}`}
+                src={getSkillUrl(data.passive_s)}
               />
             ) : (
               <img

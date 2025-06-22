@@ -1,4 +1,4 @@
-import { memo, MouseEventHandler } from "preact/compat";
+import { ChangeEvent, memo, MouseEventHandler } from "preact/compat";
 import { useContext, useState } from "preact/hooks";
 import { useForm } from "react-hook-form";
 import STATS from "../stats";
@@ -54,7 +54,7 @@ function UnitList({
   index: number;
   onUnitClick: MouseEventHandler<HTMLTableSectionElement>;
 }) {
-  const { register, handleSubmit, reset } = useForm<HeroFilters>({
+  const { register, handleSubmit, reset, setValue, getValues } = useForm<HeroFilters>({
     defaultValues: {
       characterName: "",
       color: [],
@@ -119,7 +119,20 @@ function UnitList({
                   class="red"
                   id={`${index}-red`}
                   type="checkbox"
-                  {...register("color")}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                    // @ts-ignore
+                    if (e.target.checked) {
+                      setValue("color", Array.from(new Set(getValues("color").concat("red"))));
+                      setValue("weapons", Array.from(new Set(getValues("weapons").concat(["red-sword", "red-tome", "red-bow", "red-breath", "red-dagger", "red-beast"]))));
+                    } else {
+                      setValue("color", getValues("color").filter((i) => i !== "red"));
+                      const weapons = getValues("weapons");
+                      for (let weapon of ["red-sword", "red-tome", "red-bow", "red-breath", "red-dagger", "red-beast"]) {
+                        weapons.splice(weapons.indexOf(weapon), 1);
+                      }
+                      setValue("weapons", weapons);
+                    }
+                  }}
                 />
                 <label for={`${index}-red`}>
                   <img class="game-asset" src="/teambuilder/red.png" />
@@ -131,7 +144,20 @@ function UnitList({
                   class="blue"
                   id={`${index}-blue`}
                   type="checkbox"
-                  {...register("color")}
+                  onChange={(e) => {
+                    // @ts-ignore
+                    if (e.target.checked) {
+                      setValue("color", Array.from(new Set(getValues("color").concat("blue"))));
+                      setValue("weapons", Array.from(new Set(getValues("weapons").concat(["blue-lance", "blue-tome", "blue-bow", "blue-breath", "blue-dagger", "blue-beast"]))));
+                    } else {
+                      setValue("color", getValues("color").filter((i) => i !== "blue"));
+                      const weapons = getValues("weapons");
+                      for (let weapon of ["blue-lance", "blue-tome", "blue-bow", "blue-breath", "blue-dagger", "blue-beast"]) {
+                        weapons.splice(weapons.indexOf(weapon), 1);
+                      }
+                      setValue("weapons", weapons);
+                    }
+                  }}
                 />
                 <label for={`${index}-blue`}>
                   <img class="game-asset" src="/teambuilder/blue.png" />
@@ -143,7 +169,20 @@ function UnitList({
                   class="green"
                   id={`${index}-green`}
                   type="checkbox"
-                  {...register("color")}
+                  onChange={(e) => {
+                    // @ts-ignore
+                    if (e.target.checked) {
+                      setValue("color", Array.from(new Set(getValues("color").concat("green"))));
+                      setValue("weapons", Array.from(new Set(getValues("weapons").concat(["green-axe", "green-tome", "green-bow", "green-breath", "green-dagger", "green-beast"]))));
+                    } else {
+                      setValue("color", getValues("color").filter((i) => i !== "green"));
+                      const weapons = getValues("weapons");
+                      for (let weapon of ["green-axe", "green-tome", "green-bow", "green-breath", "green-dagger", "green-beast"]) {
+                        weapons.splice(weapons.indexOf(weapon), 1);
+                      }
+                      setValue("weapons", weapons);
+                    }
+                  }}
                 />
                 <label for={`${index}-green`}>
                   <img class="game-asset" src="/teambuilder/green.png" />
@@ -155,7 +194,20 @@ function UnitList({
                   class="colorless"
                   id={`${index}-colorless`}
                   type="checkbox"
-                  {...register("color")}
+                  onChange={(e) => {
+                    // @ts-ignore
+                    if (e.target.checked) {
+                      setValue("color", Array.from(new Set(getValues("color").concat("colorless"))));
+                      setValue("weapons", Array.from(new Set(getValues("weapons").concat(["colorless-staff", "colorless-tome", "colorless-bow", "colorless-breath", "colorless-dagger", "colorless-beast"]))));
+                    } else {
+                      setValue("color", getValues("color").filter((i) => i !== "colorless"));
+                      const weapons = getValues("weapons");
+                      for (let weapon of ["colorless-staff", "colorless-tome", "colorless-bow", "colorless-breath", "colorless-dagger", "colorless-beast"]) {
+                        weapons.splice(weapons.indexOf(weapon), 1);
+                      }
+                      setValue("weapons", weapons);
+                    }
+                  }}
                 />
                 <label for={`${index}-colorless`}>
                   <img class="game-asset" src="/teambuilder/colorless.png" />

@@ -1,3 +1,5 @@
+import SKILL_ICON_DEX, { getSkillUrl } from "../data/skill-icon-dex";
+
 function Summary({ data }: { data: StoredHero }) {
   return (
     <div class="summary-grid">
@@ -19,7 +21,7 @@ function Summary({ data }: { data: StoredHero }) {
           class="game-asset"
           src={
             data?.passive_a
-              ? `http://localhost:3479/img/${data?.passive_a.replace("/", ";")}`
+              ? getSkillUrl(data.passive_a)
               : "/teambuilder/A.png"
           }
         />
@@ -31,7 +33,7 @@ function Summary({ data }: { data: StoredHero }) {
           class="game-asset"
           src={
             data?.passive_b 
-              ? `http://localhost:3479/img/${data?.passive_b.replace("/", ";")}`
+              ? getSkillUrl(data.passive_b)
               : "/teambuilder/B.png"
           }
         />
@@ -43,7 +45,7 @@ function Summary({ data }: { data: StoredHero }) {
           class="game-asset"
           src={
             data?.passive_c 
-              ? `http://localhost:3479/img/${data?.passive_c.replace("/", ";")}`
+              ? getSkillUrl(data.passive_c)
               : "/teambuilder/C.png"
           }
         />
@@ -55,7 +57,7 @@ function Summary({ data }: { data: StoredHero }) {
           class="game-asset"
           src={
             data?.passive_s 
-              ? `http://localhost:3479/img/${data?.passive_s.replace("/", ";")}`
+              ? getSkillUrl(data.passive_s)
               : "/teambuilder/S.png"
           }
         />

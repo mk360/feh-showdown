@@ -16,6 +16,7 @@ import Summary from "./summary";
 import TeamPreview from "./team-preview";
 import UnitList from "./unit-list";
 import STATS from "../stats";
+import SKILL_ICON_DEX, { getSkillUrl } from "../data/skill-icon-dex";
 
 interface SkillWithDescription {
   name: string;
@@ -839,10 +840,7 @@ export default function Tab() {
                       <img
                         loading="lazy"
                         class="game-asset"
-                        src={`http://localhost:3479/img/${passive.name.replace(
-                          "/",
-                          ";"
-                        )}`}
+                        src={getSkillUrl(passive.name)}
                       />
                     )}
                     {passive.name}
@@ -877,10 +875,7 @@ export default function Tab() {
                       <img
                         loading="lazy"
                         class="game-asset"
-                        src={`http://localhost:3479/img/${passive.name.replace(
-                          "/",
-                          ";"
-                        )}`}
+                        src={getSkillUrl(passive.name)}
                       />
                     )}
                     {passive.name}
@@ -915,10 +910,7 @@ export default function Tab() {
                       <img
                         loading="lazy"
                         class="game-asset"
-                        src={`http://localhost:3479/img/${passive.name.replace(
-                          "/",
-                          ";"
-                        )}`}
+                        src={getSkillUrl(passive.name)}
                       />
                     )}
                     {passive.name}
@@ -950,10 +942,7 @@ export default function Tab() {
                       <img
                         loading="lazy"
                         class="game-asset"
-                        src={`http://localhost:3479/img/${passive.name.replace(
-                          "/",
-                          ";"
-                        )}`}
+                        src={getSkillUrl(passive.name)}
                       />
                     )}
                     {passive.name}
@@ -981,24 +970,40 @@ export default function Tab() {
                 signal: lastAbortController.current.signal,
                 body: JSON.stringify(teamPreview.filter((i) => i.name).map((rec) => {
                   const payload = {
-                    name: rec.name,
-                    weapon: rec.weapon,
-                    assist: rec.assist,
-                    special: rec.special,
-                    A: rec.passive_a,
-                    B: rec.passive_b,
-                    C: rec.passive_c,
-                    S: rec.passive_s,
-                    asset: rec.asset,
-                    flaw: rec.flaw,
-                    merges: rec.merges,
+                    name: rec.name ?? "",
+                    weapon: rec.weapon ?? "",
+                    assist: rec.assist ?? "",
+                    special: rec.special ?? "",
+                    A: rec.passive_a ?? "",
+                    B: rec.passive_b ?? "",
+                    C: rec.passive_c ?? "",
+                    S: rec.passive_s ?? "",
+                    asset: rec.asset ?? "",
+                    flaw: rec.flaw ?? "",
+                    merges: rec.merges ?? 0,
                   };
 
                   return payload;
                 }))
               }).then((resp) => {
                 if (resp.ok) {
-                  localStorage.setItem("team", JSON.stringify(teamPreview.filter((i) => i.name)));
+                  localStorage.setItem("team", JSON.stringify(teamPreview.filter((i) => i.name).map((rec) => {
+                  const payload = {
+                    name: rec.name ?? "",
+                    weapon: rec.weapon ?? "",
+                    assist: rec.assist ?? "",
+                    special: rec.special ?? "",
+                    A: rec.passive_a ?? "",
+                    B: rec.passive_b ?? "",
+                    C: rec.passive_c ?? "",
+                    S: rec.passive_s ?? "",
+                    asset: rec.asset ?? "",
+                    flaw: rec.flaw ?? "",
+                    merges: rec.merges ?? 0,
+                  };
+
+                  return payload;
+                })));
                   return {};
                 }
                 return resp.json()
@@ -1013,6 +1018,8 @@ export default function Tab() {
                   }
                   alert(str);
                 }
+              }).catch(() => {
+                alert("An unknown error happened.");
               })
             }}
             class="save"

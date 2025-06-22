@@ -12,7 +12,7 @@ import "./style.css";
 export function App() {
   return (
     <LocationProvider>
-      <main>
+      <main class="pad">
         <Router>
           <Route path="/teambuilder/" component={Teambuilder} />
           <Route default component={NotFound} />
