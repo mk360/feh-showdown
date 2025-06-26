@@ -3,7 +3,7 @@ import { useContext, useState } from "preact/hooks";
 import { useForm } from "react-hook-form";
 import STATS from "../stats";
 import TeamContext from "../team-context";
-import convertToSingleLevel40 from "../utils/convert-to-level-40";
+import { convertToSingleLevel40 } from "../stats/convert-to-level-40";
 import getSortingFunction from "../utils/sort-functions";
 import { capitalize, formatName } from "../utils/strings";
 import WeaponCheckbox from "./weapon-checkbox";

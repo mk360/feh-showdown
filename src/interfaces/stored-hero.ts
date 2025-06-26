@@ -13,7 +13,7 @@ interface StoredHero {
     passive_a: string;
     passive_b: string;
     passive_c: string;
-    passive_s: string;
+    sacred_seal: string;
     asset: FEH_Stat | "";
     flaw: FEH_Stat | "";
     stats: FEHStats;

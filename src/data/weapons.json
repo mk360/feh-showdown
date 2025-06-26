@@ -1,0 +1,974 @@
+{
+  "Fólkvangr": {
+    "atk": 16
+  },
+  "Fensalir": {
+    "atk": 16
+  },
+  "Nóatún": {
+    "atk": 16
+  },
+  "Fire Breath": {
+    "atk": 6
+  },
+  "Fire Breath+": {
+    "atk": 8
+  },
+  "Flametongue": {
+    "atk": 11
+  },
+  "Flametongue+": {
+    "atk": 15
+  },
+  "Iron Sword": {
+    "atk": 6
+  },
+  "Iron Lance": {
+    "atk": 6
+  },
+  "Iron Axe": {
+    "atk": 6
+  },
+  "Iron Bow": {
+    "atk": 4
+  },
+  "Iron Dagger": {
+    "atk": 3
+  },
+  "Steel Sword": {
+    "atk": 8
+  },
+  "Steel Lance": {
+    "atk": 8
+  },
+  "Steel Axe": {
+    "atk": 8
+  },
+  "Steel Bow": {
+    "atk": 6
+  },
+  "Steel Dagger": {
+    "atk": 5
+  },
+  "Silver Sword": {
+    "atk": 11
+  },
+  "Silver Lance": {
+    "atk": 11
+  },
+  "Silver Axe": {
+    "atk": 11
+  },
+  "Silver Bow": {
+    "atk": 9
+  },
+  "Silver Dagger": {
+    "atk": 7
+  },
+  "Silver Sword+": {
+    "atk": 15
+  },
+  "Silver Lance+": {
+    "atk": 15
+  },
+  "Silver Axe+": {
+    "atk": 15
+  },
+  "Silver Bow+": {
+    "atk": 13
+  },
+  "Silver Dagger+": {
+    "atk": 10
+  },
+  "Fire": {
+    "atk": 4
+  },
+  "Elfire": {
+    "atk": 6
+  },
+  "Bolganone": {
+    "atk": 9
+  },
+  "Bolganone+": {
+    "atk": 13
+  },
+  "Flux": {
+    "atk": 4
+  },
+  "Ruin": {
+    "atk": 6
+  },
+  "Fenrir": {
+    "atk": 9
+  },
+  "Fenrir+": {
+    "atk": 13
+  },
+  "Thunder": {
+    "atk": 4
+  },
+  "Elthunder": {
+    "atk": 6
+  },
+  "Thoron": {
+    "atk": 9
+  },
+  "Wind": {
+    "atk": 4
+  },
+  "Elwind": {
+    "atk": 6
+  },
+  "Rexcalibur": {
+    "atk": 9
+  },
+  "Rexcalibur+": {
+    "atk": 13
+  },
+  "Absorb": {
+    "atk": 4
+  },
+  "Absorb+": {
+    "atk": 7
+  },
+  "Alondite": {
+    "atk": 16
+  },
+  "Amiti": {
+    "atk": 11
+  },
+  "Arden's Blade": {
+    "atk": 10
+  },
+  "Argent Bow": {
+    "atk": 8
+  },
+  "Armads": {
+    "atk": 16
+  },
+  "Armorslayer": {
+    "atk": 8
+  },
+  "Armorslayer+": {
+    "atk": 12
+  },
+  "Arthur's Axe": {
+    "atk": 16
+  },
+  "Assault": {
+    "atk": 10
+  },
+  "Assassin's Bow": {
+    "atk": 7
+  },
+  "Assassin's Bow+": {
+    "atk": 11
+  },
+  "Audhulma": {
+    "atk": 16
+  },
+  "Aura": {
+    "atk": 14
+  },
+  "Axe of Virility": {
+    "atk": 16
+  },
+  "Ayra's Blade": {
+    "atk": 16
+  },
+  "Basilikos": {
+    "atk": 16
+  },
+  "Berkut's Lance": {
+    "atk": 10
+  },
+  "Berkut's Lance+": {
+    "atk": 14
+  },
+  "Beruka's Axe": {
+    "atk": 16
+  },
+  "Blazing Durandal": {
+    "atk": 16
+  },
+  "Blárblade": {
+    "atk": 9
+  },
+  "Blárblade+": {
+    "atk": 13
+  },
+  "Blárowl": {
+    "atk": 10
+  },
+  "Blárowl+": {
+    "atk": 14
+  },
+  "Blárraven": {
+    "atk": 7
+  },
+  "Blárraven+": {
+    "atk": 11
+  },
+  "Blárwolf": {
+    "atk": 6
+  },
+  "Blárwolf+": {
+    "atk": 10
+  },
+  "Blessed Bouquet": {
+    "atk": 8
+  },
+  "Blessed Bouquet+": {
+    "atk": 12
+  },
+  "Blue Egg": {
+    "atk": 7
+  },
+  "Blue Egg+": {
+    "atk": 11
+  },
+  "Book of Orchids": {
+    "atk": 16
+  },
+  "Bow of Beauty": {
+    "atk": 14
+  },
+  "Brave Axe": {
+    "atk": 5
+  },
+  "Brave Axe+": {
+    "atk": 8
+  },
+  "Brave Bow": {
+    "atk": 4
+  },
+  "Brave Bow+": {
+    "atk": 7
+  },
+  "Brave Lance": {
+    "atk": 5
+  },
+  "Brave Lance+": {
+    "atk": 8
+  },
+  "Brave Sword": {
+    "atk": 5
+  },
+  "Brave Sword+": {
+    "atk": 8
+  },
+  "Breath of Fog": {
+    "atk": 16
+  },
+  "Brynhildr": {
+    "atk": 14
+  },
+  "Bull Blade": {
+    "atk": 16
+  },
+  "Bull Spear": {
+    "atk": 16
+  },
+  "Camilla's Axe": {
+    "atk": 16
+  },
+  "Candied Dagger": {
+    "atk": 14
+  },
+  "Candlelight": {
+    "atk": 7
+  },
+  "Candlelight+": {
+    "atk": 11
+  },
+  "Carrot Axe": {
+    "atk": 9
+  },
+  "Carrot Axe+": {
+    "atk": 13
+  },
+  "Carrot Lance": {
+    "atk": 9
+  },
+  "Carrot Lance+": {
+    "atk": 13
+  },
+  "Cherche's Axe": {
+    "atk": 11
+  },
+  "Clarisse's Bow": {
+    "atk": 7
+  },
+  "Clarisse's Bow+": {
+    "atk": 11
+  },
+  "Cordelia's Lance": {
+    "atk": 10
+  },
+  "Corvus Tome": {
+    "atk": 14
+  },
+  "Concealed Blade": {
+    "atk": 16
+  },
+  "Crimson Axe": {
+    "atk": 16
+  },
+  "Cupid Arrow": {
+    "atk": 8
+  },
+  "Cupid Arrow+": {
+    "atk": 12
+  },
+  "Cursed Lance": {
+    "atk": 16
+  },
+  "Cymbeline": {
+    "atk": 14
+  },
+  "Dark Breath": {
+    "atk": 9
+  },
+  "Dark Breath+": {
+    "atk": 13
+  },
+  "Dark Excalibur": {
+    "atk": 14
+  },
+  "Dancer's Fan": {
+    "atk": 7
+  },
+  "Dancer's Fan+": {
+    "atk": 10
+  },
+  "Dancer's Ring": {
+    "atk": 8
+  },
+  "Dancer's Ring+": {
+    "atk": 12
+  },
+  "Dancer's Score": {
+    "atk": 8
+  },
+  "Dancer's Score+": {
+    "atk": 12
+  },
+  "Dark Aura": {
+    "atk": 14
+  },
+  "Dark Royal Spear": {
+    "atk": 16
+  },
+  "Dauntless Lance": {
+    "atk": 16
+  },
+  "Daybreak Lance": {
+    "atk": 16
+  },
+  "Deathly Dagger": {
+    "atk": 11
+  },
+  "Deft Harpoon": {
+    "atk": 10
+  },
+  "Deft Harpoon+": {
+    "atk": 14
+  },
+  "Devil Axe": {
+    "atk": 16
+  },
+  "Dignified Bow": {
+    "atk": 14
+  },
+  "Dire Thunder": {
+    "atk": 9
+  },
+  "Divine Naga": {
+    "atk": 14
+  },
+  "Divine Tyrfing": {
+    "atk": 16
+  },
+  "Draconic Poleaxe": {
+    "atk": 16
+  },
+  "Durandal": {
+    "atk": 16
+  },
+  "Eckesachs": {
+    "atk": 16
+  },
+  "Elena's Staff": {
+    "atk": 14
+  },
+  "Elise's Staff": {
+    "atk": 14
+  },
+  "Emerald Axe": {
+    "atk": 8
+  },
+  "Emerald Axe+": {
+    "atk": 12
+  },
+  "Eternal Breath": {
+    "atk": 16
+  },
+  "Eternal Tome": {
+    "atk": 14
+  },
+  "Excalibur": {
+    "atk": 14
+  },
+  "Falchion (Awakening)": {
+    "atk": 16
+  },
+  "Falchion (Mystery)": {
+    "atk": 16
+  },
+  "Falchion (Gaiden)": {
+    "atk": 16
+  },
+  "Fear": {
+    "atk": 5
+  },
+  "Fear+": {
+    "atk": 12
+  },
+  "Felicia's Plate": {
+    "atk": 14
+  },
+  "Firesweep Bow": {
+    "atk": 7
+  },
+  "Firesweep Bow+": {
+    "atk": 11
+  },
+  "Firesweep Lance": {
+    "atk": 11
+  },
+  "Firesweep Lance+": {
+    "atk": 15
+  },
+  "First Bite": {
+    "atk": 10
+  },
+  "First Bite+": {
+    "atk": 14
+  },
+  "Florina's Lance": {
+    "atk": 16
+  },
+  "Forblaze": {
+    "atk": 14
+  },
+  "Frederick's Axe": {
+    "atk": 16
+  },
+  "Fujin Yumi": {
+    "atk": 14
+  },
+  "Geirskögul": {
+    "atk": 16
+  },
+  "Gladiator's Blade": {
+    "atk": 16
+  },
+  "Gloom Breath": {
+    "atk": 16
+  },
+  "Green Egg": {
+    "atk": 7
+  },
+  "Green Egg+": {
+    "atk": 11
+  },
+  "Grimoire": {
+    "atk": 14
+  },
+  "Golden Dagger": {
+    "atk": 16
+  },
+  "Golden Naginata": {
+    "atk": 16
+  },
+  "Gradivus": {
+    "atk": 16
+  },
+  "Grado Poleax": {
+    "atk": 16
+  },
+  "Gravity": {
+    "atk": 6
+  },
+  "Gravity+": {
+    "atk": 10
+  },
+  "Gronnblade": {
+    "atk": 9
+  },
+  "Gronnblade+": {
+    "atk": 13
+  },
+  "Gronnowl": {
+    "atk": 6
+  },
+  "Gronnowl+": {
+    "atk": 10
+  },
+  "Gronnraven": {
+    "atk": 7
+  },
+  "Gronnraven+": {
+    "atk": 11
+  },
+  "Gronnwolf": {
+    "atk": 6
+  },
+  "Gronnwolf+": {
+    "atk": 10
+  },
+  "Guardian's Axe": {
+    "atk": 16
+  },
+  "Hammer": {
+    "atk": 8
+  },
+  "Hammer+": {
+    "atk": 12
+  },
+  "Hauteclere": {
+    "atk": 16
+  },
+  "Hana's Katana": {
+    "atk": 16
+  },
+  "Heavy Spear": {
+    "atk": 8
+  },
+  "Heavy Spear+": {
+    "atk": 12
+  },
+  "Hermit's Tome": {
+    "atk": 14
+  },
+  "Hewn Lance": {
+    "atk": 11
+  },
+  "Hibiscus Tome": {
+    "atk": 8
+  },
+  "Hibiscus Tome+": {
+    "atk": 12
+  },
+  "Hinata's Katana": {
+    "atk": 16
+  },
+  "Hinoka's Spear": {
+    "atk": 16
+  },
+  "Inscribed Tome": {
+    "atk": 14
+  },
+  "Inveterate Axe": {
+    "atk": 16
+  },
+  "Iris's Tome": {
+    "atk": 14
+  },
+  "Jakob's Tray": {
+    "atk": 14
+  },
+  "Jubilant Blade": {
+    "atk": 16
+  },
+  "Kagero's Dart": {
+    "atk": 14
+  },
+  "Killer Axe": {
+    "atk": 7
+  },
+  "Killer Axe+": {
+    "atk": 11
+  },
+  "Killer Bow": {
+    "atk": 5
+  },
+  "Killer Bow+": {
+    "atk": 9
+  },
+  "Killer Lance": {
+    "atk": 7
+  },
+  "Killer Lance+": {
+    "atk": 11
+  },
+  "Killing Edge": {
+    "atk": 7
+  },
+  "Killing Edge+": {
+    "atk": 11
+  },
+  "Kitty Paddle": {
+    "atk": 5
+  },
+  "Kitty Paddle+": {
+    "atk": 8
+  },
+  "Knightly Lance": {
+    "atk": 16
+  },
+  "Laid-Back Blade": {
+    "atk": 16
+  },
+  "Laslow's Blade": {
+    "atk": 16
+  },
+  "Legion's Axe": {
+    "atk": 10
+  },
+  "Legion's Axe+": {
+    "atk": 14
+  },
+  "Light Breath": {
+    "atk": 9
+  },
+  "Light Breath+": {
+    "atk": 13
+  },
+  "Lightning Breath": {
+    "atk": 7
+  },
+  "Lightning Breath+": {
+    "atk": 11
+  },
+  "Lilith Floatie": {
+    "atk": 10
+  },
+  "Lilith Floatie+": {
+    "atk": 14
+  },
+  "Lordly Lance": {
+    "atk": 16
+  },
+  "Loyal Greatlance": {
+    "atk": 16
+  },
+  "Melon Crusher": {
+    "atk": 10
+  },
+  "Melon Crusher+": {
+    "atk": 14
+  },
+  "Monstrous Bow": {
+    "atk": 8
+  },
+  "Monstrous Bow+": {
+    "atk": 12
+  },
+  "Mulagir": {
+    "atk": 14
+  },
+  "Mystletainn": {
+    "atk": 16
+  },
+  "Naga": {
+    "atk": 14
+  },
+  "Nidhogg": {
+    "atk": 14
+  },
+  "Niles's Bow": {
+    "atk": 14
+  },
+  "Oboro's Spear": {
+    "atk": 16
+  },
+  "Odin's Grimoire": {
+    "atk": 14
+  },
+  "Pain": {
+    "atk": 3
+  },
+  "Pain+": {
+    "atk": 10
+  },
+  "Panic": {
+    "atk": 7
+  },
+  "Panic+": {
+    "atk": 11
+  },
+  "Panther Lance": {
+    "atk": 16
+  },
+  "Panther Sword": {
+    "atk": 16
+  },
+  "Parthia": {
+    "atk": 14
+  },
+  "Poison Dagger": {
+    "atk": 2
+  },
+  "Poison Dagger+": {
+    "atk": 5
+  },
+  "Purifying Breath": {
+    "atk": 14
+  },
+  "Ragnarok": {
+    "atk": 14
+  },
+  "Ragnell": {
+    "atk": 16
+  },
+  "Raijinto": {
+    "atk": 16
+  },
+  "Rauðrblade": {
+    "atk": 9
+  },
+  "Rauðrblade+": {
+    "atk": 13
+  },
+  "Rauðrowl": {
+    "atk": 6
+  },
+  "Rauðrowl+": {
+    "atk": 10
+  },
+  "Rauðrraven": {
+    "atk": 7
+  },
+  "Rauðrraven+": {
+    "atk": 11
+  },
+  "Rauðrwolf": {
+    "atk": 6
+  },
+  "Rauðrwolf+": {
+    "atk": 10
+  },
+  "Rebecca's Bow": {
+    "atk": 14
+  },
+  "Reese's Tome": {
+    "atk": 14
+  },
+  "Regal Blade": {
+    "atk": 16
+  },
+  "Renowned Bow": {
+    "atk": 9
+  },
+  "Resolute Blade": {
+    "atk": 16
+  },
+  "Rhomphaia": {
+    "atk": 16
+  },
+  "Ridersbane": {
+    "atk": 10
+  },
+  "Ridersbane+": {
+    "atk": 14
+  },
+  "Rogue Dagger": {
+    "atk": 4
+  },
+  "Rogue Dagger+": {
+    "atk": 7
+  },
+  "Rowdy Sword": {
+    "atk": 11
+  },
+  "Ruby Sword": {
+    "atk": 8
+  },
+  "Ruby Sword+": {
+    "atk": 12
+  },
+  "Runeaxe": {
+    "atk": 16
+  },
+  "Saizo's Star": {
+    "atk": 14
+  },
+  "Sapphire Lance": {
+    "atk": 8
+  },
+  "Sapphire Lance+": {
+    "atk": 12
+  },
+  "Scarlet Sword": {
+    "atk": 16
+  },
+  "Sealife Tome": {
+    "atk": 8
+  },
+  "Sealife Tome+": {
+    "atk": 12
+  },
+  "Seashell": {
+    "atk": 7
+  },
+  "Seashell+": {
+    "atk": 10
+  },
+  "Selena's Blade": {
+    "atk": 16
+  },
+  "Setsuna's Yumi": {
+    "atk": 14
+  },
+  "Shanna's Lance": {
+    "atk": 16
+  },
+  "Siegfried": {
+    "atk": 16
+  },
+  "Sieglinde": {
+    "atk": 16
+  },
+  "Siegmund": {
+    "atk": 16
+  },
+  "Silverbrand": {
+    "atk": 16
+  },
+  "Slaying Axe": {
+    "atk": 10
+  },
+  "Slaying Axe+": {
+    "atk": 14
+  },
+  "Slaying Bow": {
+    "atk": 8
+  },
+  "Slaying Bow+": {
+    "atk": 12
+  },
+  "Slaying Lance": {
+    "atk": 10
+  },
+  "Slaying Lance+": {
+    "atk": 14
+  },
+  "Slaying Edge": {
+    "atk": 10
+  },
+  "Slaying Edge+": {
+    "atk": 14
+  },
+  "Slow": {
+    "atk": 5
+  },
+  "Slow+": {
+    "atk": 12
+  },
+  "Smoke Dagger": {
+    "atk": 6
+  },
+  "Smoke Dagger+": {
+    "atk": 9
+  },
+  "Sniper's Bow": {
+    "atk": 14
+  },
+  "Solitary Blade": {
+    "atk": 16
+  },
+  "Spectral Tome": {
+    "atk": 8
+  },
+  "Spectral Tome+": {
+    "atk": 12
+  },
+  "Springtime Staff": {
+    "atk": 14
+  },
+  "Spy's Dagger": {
+    "atk": 14
+  },
+  "Sol Katti": {
+    "atk": 16
+  },
+  "Stalwart Sword": {
+    "atk": 16
+  },
+  "Steady Lance": {
+    "atk": 16
+  },
+  "Stout Tomahawk": {
+    "atk": 16
+  },
+  "Tactical Bolt": {
+    "atk": 14
+  },
+  "Tactical Gale": {
+    "atk": 14
+  },
+  "Tharja's Hex": {
+    "atk": 14
+  },
+  "Tomato Tome": {
+    "atk": 8
+  },
+  "Tomato Tome+": {
+    "atk": 12
+  },
+  "Tome of Thoron": {
+    "atk": 14
+  },
+  "Tyrfing": {
+    "atk": 16
+  },
+  "Urðr": {
+    "atk": 16
+  },
+  "Urvan": {
+    "atk": 16
+  },
+  "Valflame": {
+    "atk": 14
+  },
+  "Veteran Lance": {
+    "atk": 16
+  },
+  "Vidofnir": {
+    "atk": 16
+  },
+  "Weirding Tome": {
+    "atk": 14
+  },
+  "Whitewing Blade": {
+    "atk": 16
+  },
+  "Whitewing Lance": {
+    "atk": 16
+  },
+  "Whitewing Spear": {
+    "atk": 16
+  },
+  "Wind's Brand": {
+    "atk": 14
+  },
+  "Wing Sword": {
+    "atk": 16
+  },
+  "Wo Dao": {
+    "atk": 9
+  },
+  "Wo Dao+": {
+    "atk": 13
+  },
+  "Yato": {
+    "atk": 16
+  },
+  "Zanbato": {
+    "atk": 10
+  },
+  "Zanbato+": {
+    "atk": 14
+  }
+}

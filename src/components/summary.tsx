@@ -56,13 +56,13 @@ function Summary({ data }: { data: StoredHero }) {
           loading="lazy"
           class="game-asset"
           src={
-            data?.passive_s 
-              ? getSkillUrl(data.passive_s)
+            data?.sacred_seal 
+              ? getSkillUrl(data.sacred_seal)
               : "/teambuilder/S.png"
           }
         />
       </div>
-      <div>{data?.passive_s}</div>
+      <div>{data?.sacred_seal}</div>
     </div>
   );
 }

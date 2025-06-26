@@ -1,3 +1,5 @@
+import WEAPON_BUFFS from "./weapons.json";
+
 export type FEH_Stat = "atk" | "def" | "spd" | "res" | "hp"
 
 interface StatChanges {
@@ -7,35 +9,90 @@ interface StatChanges {
 }
 
 const SKILL_STAT_CHANGES: StatChanges = {
+    ...WEAPON_BUFFS,
+    "Audhulma": {
+        atk: WEAPON_BUFFS["Audhulma"].atk,
+        res: 5,
+    },
+    "Ayra's Blade": {
+        atk: WEAPON_BUFFS["Ayra's Blade"].atk,
+        spd: 3,
+    },
+    "Blazing Durandal": {
+        atk: WEAPON_BUFFS["Blazing Durandal"].atk + 3
+    },
     "Brave Axe": {
-        spd: -5
+        spd: -5,
+        atk: WEAPON_BUFFS["Brave Axe"].atk,
     },
     "Brave Axe+": {
-        spd: -5
+        spd: -5,
+        atk: WEAPON_BUFFS["Brave Axe+"].atk,
     },
     "Brave Bow": {
-        spd: -5
+        spd: -5,
+        atk: WEAPON_BUFFS["Brave Bow"].atk,
     },
     "Brave Bow+": {
-        spd: -5
+        spd: -5,
+        atk: WEAPON_BUFFS["Brave Bow+"].atk,
     },
     "Brave Lance": {
-        spd: -5
+        spd: -5,
+        atk: WEAPON_BUFFS["Brave Lance"].atk,
     },
     "Brave Lance+": {
-        spd: -5
+        spd: -5,
+        atk: WEAPON_BUFFS["Brave Lance+"].atk,
     },
     "Brave Sword": {
-        spd: -5
+        spd: -5,
+        atk: WEAPON_BUFFS["Brave Sword"].atk,
     },
     "Brave Sword+": {
-        spd: -5
+        spd: -5,
+        atk: WEAPON_BUFFS["Brave Sword+"].atk,
     },
     "Cordelia's Lance": {
-        spd: -2
+        spd: -2,
+        atk: WEAPON_BUFFS["Cordelia's Lance"].atk,
+    },
+    "Cursed Lance": {
+        atk: WEAPON_BUFFS["Cursed Lance"].atk + 2,
+        spd: 2,
     },
     "Dire Thunder": {
-        spd: -5
+        spd: -5,
+        atk: WEAPON_BUFFS["Dire Thunder"].atk,
+    },
+    "Divine Tyrfing": {
+        atk: WEAPON_BUFFS["Divine Tyrfing"].atk,
+        res: 3,
+    },
+    "Elena's Staff": {
+        atk: WEAPON_BUFFS["Elena's Staff"].atk,
+        res: 3,
+    },
+    "Elise's Staff": {
+        atk: WEAPON_BUFFS["Elise's Staff"].atk,
+        spd: 3,
+    },
+    "Geirskögul": {
+        atk: WEAPON_BUFFS["Geirskögul"].atk,
+        def: 3,
+    },
+    "Mulagir": {
+        atk: WEAPON_BUFFS["Mulagir"].atk,
+        spd: 3,
+    },
+    "Resolute Blade": {
+        atk: WEAPON_BUFFS["Resolute Blade"].atk + 3,
+    },
+    "Springtime Staff": {
+        atk: WEAPON_BUFFS["Springtime Staff"].atk + 3,
+    },
+    "Weirding Tome": {
+        spd: 3,
     },
     "Attack +1": {
         atk: 1,

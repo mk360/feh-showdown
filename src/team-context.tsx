@@ -1,6 +1,7 @@
 import { createContext } from "preact";
 import { SetStateAction } from "preact/compat";
 import { Dispatch, useEffect, useState } from "preact/hooks";
+import { getExtraStats, getLevel40Stats, withMerges } from "./stats/convert-to-level-40";
 
 const TeamContext = createContext<{
   teamPreview: StoredHero[];
@@ -19,7 +20,7 @@ export const TeamProvider = ({ children }) => {
       passive_a: "",
       passive_b: "",
       passive_c: "",
-      passive_s: "",
+      sacred_seal: "",
       stats: {
         hp: 0,
         atk: 0,
@@ -36,7 +37,26 @@ export const TeamProvider = ({ children }) => {
 
   useEffect(() => {
     if (localStorage.getItem("team")) {
-      const parsedTeam = JSON.parse(localStorage.getItem("team"));
+      const parsedTeam = JSON.parse(localStorage.getItem("team")) as StoredHero[];
+      for (let i = 0; i < parsedTeam.length; i++) {
+        const member = parsedTeam[i];
+        const lv40 = getLevel40Stats({
+          character: member.name,
+          asset: member.asset,
+          flaw: member.flaw,
+        });
+        const withMergesStats = withMerges(lv40, member.merges, member.asset, member.flaw);
+        const extraStats = getExtraStats(member);
+
+        const totalStats = {...withMergesStats};
+        for (let key in extraStats) {
+          totalStats[key] += extraStats[key];
+        }
+
+        member.stats = totalStats;
+
+        parsedTeam[i] = member;
+      }
       setTeamPreview(parsedTeam);
     }
   }, []);

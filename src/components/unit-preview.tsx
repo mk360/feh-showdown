@@ -1,5 +1,14 @@
+import { getSkillUrl } from "../data/skill-icon-dex";
 import { formatName } from "../utils/strings";
-import SKILL_ICON_DEX, { getSkillUrl } from "../data/skill-icon-dex";
+
+function EmptyIcon({ title }: { title: string }) {
+  return <img
+    loading="lazy"
+    title={title}
+    class="game-asset"
+    src="/teambuilder/no-skill.png"
+  />;
+}
 
 function UnitPreview({ data }: { data: StoredHero }) {
   return (
@@ -56,12 +65,7 @@ function UnitPreview({ data }: { data: StoredHero }) {
                 src={getSkillUrl(data.passive_a)}
               />
             ) : (
-              <img
-                loading="lazy"
-                title={data?.passive_b}
-                class="game-asset"
-                src="/teambuilder/no-skill.png"
-              />
+              <EmptyIcon title="No A Passive" />
             )}
             {!!data?.passive_b && data?.passive_b !== "No B" ? (
               <img
@@ -71,12 +75,7 @@ function UnitPreview({ data }: { data: StoredHero }) {
                 src={getSkillUrl(data.passive_b)}
               />
             ) : (
-              <img
-                loading="lazy"
-                title={data?.passive_b}
-                class="game-asset"
-                src="/teambuilder/no-skill.png"
-              />
+              <EmptyIcon title="No B Passive" />
             )}
             {!!data?.passive_c && data?.passive_c !== "No C" ? (
               <img
@@ -86,27 +85,17 @@ function UnitPreview({ data }: { data: StoredHero }) {
                 src={getSkillUrl(data.passive_c)}
               />
             ) : (
-              <img
-                loading="lazy"
-                title={data?.passive_c}
-                class="game-asset"
-                src="/teambuilder/no-skill.png"
-              />
+              <EmptyIcon title="No C Passive" />
             )}
-            {!!data?.passive_s && data?.passive_s !== "No S" ? (
+            {!!data?.sacred_seal && data?.sacred_seal !== "No S" ? (
               <img
-                title={data?.passive_s}
+                title={data?.sacred_seal}
                 loading="lazy"
                 class="game-asset"
-                src={getSkillUrl(data.passive_s)}
+                src={getSkillUrl(data.sacred_seal)}
               />
             ) : (
-              <img
-                loading="lazy"
-                title={data?.passive_s}
-                class="game-asset"
-                src="/teambuilder/no-skill.png"
-              />
+              <EmptyIcon title="No Sacred Seal" />
             )}
           </div>
         </div>

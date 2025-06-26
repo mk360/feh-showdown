@@ -1,22 +1,24 @@
 import {
-  useCallback,
   useContext,
   useEffect,
   useMemo,
   useRef,
-  useState,
+  useState
 } from "preact/hooks";
 import { Fragment } from "preact/jsx-runtime";
 import { useForm } from "react-hook-form";
-import SKILL_STAT_CHANGES from "../buffs";
+import { getSkillUrl } from "../data/skill-icon-dex";
+import STATS from "../stats";
+import { getExtraStats, getLevel40Stats, withMerges } from "../stats/convert-to-level-40";
 import TeamContext from "../team-context";
 import fetchMovesets from "../utils/fetch-moveset";
 import { formatName } from "../utils/strings";
 import Summary from "./summary";
 import TeamPreview from "./team-preview";
 import UnitList from "./unit-list";
-import STATS from "../stats";
-import SKILL_ICON_DEX, { getSkillUrl } from "../data/skill-icon-dex";
+import { CharacterMoveset } from "../interfaces/moveset";
+
+const statLabels = ["hp", "atk", "spd", "def", "res"];
 
 interface SkillWithDescription {
   name: string;
@@ -36,19 +38,6 @@ interface SkillList {
 type StatChangeFields = {
   [k in `${FEH_Stat}-change`]: "asset" | "flaw" | "neutral";
 };
-
-interface CharacterMoveset {
-  exclusiveSkills: Omit<SkillList, "S">;
-  commonSkills: SkillList;
-}
-
-const statLabels = ["hp", "atk", "spd", "def", "res"];
-
-function convertToLevel40(stat1: number, growthRate: number) {
-  const appliedGrowthRate = Math.floor(growthRate * 1.14 + 1e-10);
-  const growthValue = Math.floor((39 * appliedGrowthRate) / 100);
-  return stat1 + growthValue;
-}
 
 export default function Tab() {
   const [temporaryChoice, setTemporaryChoice] = useState("");
@@ -129,7 +118,7 @@ export default function Tab() {
         setValue("A", tabData.passive_a);
         setValue("B", tabData.passive_b);
         setValue("C", tabData.passive_c);
-        setValue("S", tabData.passive_s);
+        setValue("S", tabData.sacred_seal);
         setMoveset(moveset);
       });
     }
@@ -143,35 +132,6 @@ export default function Tab() {
     }
   }, [teamPreview[tab]?.name]);
 
-  const getExtraStats = () => {
-    const stats: { [k in FEH_Stat]?: number } = {
-      hp: 0,
-      atk: skillsData.weapons.find(({ name }) => name === getValues("weapons"))
-          ?.might ?? 0,
-      spd: 0,
-      def: 0,
-      res: 0,
-    };
-
-    for (let key of [
-      "weapons",
-      "assists",
-      "specials",
-      "A",
-      "B",
-      "C",
-      "S",
-    ] as const) {
-      const fieldValue = getValues(key);
-      const skillStatChange = SKILL_STAT_CHANGES[fieldValue];
-      for (let changedStat in skillStatChange) {
-        stats[changedStat] += skillStatChange[changedStat];
-      }
-    }
-
-    return stats;
-  };
-
   const getAlteredStats = function () {
     const asset = statLabels.find(
       (stat: FEH_Stat) => getValues(`${stat}-change`) === "asset"
@@ -182,8 +142,8 @@ export default function Tab() {
 
     if (asset && flaw) {
       return {
-        asset,
-        flaw,
+        asset: asset as FEH_Stat,
+        flaw: flaw as FEH_Stat,
       };
     }
 
@@ -193,122 +153,7 @@ export default function Tab() {
     };
   };
 
-  const getLevel40Stat = useCallback(
-    (options: {
-      lv1Stat: number;
-      character: string;
-      stat: FEH_Stat;
-      extraStats: { [k in FEH_Stat]?: number };
-    }) => {
-      const alteredStats = getAlteredStats();
-      const baseGrowthRate = STATS[options.character].growthRates[options.stat];
-      const baseLevel1 = STATS[options.character].lv1[options.stat];
-      const finalGrowthRate =
-        alteredStats.asset === options.stat
-          ? baseGrowthRate + 5
-          : alteredStats.flaw === options.stat
-          ? baseGrowthRate - 5
-          : baseGrowthRate;
-      const finalLevel1 =
-        alteredStats.asset === options.stat
-          ? baseLevel1 + 1
-          : alteredStats.flaw === options.stat
-          ? baseLevel1 - 1
-          : baseLevel1;
-      const level40Stat = convertToLevel40(finalLevel1, finalGrowthRate);
-      return level40Stat + options.extraStats[options.stat];
-    },
-    []
-  );
-
-  const withMerges = function (stats: FEHStats, merges: number) {
-    const alteredStats = getAlteredStats();
-    const sortedStats = Object.entries(stats)
-      .sort(([b, stat1], [a, stat2]) => {
-        const statDifference = stat2 - stat1;
-        if (!statDifference)
-          return statLabels.indexOf(b) - statLabels.indexOf(a);
-        return statDifference;
-      })
-      .map(([stat, value]) => ({
-        stat,
-        value,
-      }));
-    const firstStatChange =
-      alteredStats.asset && alteredStats.flaw ? [0, 1] : [0, 1, 2];
-    const statChanges = [
-      firstStatChange,
-      [2, 3],
-      [4, 0],
-      [1, 2],
-      [3, 4],
-      [0, 1],
-      [2, 3],
-      [4, 0],
-      [1, 2],
-    ];
-
-    for (let i = 0; i < merges; i++) {
-      let mod5 = i % 5;
-      let increase = statChanges[mod5];
-      for (let index of increase) {
-        sortedStats[index].value++;
-      }
-    }
-
-    const splitStats = Object.groupBy(sortedStats, (s) => s.stat);
-
-    const obj: { [k in FEH_Stat]: number } = {
-      hp: splitStats["hp"][0]?.value,
-      atk: splitStats["atk"][0]?.value,
-      spd: splitStats["spd"][0]?.value,
-      def: splitStats["def"][0]?.value,
-      res: splitStats["res"][0]?.value,
-    };
-
-    return obj;
-  };
-
-  const baseStats = !temporaryChoice
-    ? {
-        atk: 0,
-        hp: 0,
-        spd: 0,
-        def: 0,
-        res: 0,
-      }
-    : {
-        hp: getLevel40Stat({
-          lv1Stat: STATS[temporaryChoice].lv1.hp,
-          character: temporaryChoice,
-          stat: "hp",
-          extraStats: getExtraStats(),
-        }),
-        atk: getLevel40Stat({
-          lv1Stat: STATS[temporaryChoice].lv1.atk,
-          character: temporaryChoice,
-          stat: "atk",
-          extraStats: getExtraStats(),
-        }),
-        spd: getLevel40Stat({
-          lv1Stat: STATS[temporaryChoice].lv1.spd,
-          character: temporaryChoice,
-          stat: "spd",
-          extraStats: getExtraStats(),
-        }),
-        def: getLevel40Stat({
-          lv1Stat: STATS[temporaryChoice].lv1.def,
-          character: temporaryChoice,
-          stat: "def",
-          extraStats: getExtraStats(),
-        }),
-        res: getLevel40Stat({
-          lv1Stat: STATS[temporaryChoice].lv1.res,
-          character: temporaryChoice,
-          stat: "res",
-          extraStats: getExtraStats(),
-        }),
-      };
+  const alteredStats = getAlteredStats();
 
   const stats = !temporaryChoice
     ? {
@@ -318,7 +163,35 @@ export default function Tab() {
         def: 0,
         res: 0,
       }
-    : withMerges(baseStats, +getValues("merges"));
+    : getLevel40Stats({
+       character: temporaryChoice,
+       asset: alteredStats.asset,
+       flaw: alteredStats.flaw,
+    });
+
+  const statsWithMerges = !temporaryChoice
+    ? {
+        atk: 0,
+        hp: 0,
+        spd: 0,
+        def: 0,
+        res: 0,
+      }
+    : withMerges(stats, +getValues("merges"), alteredStats.asset, alteredStats.flaw);
+
+    const extraStats = getExtraStats({
+      weapon: getValues("weapons"),
+      assist: getValues("assists"),
+      special: getValues("specials"),
+      passive_a: getValues("A"),
+      passive_b: getValues("B"),
+      passive_c: getValues("C"),
+      sacred_seal: getValues("S"),
+    });
+
+    for (let key in extraStats) {
+      statsWithMerges[key] += extraStats[key];
+    }
 
   return (
     <>
@@ -350,7 +223,7 @@ export default function Tab() {
                 passive_a: "",
                 passive_b: "",
                 passive_c: "",
-                passive_s: "",
+                sacred_seal: "",
               };
               setTeamPreview(copy);
               setSubTab("detail");
@@ -362,6 +235,7 @@ export default function Tab() {
       </div>
       <div
         onChange={handleSubmitMoveset((data) => {
+          const alteredStats = getAlteredStats();
           const baseStats = !temporaryChoice
             ? {
                 atk: 0,
@@ -370,38 +244,11 @@ export default function Tab() {
                 def: 0,
                 res: 0,
               }
-            : {
-                hp: getLevel40Stat({
-                  lv1Stat: STATS[temporaryChoice].lv1.hp,
-                  character: temporaryChoice,
-                  stat: "hp",
-                  extraStats: getExtraStats(),
-                }),
-                atk: getLevel40Stat({
-                  lv1Stat: STATS[temporaryChoice].lv1.atk,
-                  character: temporaryChoice,
-                  stat: "atk",
-                  extraStats: getExtraStats(),
-                }),
-                spd: getLevel40Stat({
-                  lv1Stat: STATS[temporaryChoice].lv1.spd,
-                  character: temporaryChoice,
-                  stat: "spd",
-                  extraStats: getExtraStats(),
-                }),
-                def: getLevel40Stat({
-                  lv1Stat: STATS[temporaryChoice].lv1.def,
-                  character: temporaryChoice,
-                  stat: "def",
-                  extraStats: getExtraStats(),
-                }),
-                res: getLevel40Stat({
-                  lv1Stat: STATS[temporaryChoice].lv1.res,
-                  character: temporaryChoice,
-                  stat: "res",
-                  extraStats: getExtraStats(),
-                }),
-              };
+            : getLevel40Stats({
+                character: temporaryChoice,
+                asset: alteredStats.asset,
+                flaw: alteredStats.flaw,
+              });
 
           const stats = !temporaryChoice
             ? {
@@ -411,7 +258,21 @@ export default function Tab() {
                 def: 0,
                 res: 0,
               }
-            : withMerges(baseStats, +getValues("merges"));
+            : withMerges(baseStats, +getValues("merges"), alteredStats.asset, alteredStats.flaw);
+
+            const extraStats = getExtraStats({
+            weapon: getValues("weapons"),
+            assist: getValues("assists"),
+            special: getValues("specials"),
+            passive_a: getValues("A"),
+            passive_b: getValues("B"),
+            passive_c: getValues("C"),
+            sacred_seal: getValues("S"),
+          });
+
+          for (let key in extraStats) {
+            stats[key] += extraStats[key];
+          }
           const copy: StoredHero[] = [];
           for (let member of teamPreview) {
             copy.push(member);
@@ -427,11 +288,9 @@ export default function Tab() {
             passive_a: data.A,
             passive_b: data.B,
             passive_c: data.C,
-            passive_s: data.S,
-            stats: {
-              ...stats,
-              ...getAlteredStats(),
-            },
+            sacred_seal: data.S,
+            ...getAlteredStats(),
+            stats,
           };
           setTeamPreview(copy);
         })}
@@ -450,7 +309,7 @@ export default function Tab() {
             <tbody>
               <tr>
                 <td>HP</td>
-                <td>{!!temporaryChoice && stats.hp}</td>
+                <td>{!!temporaryChoice && statsWithMerges.hp}</td>
                 <td>
                   <input
                     class="stat-input"
@@ -502,7 +361,7 @@ export default function Tab() {
               </tr>
               <tr>
                 <td>Atk</td>
-                <td>{!!temporaryChoice && stats.atk}</td>
+                <td>{!!temporaryChoice && statsWithMerges.atk}</td>
                 <td>
                   <input
                     class="stat-input"
@@ -554,7 +413,7 @@ export default function Tab() {
               </tr>
               <tr>
                 <td>Spd</td>
-                <td>{!!temporaryChoice && stats.spd}</td>
+                <td>{!!temporaryChoice && statsWithMerges.spd}</td>
                 <td>
                   <input
                     class="stat-input"
@@ -606,7 +465,7 @@ export default function Tab() {
               </tr>
               <tr>
                 <td>Def</td>
-                <td>{!!temporaryChoice && stats.def}</td>
+                <td>{!!temporaryChoice && statsWithMerges.def}</td>
                 <td>
                   <input
                     class="stat-input"
@@ -658,7 +517,7 @@ export default function Tab() {
               </tr>
               <tr>
                 <td>Res</td>
-                <td>{!!temporaryChoice && stats.res}</td>
+                <td>{!!temporaryChoice && statsWithMerges.res}</td>
                 <td>
                   <input
                     class="stat-input"
@@ -977,7 +836,7 @@ export default function Tab() {
                     A: rec.passive_a ?? "",
                     B: rec.passive_b ?? "",
                     C: rec.passive_c ?? "",
-                    S: rec.passive_s ?? "",
+                    S: rec.sacred_seal ?? "",
                     asset: rec.asset ?? "",
                     flaw: rec.flaw ?? "",
                     merges: rec.merges ?? 0,
@@ -986,24 +845,28 @@ export default function Tab() {
                   return payload;
                 }))
               }).then((resp) => {
-                if (resp.ok) {
-                  localStorage.setItem("team", JSON.stringify(teamPreview.filter((i) => i.name).map((rec) => {
-                  const payload = {
-                    name: rec.name ?? "",
-                    weapon: rec.weapon ?? "",
-                    assist: rec.assist ?? "",
-                    special: rec.special ?? "",
-                    A: rec.passive_a ?? "",
-                    B: rec.passive_b ?? "",
-                    C: rec.passive_c ?? "",
-                    S: rec.passive_s ?? "",
-                    asset: rec.asset ?? "",
-                    flaw: rec.flaw ?? "",
-                    merges: rec.merges ?? 0,
-                  };
+                localStorage.setItem("team", JSON.stringify(teamPreview.filter((i) => i.name).map((rec) => {
+                  console.log(JSON.stringify(rec.stats))
+                const payload = {
+                  name: rec.name ?? "",
+                  weapon: rec.weapon ?? "",
+                  assist: rec.assist ?? "",
+                  special: rec.special ?? "",
+                  A: rec.passive_a ?? "",
+                  B: rec.passive_b ?? "",
+                  C: rec.passive_c ?? "",
+                  S: rec.sacred_seal ?? "",
+                  // @ts-ignore
+                  asset: rec.stats.asset ?? "",
+                  // @ts-ignore
+                  flaw: rec.stats.flaw ?? "",
+                  merges: rec.merges ?? 0,
+                };
+                console.log(JSON.stringify(payload));
 
-                  return payload;
-                })));
+                return payload;
+              })));
+                if (resp.ok) {
                   return {};
                 }
                 return resp.json()
@@ -1019,6 +882,27 @@ export default function Tab() {
                   alert(str);
                 }
               }).catch(() => {
+                localStorage.setItem("team", JSON.stringify(teamPreview.filter((i) => i.name).map((rec) => {
+                  console.log(JSON.stringify(rec.stats))
+                const payload = {
+                  name: rec.name ?? "",
+                  weapon: rec.weapon ?? "",
+                  assist: rec.assist ?? "",
+                  special: rec.special ?? "",
+                  A: rec.passive_a ?? "",
+                  B: rec.passive_b ?? "",
+                  C: rec.passive_c ?? "",
+                  S: rec.sacred_seal ?? "",
+                  // @ts-ignore
+                  asset: rec.stats?.asset ?? "",
+                  // @ts-ignore
+                  flaw: rec.stats?.flaw ?? "",
+                  merges: rec.merges ?? 0,
+                };
+                console.log(JSON.stringify(payload));
+
+                return payload;
+              })));
                 alert("An unknown error happened.");
               })
             }}
