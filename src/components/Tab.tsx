@@ -28,7 +28,7 @@ interface SkillWithDescription {
 interface SkillList {
   weapons: (SkillWithDescription & { might: number })[];
   assists: SkillWithDescription[];
-  specials: SkillWithDescription[];
+  specials: (SkillWithDescription & { cooldown: number })[];
   A: SkillWithDescription[];
   B: SkillWithDescription[];
   C: SkillWithDescription[];
@@ -85,7 +85,7 @@ export default function Tab() {
       assists: [{ name: "No Assist", description: "" }]
               .concat(moveset.exclusiveSkills.assists)
               .concat(moveset.commonSkills.assists),
-      specials: [{ name: "No Special", description: "" }]
+      specials: [{ name: "No Special", description: "", cooldown: 0 }]
               .concat(moveset.exclusiveSkills.specials)
               .concat(moveset.commonSkills.specials),
       A: [{ name: "No A", description: "" }]
@@ -205,18 +205,17 @@ export default function Tab() {
             fetchMovesets(target.id).then((moveset) => {
               setTemporaryChoice(target.id);
               const copy = [...teamPreview];
+              const initialStats = getLevel40Stats({
+                character: target.id,
+                asset: "",
+                flaw: "",
+              });
               copy[tab] = {
                 name: target.id,
                 merges: 0,
                 asset: "",
                 flaw: "",
-                stats: {
-                  atk: 0,
-                  def: 0,
-                  spd: 0,
-                  res: 0,
-                  hp: 0,
-                },
+                stats: initialStats,
                 weapon: "",
                 assist: "",
                 special: "",
@@ -236,15 +235,7 @@ export default function Tab() {
       <div
         onChange={handleSubmitMoveset((data) => {
           const alteredStats = getAlteredStats();
-          const baseStats = !temporaryChoice
-            ? {
-                atk: 0,
-                hp: 0,
-                spd: 0,
-                def: 0,
-                res: 0,
-              }
-            : getLevel40Stats({
+          const baseStats = getLevel40Stats({
                 character: temporaryChoice,
                 asset: alteredStats.asset,
                 flaw: alteredStats.flaw,
@@ -299,8 +290,8 @@ export default function Tab() {
         }
       >
         <div class="hero-portrait">
-          <h2>{temporaryChoice}</h2>
-          <img src={`/teambuilder/portraits/${formatName(temporaryChoice ?? "")}.webp`} />
+          <h2>{teamPreview[tab].name}</h2>
+          <img src={`/teambuilder/portraits/${formatName(teamPreview[tab].name ?? "")}.webp`} />
           <div />
         </div>
         <div class="stats">
@@ -663,10 +654,13 @@ export default function Tab() {
                   class={`skill-label ${STATS[temporaryChoice].color}`}
                   for={`special-${specialsData.name}`}
                 >
-                  <h3>
+                  <div>
+                    <h3>
                     <img class="game-asset" src="/teambuilder/special-icon.png" />
                     {specialsData.name}
                   </h3>
+                  {!!specialsData.cooldown && <h4>{specialsData.cooldown}</h4>}
+                  </div>
                   {!!specialsData.description && (
                     <p>{specialsData.description}</p>
                   )}
