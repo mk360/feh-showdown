@@ -18,6 +18,9 @@ export default defineConfig({
 		}),
 		viteTsconfigPaths()
 	],
+	build: {
+		target: ["es2024"]
+	}
 	// experimental: {
 	// 	renderBuiltUrl() {
 	// 		return {
