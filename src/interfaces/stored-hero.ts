@@ -10,10 +10,10 @@ interface StoredHero {
     assist: string;
     special: string;
     merges: number;
-    passive_a: string;
-    passive_b: string;
-    passive_c: string;
-    sacred_seal: string;
+    A: string;
+    B: string;
+    C: string;
+    S: string;
     asset: FEH_Stat | "";
     flaw: FEH_Stat | "";
     stats: FEHStats;

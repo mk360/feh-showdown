@@ -57,42 +57,42 @@ function UnitPreview({ data }: { data: StoredHero }) {
               }`}
           </span>
           <div>
-            {!!data?.passive_a && data?.passive_a !== "No A" ? (
+            {!!data?.A && data?.A !== "No A" ? (
               <img
                 loading="lazy"
-                title={data?.passive_a}
+                title={data?.A}
                 class="game-asset"
-                src={getSkillUrl(data.passive_a)}
+                src={getSkillUrl(data.A)}
               />
             ) : (
               <EmptyIcon title="No A Passive" />
             )}
-            {!!data?.passive_b && data?.passive_b !== "No B" ? (
+            {!!data?.B && data?.B !== "No B" ? (
               <img
-                title={data?.passive_b}
+                title={data?.B}
                 loading="lazy"
                 class="game-asset"
-                src={getSkillUrl(data.passive_b)}
+                src={getSkillUrl(data.B)}
               />
             ) : (
               <EmptyIcon title="No B Passive" />
             )}
-            {!!data?.passive_c && data?.passive_c !== "No C" ? (
+            {!!data?.C && data?.C !== "No C" ? (
               <img
-                title={data?.passive_c}
+                title={data?.C}
                 loading="lazy"
                 class="game-asset"
-                src={getSkillUrl(data.passive_c)}
+                src={getSkillUrl(data.C)}
               />
             ) : (
               <EmptyIcon title="No C Passive" />
             )}
-            {!!data?.sacred_seal && data?.sacred_seal !== "No S" ? (
+            {!!data?.S && data?.S !== "No S" ? (
               <img
-                title={data?.sacred_seal}
+                title={data?.S}
                 loading="lazy"
                 class="game-asset"
-                src={getSkillUrl(data.sacred_seal)}
+                src={getSkillUrl(data.S)}
               />
             ) : (
               <EmptyIcon title="No Sacred Seal" />

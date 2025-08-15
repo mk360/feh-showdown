@@ -17,10 +17,10 @@ export const TeamProvider = ({ children }) => {
       weapon: "",
       assist: "",
       special: "",
-      passive_a: "",
-      passive_b: "",
-      passive_c: "",
-      sacred_seal: "",
+      A: "",
+      B: "",
+      C: "",
+      S: "",
       stats: {
         hp: 0,
         atk: 0,
@@ -60,6 +60,8 @@ export const TeamProvider = ({ children }) => {
       setTeamPreview(parsedTeam);
     }
   }, []);
+
+  console.log({ teamPreview })
 
   return (
     <TeamContext.Provider value={{ teamPreview, setTeamPreview, tab, setTab }}>

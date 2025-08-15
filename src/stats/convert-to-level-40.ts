@@ -48,10 +48,10 @@ export function getExtraStats(moveset: {
     weapon: string,
     assist: string,
     special: string,
-    passive_a: string,
-    passive_b: string,
-    passive_c: string,
-    sacred_seal: string
+    A: string,
+    B: string,
+    C: string,
+    S: string
 }) {
     const stats: { [k in FEH_Stat]?: number } = {
         hp: 0,

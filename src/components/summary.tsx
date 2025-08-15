@@ -1,4 +1,4 @@
-import SKILL_ICON_DEX, { getSkillUrl } from "../data/skill-icon-dex";
+import { getSkillUrl } from "../data/skill-icon-dex";
 
 function Summary({ data }: { data: StoredHero }) {
   return (
@@ -20,49 +20,49 @@ function Summary({ data }: { data: StoredHero }) {
           loading="lazy"
           class="game-asset"
           src={
-            data?.passive_a
-              ? getSkillUrl(data.passive_a)
+            data?.A
+              ? getSkillUrl(data.A)
               : "/teambuilder/A.png"
           }
         />
       </div>
-      <div>{data?.passive_a}</div>
+      <div>{data?.A}</div>
       <div>
         <img
           loading="lazy"
           class="game-asset"
           src={
-            data?.passive_b 
-              ? getSkillUrl(data.passive_b)
+            data?.B 
+              ? getSkillUrl(data.B)
               : "/teambuilder/B.png"
           }
         />
       </div>
-      <div>{data?.passive_b}</div>
+      <div>{data?.B}</div>
       <div>
         <img
           loading="lazy"
           class="game-asset"
           src={
-            data?.passive_c 
-              ? getSkillUrl(data.passive_c)
+            data?.C 
+              ? getSkillUrl(data.C)
               : "/teambuilder/C.png"
           }
         />
       </div>
-      <div>{data?.passive_c}</div>
+      <div>{data?.C}</div>
       <div>
         <img
           loading="lazy"
           class="game-asset"
           src={
-            data?.sacred_seal 
-              ? getSkillUrl(data.sacred_seal)
+            data?.S 
+              ? getSkillUrl(data.S)
               : "/teambuilder/S.png"
           }
         />
       </div>
-      <div>{data?.sacred_seal}</div>
+      <div>{data?.S}</div>
     </div>
   );
 }

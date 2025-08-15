@@ -115,10 +115,10 @@ export default function Tab() {
         setValue("weapons", tabData.weapon);
         setValue("assists", tabData.assist);
         setValue("specials", tabData.special);
-        setValue("A", tabData.passive_a);
-        setValue("B", tabData.passive_b);
-        setValue("C", tabData.passive_c);
-        setValue("S", tabData.sacred_seal);
+        setValue("A", tabData.A);
+        setValue("B", tabData.B);
+        setValue("C", tabData.C);
+        setValue("S", tabData.S);
         setMoveset(moveset);
       });
     }
@@ -183,10 +183,10 @@ export default function Tab() {
       weapon: getValues("weapons"),
       assist: getValues("assists"),
       special: getValues("specials"),
-      passive_a: getValues("A"),
-      passive_b: getValues("B"),
-      passive_c: getValues("C"),
-      sacred_seal: getValues("S"),
+      A: getValues("A"),
+      B: getValues("B"),
+      C: getValues("C"),
+      S: getValues("S"),
     });
 
     for (let key in extraStats) {
@@ -219,10 +219,10 @@ export default function Tab() {
                 weapon: "",
                 assist: "",
                 special: "",
-                passive_a: "",
-                passive_b: "",
-                passive_c: "",
-                sacred_seal: "",
+                A: "",
+                B: "",
+                C: "",
+                S: "",
               };
               setTeamPreview(copy);
               setSubTab("detail");
@@ -255,10 +255,10 @@ export default function Tab() {
             weapon: getValues("weapons"),
             assist: getValues("assists"),
             special: getValues("specials"),
-            passive_a: getValues("A"),
-            passive_b: getValues("B"),
-            passive_c: getValues("C"),
-            sacred_seal: getValues("S"),
+            A: getValues("A"),
+            B: getValues("B"),
+            C: getValues("C"),
+            S: getValues("S"),
           });
 
           for (let key in extraStats) {
@@ -276,10 +276,10 @@ export default function Tab() {
             assist: data.assists,
             special: data.specials,
             merges: +data.merges,
-            passive_a: data.A,
-            passive_b: data.B,
-            passive_c: data.C,
-            sacred_seal: data.S,
+            A: data.A,
+            B: data.B,
+            C: data.C,
+            S: data.S,
             ...getAlteredStats(),
             stats,
           };
@@ -827,10 +827,10 @@ export default function Tab() {
                     weapon: rec.weapon ?? "",
                     assist: rec.assist ?? "",
                     special: rec.special ?? "",
-                    A: rec.passive_a ?? "",
-                    B: rec.passive_b ?? "",
-                    C: rec.passive_c ?? "",
-                    S: rec.sacred_seal ?? "",
+                    A: rec.A ?? "",
+                    B: rec.B ?? "",
+                    C: rec.C ?? "",
+                    S: rec.S ?? "",
                     asset: rec.asset ?? "",
                     flaw: rec.flaw ?? "",
                     merges: rec.merges ?? 0,
@@ -846,10 +846,10 @@ export default function Tab() {
                   weapon: rec.weapon ?? "",
                   assist: rec.assist ?? "",
                   special: rec.special ?? "",
-                  A: rec.passive_a ?? "",
-                  B: rec.passive_b ?? "",
-                  C: rec.passive_c ?? "",
-                  S: rec.sacred_seal ?? "",
+                  A: rec.A ?? "",
+                  B: rec.B ?? "",
+                  C: rec.C ?? "",
+                  S: rec.S ?? "",
                   // @ts-ignore
                   asset: rec.stats.asset ?? "",
                   // @ts-ignore
@@ -883,10 +883,10 @@ export default function Tab() {
                   weapon: rec.weapon ?? "",
                   assist: rec.assist ?? "",
                   special: rec.special ?? "",
-                  A: rec.passive_a ?? "",
-                  B: rec.passive_b ?? "",
-                  C: rec.passive_c ?? "",
-                  S: rec.sacred_seal ?? "",
+                  A: rec.A ?? "",
+                  B: rec.B ?? "",
+                  C: rec.C ?? "",
+                  S: rec.S ?? "",
                   // @ts-ignore
                   asset: rec.stats?.asset ?? "",
                   // @ts-ignore
