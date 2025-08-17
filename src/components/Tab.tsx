@@ -850,10 +850,8 @@ export default function Tab() {
                   B: rec.B ?? "",
                   C: rec.C ?? "",
                   S: rec.S ?? "",
-                  // @ts-ignore
-                  asset: rec.stats.asset ?? "",
-                  // @ts-ignore
-                  flaw: rec.stats.flaw ?? "",
+                  asset: rec.asset ?? "",
+                  flaw: rec.flaw ?? "",
                   merges: rec.merges ?? 0,
                 };
                 console.log(JSON.stringify(payload));
@@ -887,10 +885,8 @@ export default function Tab() {
                   B: rec.B ?? "",
                   C: rec.C ?? "",
                   S: rec.S ?? "",
-                  // @ts-ignore
-                  asset: rec.stats?.asset ?? "",
-                  // @ts-ignore
-                  flaw: rec.stats?.flaw ?? "",
+                  asset: rec.asset ?? "",
+                  flaw: rec.flaw ?? "",
                   merges: rec.merges ?? 0,
                 };
                 console.log(JSON.stringify(payload));
