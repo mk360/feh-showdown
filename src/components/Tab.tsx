@@ -840,7 +840,6 @@ export default function Tab() {
                 }))
               }).then((resp) => {
                 localStorage.setItem("team", JSON.stringify(teamPreview.filter((i) => i.name).map((rec) => {
-                  console.log(JSON.stringify(rec.stats))
                 const payload = {
                   name: rec.name ?? "",
                   weapon: rec.weapon ?? "",
@@ -854,7 +853,6 @@ export default function Tab() {
                   flaw: rec.flaw ?? "",
                   merges: rec.merges ?? 0,
                 };
-                console.log(JSON.stringify(payload));
 
                 return payload;
               })));
@@ -875,7 +873,6 @@ export default function Tab() {
                 }
               }).catch(() => {
                 localStorage.setItem("team", JSON.stringify(teamPreview.filter((i) => i.name).map((rec) => {
-                  console.log(JSON.stringify(rec.stats))
                 const payload = {
                   name: rec.name ?? "",
                   weapon: rec.weapon ?? "",
@@ -889,7 +886,6 @@ export default function Tab() {
                   flaw: rec.flaw ?? "",
                   merges: rec.merges ?? 0,
                 };
-                console.log(JSON.stringify(payload));
 
                 return payload;
               })));
