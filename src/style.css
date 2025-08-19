@@ -3,6 +3,8 @@
 	line-height: 1.5;
 	font-weight: 400;
 	font-synthesis: none;
+	color: #ccc;
+	background-color: #1a1a1a;
 	text-rendering: optimizeLegibility;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
@@ -57,12 +59,5 @@ main {
 @media (max-width: 639px) {
 	main {
 		margin: 2rem;
-	}
-}
-
-@media (prefers-color-scheme: dark) {
-	:root {
-		color: #ccc;
-		background-color: #1a1a1a;
 	}
 }
