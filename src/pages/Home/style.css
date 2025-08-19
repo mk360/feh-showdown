@@ -326,7 +326,18 @@ li:has(> .tab) {
 	}
 
 	.passive-s-list {
-		grid-area: 7 / 3 / 9 / 5;
+		grid-area: 7 / 4 / 9 / 5;
+	}
+
+	.support {
+		grid-area: 7 / 3 / 9 / 4;
+		padding: 10px;
+
+		.support-table {
+			display: grid;
+			grid-template-columns: auto 1fr 1fr;
+			gap: 1rem;
+		}
 	}
 
 	.stats {

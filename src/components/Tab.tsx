@@ -774,6 +774,34 @@ export default function Tab() {
             );
           })}
         </div>
+        {/* <div class="support">
+          <h2>Supports</h2>
+          <div class="support-table">
+            <span>Summoner Support</span>
+            <span />
+            <select>
+              <option>None</option>
+              <option>C</option>
+              <option>B</option>
+              <option>A</option>
+              <option>S</option>
+            </select>
+            <span>Ally Support</span>
+            <select>
+              <option>None</option>
+              {teamPreview.filter((i) => i.name !== teamPreview[tab].name).map((choice) => (
+                <option key={choice.name}>{choice.name}</option>
+              ))}
+            </select>
+             <select>
+              <option>None</option>
+              <option>C</option>
+              <option>B</option>
+              <option>A</option>
+              <option>S</option>
+            </select>
+          </div>
+        </div> */}
         <div class="passive-s-list">
           <h2>Sacred Seal</h2>
           {skillsData.S.map((passive) => {
