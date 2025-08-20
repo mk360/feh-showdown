@@ -57,11 +57,31 @@ export const TeamProvider = ({ children }) => {
 
         parsedTeam[i] = member;
       }
+      for (let i = parsedTeam.length; i < 4; i++) {
+        parsedTeam.push({
+          name: "",
+          weapon: "",
+          assist: "",
+          special: "",
+          A: "",
+          B: "",
+          C: "",
+          S: "",
+          stats: {
+            hp: 0,
+            atk: 0,
+            spd: 0,
+            def: 0,
+            res: 0,
+          },
+          merges: 0,
+          asset: "",
+          flaw: "",
+        });
+      }
       setTeamPreview(parsedTeam);
     }
   }, []);
-
-  console.log({ teamPreview })
 
   return (
     <TeamContext.Provider value={{ teamPreview, setTeamPreview, tab, setTab }}>

@@ -15,7 +15,7 @@ export function App() {
       <main class="pad">
         <Router>
           <Route path="/teambuilder/" component={Teambuilder} />
-          <Route default component={NotFound} />
+          <Route default component={Teambuilder} />
         </Router>
       </main>
     </LocationProvider>
