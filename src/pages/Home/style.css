@@ -408,12 +408,18 @@ li:has(> .tab) {
 	}
 
 	.submit {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
+		display: grid;
+		grid-template-rows: 1fr 1fr 1fr;
 		gap: 0.5rem;
 
-		button {
+		a.homepage {
+			display: block;
+			background-color: buttonface;
+			text-decoration: none;
+		}
+
+		button,
+		a.homepage {
 			padding: 10px;
 			border: none;
 			border-radius: 6px;
@@ -426,11 +432,14 @@ li:has(> .tab) {
 			}
 
 			&.save {
-				background-color: #89e395;
+				background-color: #A78BFA;
+				display: flex;
+				align-items: center;
+				justify-content: space-around;
 			}
 
 			&:hover {
-				filter: brightness(150%);
+				filter: drop-shadow(1px 1px 2px #9DAAF2) brightness(150%);
 			}
 		}
 	}

@@ -17,6 +17,7 @@ import Summary from "./summary";
 import TeamPreview from "./team-preview";
 import UnitList from "./unit-list";
 import { CharacterMoveset } from "../interfaces/moveset";
+import SaveIcon from "../icons/save";
 
 const statLabels = ["hp", "atk", "spd", "def", "res"];
 
@@ -922,17 +923,19 @@ export default function Tab() {
             }}
             class="save"
           >
-            Save Team
+            <SaveIcon /> Save Team
           </button>
           <button
             onClick={(e) => {
               e.stopPropagation();
               setSubTab("list");
             }}
-            class="flaw"
           >
             Return to Unit List
           </button>
+          <a href="/" className="homepage">
+            Return to Home Page
+          </a>
         </div>
         <div class="moveset-summary">
           <h2>Summary</h2>
