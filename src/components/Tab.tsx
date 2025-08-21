@@ -933,7 +933,7 @@ export default function Tab() {
           >
             Return to Unit List
           </button>
-          <a href={window.location.origin} target="_top" className="homepage">
+          <a href={import.meta.env.VITE_MAIN_APP_URL} target="_top" className="homepage">
             Return to Home Page
           </a>
         </div>
