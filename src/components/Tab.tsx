@@ -933,7 +933,7 @@ export default function Tab() {
           >
             Return to Unit List
           </button>
-          <a href="/" className="homepage">
+          <a href={location.origin} target="_top" className="homepage">
             Return to Home Page
           </a>
         </div>
