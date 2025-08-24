@@ -17,4 +17,24 @@ interface StoredHero {
     asset: FEH_Stat | "";
     flaw: FEH_Stat | "";
     stats: FEHStats;
+    summonerSupport?: "C" | "B" | "A" | "S";
+    allySupport?: {
+        ally: string;
+        level: "C" | "B" | "A" | "S";
+    }
+}
+
+interface AllySupportMap {
+    allySupport: {
+        [member: string]: {
+            ally: string;
+            level: "C" | "B" | "A" | "S";
+        }
+    };
+    summonerSupport: {
+        [member: string]: {
+            ally: string;
+            level: "C" | "B" | "A" | "S";
+        }
+    }
 }

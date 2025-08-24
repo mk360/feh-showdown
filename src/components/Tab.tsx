@@ -580,11 +580,11 @@ export default function Tab() {
           <h2>
             <img class="game-asset" src="/teambuilder/weapon-icon.png" /> Weapons
           </h2>
-          {skillsData.weapons.map((weaponData) => {
+          {skillsData.weapons.map((weaponData, i) => {
             return (
               <Fragment key={weaponData.name}>
                 <input
-                  value={weaponData.name}
+                  value={i === 0 ? "" : weaponData.name}
                   id={`weapon-${weaponData.name}`}
                   type="radio"
                   class="hide"
@@ -612,11 +612,11 @@ export default function Tab() {
             <img class="game-asset" src="/teambuilder/assist-icon.png" />
             Assists
           </h2>
-          {skillsData.assists.map((assistData) => {
+          {skillsData.assists.map((assistData, i) => {
             return (
               <Fragment key={assistData.name}>
                 <input
-                  value={assistData.name}
+                  value={i === 0 ? "" : assistData.name}
                   id={`assists-${assistData.name}`}
                   type="radio"
                   class="hide"
@@ -641,11 +641,11 @@ export default function Tab() {
             <img class="game-asset" src="/teambuilder/special-icon.png" />
             Specials
           </h2>
-          {skillsData.specials.map((specialsData) => {
+          {skillsData.specials.map((specialsData, i) => {
             return (
               <Fragment key={specialsData.name}>
                 <input
-                  value={specialsData.name}
+                  value={i === 0 ? "" : specialsData.name}
                   id={`special-${specialsData.name}`}
                   type="radio"
                   class="hide"
@@ -675,11 +675,11 @@ export default function Tab() {
             <img class="game-asset" src="/teambuilder/A.png" />
             Skill
           </h2>
-          {skillsData.A.map((passive) => {
+          {skillsData.A.map((passive, i) => {
             return (
               <Fragment key={passive.name}>
                 <input
-                  value={passive.name}
+                  value={i === 0 ? "" : passive.name}
                   id={`A-${passive.name}`}
                   type="radio"
                   class="hide"
@@ -710,13 +710,13 @@ export default function Tab() {
             <img class="game-asset" src="/teambuilder/B.png" />
             Skill
           </h2>
-          {skillsData.B.map((passive) => {
+          {skillsData.B.map((passive, i) => {
             return (
               <Fragment key={passive.name}>
                 <input
                   type="radio"
                   class="hide"
-                  value={passive.name}
+                  value={i === 0 ? "" : passive.name}
                   id={`B-${passive.name}`}
                   {...registerMoveset("B")}
                 />
@@ -745,13 +745,13 @@ export default function Tab() {
             <img class="game-asset" src="/teambuilder/C.png" />
             Skill
           </h2>
-          {skillsData.C.map((passive) => {
+          {skillsData.C.map((passive, i) => {
             return (
               <Fragment key={passive.name}>
                 <input
                   type="radio"
                   class="hide"
-                  value={passive.name}
+                  value={i === 0 ? "" : passive.name}
                   id={`C-${passive.name}`}
                   {...registerMoveset("C")}
                 />
@@ -775,7 +775,7 @@ export default function Tab() {
             );
           })}
         </div>
-        {/* <div class="support">
+        {/* {teamPreview.length >= 2 ? <div class="support">
           <h2>Supports</h2>
           <div class="support-table">
             <span>Summoner Support</span>
@@ -787,29 +787,30 @@ export default function Tab() {
               <option>A</option>
               <option>S</option>
             </select>
-            <span>Ally Support</span>
-            <select>
-              <option>None</option>
-              {teamPreview.filter((i) => i.name !== teamPreview[tab].name).map((choice) => (
-                <option key={choice.name}>{choice.name}</option>
-              ))}
-            </select>
-             <select>
-              <option>None</option>
-              <option>C</option>
-              <option>B</option>
-              <option>A</option>
-              <option>S</option>
-            </select>
+             
+              <span>Ally Support</span>
+              <select>
+                <option>None</option>
+                {teamPreview.filter((i) => i.name !== teamPreview[tab].name).map((choice) => (
+                  <option key={choice.name}>{choice.name}</option>
+                ))}
+              </select>
+              <select>
+                <option>None</option>
+                <option>C</option>
+                <option>B</option>
+                <option>A</option>
+                <option>S</option>
+              </select>
           </div>
-        </div> */}
+        </div> : null} */}
         <div class="passive-s-list">
           <h2>Sacred Seal</h2>
-          {skillsData.S.map((passive) => {
+          {skillsData.S.map((passive, i) => {
             return (
               <Fragment key={passive.name}>
                 <input
-                  value={passive.name}
+                  value={i === 0 ? "" : passive.name}
                   id={`S-${passive.name}`}
                   type="radio"
                   class="hide"

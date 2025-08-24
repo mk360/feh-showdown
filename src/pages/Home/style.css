@@ -321,12 +321,10 @@ li:has(> .tab) {
 	.support {
 		grid-area: 7 / 3 / 9 / 4;
 		padding: 10px;
+		display: flex;
+		gap: 1rem;
+		flex-direction: column;
 
-		.support-table {
-			display: grid;
-			grid-template-columns: auto 1fr 1fr;
-			gap: 1rem;
-		}
 	}
 
 	.stats {
