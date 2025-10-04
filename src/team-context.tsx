@@ -2,6 +2,7 @@ import { createContext } from "preact";
 import { SetStateAction } from "preact/compat";
 import { Dispatch, useEffect, useState } from "preact/hooks";
 import { getExtraStats, getLevel40Stats, withMerges } from "./stats/convert-to-level-40";
+import EMPTY_CHARACTER from "./utils/empty-character-slot";
 
 const TeamContext = createContext<{
   teamPreview: StoredHero[];
@@ -12,26 +13,7 @@ const TeamContext = createContext<{
 
 export const TeamProvider = ({ children }) => {
   const [teamPreview, setTeamPreview] = useState<StoredHero[]>(
-    Array.from<StoredHero>({ length: 4 }).fill({
-      name: "",
-      weapon: "",
-      assist: "",
-      special: "",
-      A: "",
-      B: "",
-      C: "",
-      S: "",
-      stats: {
-        hp: 0,
-        atk: 0,
-        spd: 0,
-        def: 0,
-        res: 0,
-      },
-      merges: 0,
-      asset: "",
-      flaw: "",
-    })
+    Array.from<StoredHero>({ length: 4 }).fill(EMPTY_CHARACTER)
   );
   const [tab, setTab] = useState(0);
 
@@ -58,26 +40,7 @@ export const TeamProvider = ({ children }) => {
         parsedTeam[i] = member;
       }
       for (let i = parsedTeam.length; i < 4; i++) {
-        parsedTeam.push({
-          name: "",
-          weapon: "",
-          assist: "",
-          special: "",
-          A: "",
-          B: "",
-          C: "",
-          S: "",
-          stats: {
-            hp: 0,
-            atk: 0,
-            spd: 0,
-            def: 0,
-            res: 0,
-          },
-          merges: 0,
-          asset: "",
-          flaw: "",
-        });
+        parsedTeam.push(EMPTY_CHARACTER);
       }
       setTeamPreview(parsedTeam);
     }
