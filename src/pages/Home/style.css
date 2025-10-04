@@ -1,3 +1,7 @@
+body {
+	overflow-y: scroll;
+}
+
 .home section {
 	margin-top: 5rem;
 	display: grid;

@@ -18,6 +18,7 @@ import TeamPreview from "./team-preview";
 import UnitList from "./unit-list";
 import { CharacterMoveset } from "../interfaces/moveset";
 import SaveIcon from "../icons/save";
+import EMPTY_CHARACTER from "../utils/empty-character-slot";
 
 const statLabels = ["hp", "atk", "spd", "def", "res"];
 
@@ -929,10 +930,18 @@ export default function Tab() {
           <button
             onClick={(e) => {
               e.stopPropagation();
+              const copy = [...teamPreview];
+              copy[tab] = EMPTY_CHARACTER;
+              setTeamPreview(copy);
+              setValue("atk-change", "");
+              setValue("def-change", "");
+              setValue("spd-change", "");
+              setValue("res-change", "");
+              setValue("hp-change", "");
               setSubTab("list");
             }}
           >
-            Return to Unit List
+            Remove Unit
           </button>
           <a href={import.meta.env.VITE_MAIN_APP_URL} target="_top" className="homepage">
             Return to Home Page
