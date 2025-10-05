@@ -1,5 +1,6 @@
 import { memo } from "preact/compat";
 import WeaponIcon from "./weapon-icon";
+import WEAPON_TREE from "../weapon-tree";
 
 export default memo(function WeaponCheckbox({
   index,
@@ -19,6 +20,7 @@ export default memo(function WeaponCheckbox({
         type="checkbox"
         id={inputId}
         class={color}
+        disabled={!WEAPON_TREE[color][weapon]}
         value={color + "-" + weapon}
         {...register("weapons")}
       />

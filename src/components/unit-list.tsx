@@ -7,6 +7,7 @@ import { convertToSingleLevel40 } from "../stats/convert-to-level-40";
 import getSortingFunction from "../utils/sort-functions";
 import { capitalize, formatName } from "../utils/strings";
 import WeaponCheckbox from "./weapon-checkbox";
+import WEAPON_TREE from "../weapon-tree";
 
 interface HeroFilters {
   characterName: string;
@@ -54,7 +55,7 @@ function UnitList({
   index: number;
   onUnitClick: MouseEventHandler<HTMLTableSectionElement>;
 }) {
-  const { register, handleSubmit, reset, setValue, getValues } = useForm<HeroFilters>({
+  const { register, handleSubmit, reset, setValue, getValues, formState: { isSubmitted } } = useForm<HeroFilters>({
     defaultValues: {
       characterName: "",
       color: [],
@@ -123,7 +124,12 @@ function UnitList({
                     // @ts-ignore
                     if (e.target.checked) {
                       setValue("color", Array.from(new Set(getValues("color").concat("red"))));
-                      setValue("weapons", Array.from(new Set(getValues("weapons").concat(["red-sword", "red-tome", "red-bow", "red-breath", "red-dagger", "red-beast"]))));
+                      const availableWeapons = ["red-sword", "red-tome", "red-bow", "red-breath", "red-dagger", "red-beast"].filter((weapon) => {
+                        const [, weaponType] = weapon.split("-");
+                        return !!WEAPON_TREE["red"][weaponType];
+                      });
+
+                      setValue("weapons", Array.from(new Set(getValues("weapons").concat(availableWeapons))));
                     } else {
                       setValue("color", getValues("color").filter((i) => i !== "red"));
                       const weapons = getValues("weapons");
@@ -148,7 +154,11 @@ function UnitList({
                     // @ts-ignore
                     if (e.target.checked) {
                       setValue("color", Array.from(new Set(getValues("color").concat("blue"))));
-                      setValue("weapons", Array.from(new Set(getValues("weapons").concat(["blue-lance", "blue-tome", "blue-bow", "blue-breath", "blue-dagger", "blue-beast"]))));
+                      const availableWeapons = ["blue-lance", "blue-tome", "blue-bow", "blue-breath", "blue-dagger", "blue-beast"].filter((weapon) => {
+                        const [, weaponType] = weapon.split("-");
+                        return !!WEAPON_TREE["blue"][weaponType];
+                      });
+                      setValue("weapons", Array.from(new Set(getValues("weapons").concat(availableWeapons))));
                     } else {
                       setValue("color", getValues("color").filter((i) => i !== "blue"));
                       const weapons = getValues("weapons");
@@ -173,7 +183,11 @@ function UnitList({
                     // @ts-ignore
                     if (e.target.checked) {
                       setValue("color", Array.from(new Set(getValues("color").concat("green"))));
-                      setValue("weapons", Array.from(new Set(getValues("weapons").concat(["green-axe", "green-tome", "green-bow", "green-breath", "green-dagger", "green-beast"]))));
+                      const availableWeapons = ["green-axe", "green-tome", "green-bow", "green-breath", "green-dagger", "green-beast"].filter((weapon) => {
+                        const [, weaponType] = weapon.split("-");
+                        return !!WEAPON_TREE["green"][weaponType];
+                      });
+                      setValue("weapons", Array.from(new Set(getValues("weapons").concat(availableWeapons))));
                     } else {
                       setValue("color", getValues("color").filter((i) => i !== "green"));
                       const weapons = getValues("weapons");
@@ -198,7 +212,11 @@ function UnitList({
                     // @ts-ignore
                     if (e.target.checked) {
                       setValue("color", Array.from(new Set(getValues("color").concat("colorless"))));
-                      setValue("weapons", Array.from(new Set(getValues("weapons").concat(["colorless-staff", "colorless-tome", "colorless-bow", "colorless-breath", "colorless-dagger", "colorless-beast"]))));
+                      const availableWeapons = ["colorless-staff", "colorless-tome", "colorless-bow", "colorless-breath", "colorless-dagger", "colorless-beast"].filter((weapon) => {
+                        const [, weaponType] = weapon.split("-");
+                        return !!WEAPON_TREE["colorless"][weaponType];
+                      });
+                      setValue("weapons", Array.from(new Set(getValues("weapons").concat(availableWeapons))));
                     } else {
                       setValue("color", getValues("color").filter((i) => i !== "colorless"));
                       const weapons = getValues("weapons");
@@ -515,6 +533,7 @@ function UnitList({
         </table>
       </form>
       <div class="results">
+        {isSubmitted && (
         <table>
           <thead>
             <tr>
@@ -665,6 +684,7 @@ function UnitList({
               })}
           </tbody>
         </table>
+        )}
       </div>
     </div>
   );

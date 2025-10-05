@@ -6,7 +6,6 @@ import {
   prerender as ssr,
 } from "preact-iso";
 import Teambuilder from "./pages/Home/index.jsx";
-import { NotFound } from "./pages/_404.jsx";
 import "./style.css";
 
 export function App() {
