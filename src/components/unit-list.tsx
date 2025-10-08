@@ -8,6 +8,7 @@ import getSortingFunction from "../utils/sort-functions";
 import { capitalize, formatName } from "../utils/strings";
 import WeaponCheckbox from "./weapon-checkbox";
 import WEAPON_TREE from "../weapon-tree";
+import DownArrow from "../../public/down-arrow.svg";
 
 interface HeroFilters {
   characterName: string;
@@ -525,14 +526,14 @@ function UnitList({
                 <input
                   type="submit"
                   value="Search for Units"
-                  style="height: 100%; padding: 30px; width: 100%; background-color: #FF6A3D; border: none"
+                  style="height: 100%; padding: 30px; width: 100%; background-color: #FF6A3D; border: none; cursor: pointer"
                 />
               </td>
             </tr>
           </tbody>
         </table>
       </form>
-      <div class="results">
+      <div class="results" style={{ position: "relative" }}>
         {isSubmitted && (
         <table>
           <thead>
@@ -554,7 +555,9 @@ function UnitList({
                 }}
                 class="HP"
               >
-                HP
+                <div class={"unit-list-header"}><span>HP</span>
+                  {sorting.hp === "ascending" ? <img style={{ transform: "rotate(180deg)"}} src={DownArrow} /> : sorting.hp === "descending" ? <img src={DownArrow} /> : null}
+                </div>
               </th>
               <th
                 onClick={() => {
@@ -562,7 +565,9 @@ function UnitList({
                 }}
                 class="Atk"
               >
-                Atk
+                <div class={"unit-list-header"}><span>Atk</span>
+                  {sorting.atk === "ascending" ? <img style={{ transform: "rotate(180deg)"}} src={DownArrow} /> : sorting.atk === "descending" ? <img src={DownArrow} /> : null}
+                </div>
               </th>
               <th
                 onClick={() => {
@@ -570,7 +575,9 @@ function UnitList({
                 }}
                 class="Spd"
               >
-                Spd
+                <div class={"unit-list-header"}><span>Spd</span>
+                  {sorting.spd === "ascending" ? <img style={{ transform: "rotate(180deg)"}} src={DownArrow} /> : sorting.spd === "descending" ? <img src={DownArrow} /> : null}
+                </div>
               </th>
               <th
                 onClick={() => {
@@ -578,7 +585,9 @@ function UnitList({
                 }}
                 class="Def"
               >
-                Def
+                <div class={"unit-list-header"}><span>Def</span>
+                  {sorting.def === "ascending" ? <img style={{ transform: "rotate(180deg)"}} src={DownArrow} /> : sorting.def === "descending" ? <img src={DownArrow} /> : null}
+                </div>
               </th>
               <th
                 onClick={() => {
@@ -586,7 +595,9 @@ function UnitList({
                 }}
                 class="Res"
               >
-                Res
+                <div class={"unit-list-header"}><span>Res</span>
+                  {sorting.res === "ascending" ? <img style={{ transform: "rotate(180deg)"}} src={DownArrow} /> : sorting.res === "descending" ? <img src={DownArrow} /> : null}
+                  </div>
               </th>
               <th
                 onClick={() => {
@@ -594,7 +605,9 @@ function UnitList({
                 }}
                 class="BST"
               >
-                BST
+                <div class={"unit-list-header"}><span>BST</span>
+                  {sorting.bst === "ascending" ? <img style={{ transform: "rotate(180deg)"}} src={DownArrow} /> : sorting.bst === "descending" ? <img src={DownArrow} /> : null}
+                </div>
               </th>
             </tr>
           </thead>

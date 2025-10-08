@@ -2,25 +2,21 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState
 } from "preact/hooks";
 import { Fragment } from "preact/jsx-runtime";
 import { useForm } from "react-hook-form";
 import { getSkillUrl } from "../data/skill-icon-dex";
+import { CharacterMoveset } from "../interfaces/moveset";
 import STATS from "../stats";
 import { getExtraStats, getLevel40Stats, withMerges } from "../stats/convert-to-level-40";
 import TeamContext from "../team-context";
+import EMPTY_CHARACTER from "../utils/empty-character-slot";
 import fetchMovesets from "../utils/fetch-moveset";
 import { formatName } from "../utils/strings";
 import Summary from "./summary";
 import TeamPreview from "./team-preview";
 import UnitList from "./unit-list";
-import { CharacterMoveset } from "../interfaces/moveset";
-import SaveIcon from "../icons/save";
-import EMPTY_CHARACTER from "../utils/empty-character-slot";
-
-const statLabels = ["hp", "atk", "spd", "def", "res"];
 
 interface SkillWithDescription {
   name: string;
@@ -38,12 +34,12 @@ interface SkillList {
 }
 
 type StatChangeFields = {
-  [k in `${FEH_Stat}-change`]: "asset" | "flaw" | "neutral";
+  asset: FEH_Stat | "";
+  flaw: FEH_Stat | "";
 };
 
 export default function Tab() {
   const [temporaryChoice, setTemporaryChoice] = useState("");
-  const lastAbortController = useRef(new AbortController());
   const [moveset, setMoveset] = useState<CharacterMoveset>(null);
   const { teamPreview, setTeamPreview, tab } = useContext(TeamContext);
   const [subTab, setSubTab] = useState<"list" | "detail">();
@@ -51,10 +47,13 @@ export default function Tab() {
     register: registerMoveset,
     handleSubmit: handleSubmitMoveset,
     getValues,
+    resetField,
     setValue,
+
   } = useForm<{
-    [k in keyof (SkillList & StatChangeFields & { merges: number })]: string;
-  }>({
+    [k in keyof (SkillList & { merges: number })]: string;
+  } & StatChangeFields>({
+    mode: "onChange",
     defaultValues: {
       weapons: "",
       assists: "",
@@ -109,11 +108,8 @@ export default function Tab() {
         const tabData = teamPreview[tab];
         setTemporaryChoice(teamPreview[tab].name);
         setValue("merges", tabData.merges.toString());
-        setValue("hp-change", tabData.asset === "hp" ? "asset" : tabData.flaw === "hp" ? "flaw" : "");
-        setValue("atk-change", tabData.asset === "atk" ? "asset" : tabData.flaw === "atk" ? "flaw" : "");
-        setValue("spd-change", tabData.asset === "spd" ? "asset" : tabData.flaw === "spd" ? "flaw" : "");
-        setValue("def-change", tabData.asset === "def" ? "asset" : tabData.flaw === "def" ? "flaw" : "");
-        setValue("res-change", tabData.asset === "res" ? "asset" : tabData.flaw === "res" ? "flaw" : "");
+        setValue("asset", tabData.asset);
+        setValue("flaw", tabData.flaw);
         setValue("weapons", tabData.weapon);
         setValue("assists", tabData.assist);
         setValue("specials", tabData.special);
@@ -135,14 +131,10 @@ export default function Tab() {
   }, [teamPreview[tab]?.name]);
 
   const getAlteredStats = function () {
-    const asset = statLabels.find(
-      (stat: FEH_Stat) => getValues(`${stat}-change`) === "asset"
-    );
-    const flaw = statLabels.find(
-      (stat: FEH_Stat) => getValues(`${stat}-change`) === "flaw"
-    );
+    const asset = getValues("asset");
+    const flaw = getValues("flaw");
 
-    if (asset && flaw) {
+    if (asset && flaw && asset !== flaw) {
       return {
         asset: asset as FEH_Stat,
         flaw: flaw as FEH_Stat,
@@ -236,6 +228,10 @@ export default function Tab() {
       </div>
       <div
         onChange={handleSubmitMoveset((data) => {
+          if (data.asset === data.flaw) {
+            setValue("asset", "");
+            setValue("flaw", "");
+          }
           const alteredStats = getAlteredStats();
           const baseStats = getLevel40Stats({
                 character: temporaryChoice,
@@ -297,7 +293,7 @@ export default function Tab() {
           <div />
         </div>
         <div class="stats">
-          <h2>Stats</h2>
+          <h2>Stats and Traits</h2>
           <table>
             <tbody>
               <tr>
@@ -308,14 +304,8 @@ export default function Tab() {
                     class="stat-input"
                     id={`flaw-hp`}
                     type="radio"
-                    {...registerMoveset("hp-change")}
-                    value="flaw"
-                    disabled={[
-                      getValues("atk-change"),
-                      getValues("spd-change"),
-                      getValues("def-change"),
-                      getValues("res-change"),
-                    ].includes("flaw")}
+                    {...registerMoveset("flaw")}
+                    value="hp"
                   />
                   <label class="flaw" for={`flaw-hp`}>
                     Flaw
@@ -324,28 +314,10 @@ export default function Tab() {
                 <td>
                   <input
                     class="stat-input"
-                    id={`neutral-hp`}
-                    type="radio"
-                    {...registerMoveset("hp-change")}
-                    value="neutral"
-                  />
-                  <label class="neutral" for={`neutral-hp`}>
-                    Neutral
-                  </label>
-                </td>
-                <td>
-                  <input
-                    class="stat-input"
                     id={`asset-hp`}
                     type="radio"
-                    {...registerMoveset("hp-change")}
-                    disabled={[
-                      getValues("atk-change"),
-                      getValues("spd-change"),
-                      getValues("def-change"),
-                      getValues("res-change"),
-                    ].includes("asset")}
-                    value="asset"
+                    {...registerMoveset("asset")}
+                    value="hp"
                   />
                   <label class="asset" for={`asset-hp`}>
                     Asset
@@ -360,14 +332,8 @@ export default function Tab() {
                     class="stat-input"
                     id={`flaw-atk`}
                     type="radio"
-                    {...registerMoveset("atk-change")}
-                    disabled={[
-                      getValues("hp-change"),
-                      getValues("spd-change"),
-                      getValues("def-change"),
-                      getValues("res-change"),
-                    ].includes("flaw")}
-                    value="flaw"
+                    {...registerMoveset("flaw")}
+                    value="atk"
                   />
                   <label class="flaw" for={`flaw-atk`}>
                     Flaw
@@ -376,28 +342,10 @@ export default function Tab() {
                 <td>
                   <input
                     class="stat-input"
-                    id={`neutral-atk`}
-                    type="radio"
-                    {...registerMoveset("atk-change")}
-                    value="neutral"
-                  />
-                  <label class="neutral" for="neutral-atk">
-                    Neutral
-                  </label>
-                </td>
-                <td>
-                  <input
-                    class="stat-input"
                     id={`asset-atk`}
                     type="radio"
-                    {...registerMoveset("atk-change")}
-                    value="asset"
-                    disabled={[
-                      getValues("hp-change"),
-                      getValues("spd-change"),
-                      getValues("def-change"),
-                      getValues("res-change"),
-                    ].includes("asset")}
+                    {...registerMoveset("asset")}
+                    value="atk"
                   />
                   <label class="asset" for="asset-atk">
                     Asset
@@ -412,14 +360,8 @@ export default function Tab() {
                     class="stat-input"
                     id={`flaw-spd`}
                     type="radio"
-                    {...registerMoveset("spd-change")}
-                    value="flaw"
-                    disabled={[
-                      getValues("hp-change"),
-                      getValues("atk-change"),
-                      getValues("def-change"),
-                      getValues("res-change"),
-                    ].includes("flaw")}
+                    {...registerMoveset("flaw")}
+                    value="spd"
                   />
                   <label class="flaw" for={`flaw-spd`}>
                     Flaw
@@ -428,28 +370,10 @@ export default function Tab() {
                 <td>
                   <input
                     class="stat-input"
-                    id={`neutral-spd`}
-                    type="radio"
-                    {...registerMoveset("spd-change")}
-                    value="neutral"
-                  />
-                  <label class="neutral" for={`neutral-spd`}>
-                    Neutral
-                  </label>
-                </td>
-                <td>
-                  <input
-                    class="stat-input"
                     id={`asset-spd`}
                     type="radio"
-                    {...registerMoveset("spd-change")}
-                    value="asset"
-                    disabled={[
-                      getValues("hp-change"),
-                      getValues("atk-change"),
-                      getValues("def-change"),
-                      getValues("res-change"),
-                    ].includes("asset")}
+                    {...registerMoveset("asset")}
+                    value="spd"
                   />
                   <label class="asset" for={`asset-spd`}>
                     Asset
@@ -464,14 +388,8 @@ export default function Tab() {
                     class="stat-input"
                     id={`flaw-def`}
                     type="radio"
-                    {...registerMoveset("def-change")}
-                    value="flaw"
-                    disabled={[
-                      getValues("hp-change"),
-                      getValues("spd-change"),
-                      getValues("atk-change"),
-                      getValues("res-change"),
-                    ].includes("flaw")}
+                    {...registerMoveset("flaw")}
+                    value="def"
                   />
                   <label class="flaw" for={`flaw-def`}>
                     Flaw
@@ -480,28 +398,10 @@ export default function Tab() {
                 <td>
                   <input
                     class="stat-input"
-                    id={`neutral-def`}
-                    type="radio"
-                    {...registerMoveset("def-change")}
-                    value="neutral"
-                  />
-                  <label class="neutral" for={`neutral-def`}>
-                    Neutral
-                  </label>
-                </td>
-                <td>
-                  <input
-                    class="stat-input"
                     id={`asset-def`}
                     type="radio"
-                    {...registerMoveset("def-change")}
-                    value="asset"
-                    disabled={[
-                      getValues("hp-change"),
-                      getValues("spd-change"),
-                      getValues("atk-change"),
-                      getValues("res-change"),
-                    ].includes("asset")}
+                    {...registerMoveset("asset")}
+                    value="def"
                   />
                   <label class="asset" for={`asset-def`}>
                     Asset
@@ -516,14 +416,8 @@ export default function Tab() {
                     class="stat-input"
                     id={`flaw-res`}
                     type="radio"
-                    {...registerMoveset("res-change")}
-                    value="flaw"
-                    disabled={[
-                      getValues("hp-change"),
-                      getValues("spd-change"),
-                      getValues("atk-change"),
-                      getValues("def-change"),
-                    ].includes("flaw")}
+                    {...registerMoveset("flaw")}
+                    value="res"
                   />
                   <label class="flaw" for={`flaw-res`}>
                     Flaw
@@ -532,31 +426,32 @@ export default function Tab() {
                 <td>
                   <input
                     class="stat-input"
-                    id={`neutral-res`}
-                    type="radio"
-                    {...registerMoveset("res-change")}
-                    value="neutral"
-                  />
-                  <label class="neutral" for={`neutral-res`}>
-                    Neutral
-                  </label>
-                </td>
-                <td>
-                  <input
-                    class="stat-input"
                     id={`asset-res`}
                     type="radio"
-                    {...registerMoveset("res-change")}
-                    value="asset"
-                    disabled={[
-                      getValues("hp-change"),
-                      getValues("spd-change"),
-                      getValues("atk-change"),
-                      getValues("def-change"),
-                    ].includes("asset")}
+                    {...registerMoveset("asset")}
+                    value="res"
                   />
                   <label class="asset" for={`asset-res`}>
                     Asset
+                  </label>
+                </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td colSpan={2}>
+                   <input
+                    class="stat-input"
+                    id={`neutral`}
+                    type="radio"
+                    onClick={() => {
+                      setValue("asset", "");
+                      setValue("flaw", "");
+                    }}
+                    value=""
+                  />
+                  <label for={`neutral`}>
+                    Neutral
                   </label>
                 </td>
               </tr>
@@ -841,111 +736,20 @@ export default function Tab() {
           <TeamPreview />
         </div>
         <div class="submit">
-        <button
-            onClick={() => {
-              lastAbortController.current.abort();
-              lastAbortController.current = new AbortController();
-              fetch(`${import.meta.env.VITE_API_URL}/team`, {
-                method: "POST",
-                headers: {
-                  "Authorization": localStorage.getItem("pid"),
-                  "Content-Type": "application/json"
-                },
-                signal: lastAbortController.current.signal,
-                body: JSON.stringify(teamPreview.filter((i) => i.name).map((rec) => {
-                  const payload = {
-                    name: rec.name ?? "",
-                    weapon: rec.weapon ?? "",
-                    assist: rec.assist ?? "",
-                    special: rec.special ?? "",
-                    A: rec.A ?? "",
-                    B: rec.B ?? "",
-                    C: rec.C ?? "",
-                    S: rec.S ?? "",
-                    asset: rec.asset ?? "",
-                    flaw: rec.flaw ?? "",
-                    merges: rec.merges ?? 0,
-                  };
-
-                  return payload;
-                }))
-              }).then((resp) => {
-                localStorage.setItem("team", JSON.stringify(teamPreview.filter((i) => i.name).map((rec) => {
-                const payload = {
-                  name: rec.name ?? "",
-                  weapon: rec.weapon ?? "",
-                  assist: rec.assist ?? "",
-                  special: rec.special ?? "",
-                  A: rec.A ?? "",
-                  B: rec.B ?? "",
-                  C: rec.C ?? "",
-                  S: rec.S ?? "",
-                  asset: rec.asset ?? "",
-                  flaw: rec.flaw ?? "",
-                  merges: rec.merges ?? 0,
-                };
-
-                return payload;
-              })));
-                if (resp.ok) {
-                  return {};
-                }
-                return resp.json()
-              }).then((errors) => {
-                if (!Object.keys(errors).length) {
-                  alert("Your team is ready. You will be redirected to the main page.");
-                  location.href = "/";
-                } else {
-                  let str = "";
-                  for (let key in errors) {
-                    str += errors[key].join(". ");
-                  }
-                  alert(str);
-                }
-              }).catch(() => {
-                localStorage.setItem("team", JSON.stringify(teamPreview.filter((i) => i.name).map((rec) => {
-                const payload = {
-                  name: rec.name ?? "",
-                  weapon: rec.weapon ?? "",
-                  assist: rec.assist ?? "",
-                  special: rec.special ?? "",
-                  A: rec.A ?? "",
-                  B: rec.B ?? "",
-                  C: rec.C ?? "",
-                  S: rec.S ?? "",
-                  asset: rec.asset ?? "",
-                  flaw: rec.flaw ?? "",
-                  merges: rec.merges ?? 0,
-                };
-
-                return payload;
-              })));
-                alert("An unknown error happened.");
-              })
-            }}
-            class="save"
-          >
-            <SaveIcon /> Save Team
-          </button>
           <button
             onClick={(e) => {
               e.stopPropagation();
               const copy = [...teamPreview];
               copy[tab] = EMPTY_CHARACTER;
               setTeamPreview(copy);
-              setValue("atk-change", "");
-              setValue("def-change", "");
-              setValue("spd-change", "");
-              setValue("res-change", "");
-              setValue("hp-change", "");
+              setValue("asset", "");
+              setValue("flaw", "");
               setSubTab("list");
             }}
           >
             Remove Unit
           </button>
-          <a href={import.meta.env.VITE_MAIN_APP_URL} target="_top" className="homepage">
-            Return to Home Page
-          </a>
+          
         </div>
         <div class="moveset-summary">
           <h2>Summary</h2>
