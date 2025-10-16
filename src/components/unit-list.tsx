@@ -544,7 +544,9 @@ function UnitList({
                 }}
                 rowSpan={2}
               >
-                Name
+                <div class={"unit-list-header"}><span>Name</span>
+                  {sorting.name === "ascending" ? <img style={{ transform: "rotate(180deg)"}} src={DownArrow} /> : sorting.name === "descending" ? <img src={DownArrow} /> : null}
+                </div>
               </th>
               <th colSpan={6}>5 Stars Level 40</th>
             </tr>

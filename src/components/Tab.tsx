@@ -17,6 +17,7 @@ import { formatName } from "../utils/strings";
 import Summary from "./summary";
 import TeamPreview from "./team-preview";
 import UnitList from "./unit-list";
+import DeleteIcon from "../icons/delete";
 
 interface SkillWithDescription {
   name: string;
@@ -288,7 +289,15 @@ export default function Tab() {
         }
       >
         <div class="hero-portrait">
-          <h2>{teamPreview[tab].name}</h2>
+          <h2>{teamPreview[tab].name} <button class="delete-button" onClick={(e) => {
+              e.stopPropagation();
+              const copy = [...teamPreview];
+              copy[tab] = EMPTY_CHARACTER;
+              setTeamPreview(copy);
+              setValue("asset", "");
+              setValue("flaw", "");
+              setSubTab("list");
+            }}><DeleteIcon /></button></h2>
           <img src={`/teambuilder/portraits/${formatName(teamPreview[tab].name ?? "")}.webp`} />
           <div />
         </div>
@@ -671,35 +680,6 @@ export default function Tab() {
             );
           })}
         </div>
-        {/* {teamPreview.length >= 2 ? <div class="support">
-          <h2>Supports</h2>
-          <div class="support-table">
-            <span>Summoner Support</span>
-            <span />
-            <select>
-              <option>None</option>
-              <option>C</option>
-              <option>B</option>
-              <option>A</option>
-              <option>S</option>
-            </select>
-             
-              <span>Ally Support</span>
-              <select>
-                <option>None</option>
-                {teamPreview.filter((i) => i.name !== teamPreview[tab].name).map((choice) => (
-                  <option key={choice.name}>{choice.name}</option>
-                ))}
-              </select>
-              <select>
-                <option>None</option>
-                <option>C</option>
-                <option>B</option>
-                <option>A</option>
-                <option>S</option>
-              </select>
-          </div>
-        </div> : null} */}
         <div class="passive-s-list">
           <h2>Sacred Seal</h2>
           {skillsData.S.map((passive, i) => {
@@ -735,22 +715,35 @@ export default function Tab() {
         <div class="preview">
           <TeamPreview />
         </div>
-        <div class="submit">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              const copy = [...teamPreview];
-              copy[tab] = EMPTY_CHARACTER;
-              setTeamPreview(copy);
-              setValue("asset", "");
-              setValue("flaw", "");
-              setSubTab("list");
-            }}
-          >
-            Remove Unit
-          </button>
-          
-        </div>
+        <div class="support">
+          <h2>Summoner & Ally Supports</h2>
+          <div class="support-table">
+            <span>Summoner Support</span>
+            <span />
+            <select>
+              <option>None</option>
+              <option>C</option>
+              <option>B</option>
+              <option>A</option>
+              <option>S</option>
+            </select>
+             
+              {teamPreview.filter((i) => i.name).length >= 2 ? <><span>Ally Support</span>
+              <select>
+                <option>None</option>
+                {teamPreview.filter((i) => i.name && i.name !== teamPreview[tab].name).map((choice) => (
+                  <option key={choice.name}>{choice.name}</option>
+                ))}
+              </select>
+              <select>
+                <option>None</option>
+                <option>C</option>
+                <option>B</option>
+                <option>A</option>
+                <option>S</option>
+              </select></>: <p>You need at least 2 teammates to be able to set supports.</p>}
+          </div>
+        </div> 
         <div class="moveset-summary">
           <h2>Summary</h2>
           <Summary data={teamPreview[tab]} />

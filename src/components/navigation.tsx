@@ -16,10 +16,8 @@ function Navigation() {
           <button style={{ flex: 0.1, borderRadius: "1rem" }} class={"tab homepage"}>
              <a href={import.meta.env.VITE_MAIN_APP_URL} target="_top"><HomeIcon /></a>
           </button>
-    <nav style="display: block; flex: 1;">
+    <nav>
       <ul>
-        {/* <li>
-        </li> */}
         {[0, 1, 2, 3].map((index) => {
           return (
             <li key={index}>
@@ -32,8 +30,6 @@ function Navigation() {
             </li>
           );
         })}
-        {/* <li>
-        </li> */}
       </ul>
     </nav>
     <button style={{ flex: 0.1, borderRadius: "1rem" }} onClick={() => {
@@ -141,6 +137,7 @@ function NavButton({
               teamPreview[index].name
             )}.webp`}
           />
+          <span class="tab-name">{teamPreview[index].name}</span>
           <div style="display: flex; flex-direction: column">
             <WeaponIcon
               type={STATS[teamPreview[index].name].weaponType}

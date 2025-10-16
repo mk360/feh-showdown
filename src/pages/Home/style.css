@@ -2,6 +2,11 @@ body {
 	overflow-y: scroll;
 }
 
+nav {
+	display: block;
+	flex: 0.75;
+}
+
 .home section {
 	margin-top: 5rem;
 	display: grid;
@@ -117,11 +122,16 @@ td label {
 	cursor: pointer;
 	display: grid;
 	align-items: center;
-	grid-template-columns: 1fr auto;
+	grid-template-columns: 0.5fr 1fr 0.1fr;
 	grid-template-rows: 6rem;
 
 	img {
 		height: 100%;
+	}
+
+	&:has(svg) {
+		display: grid;
+		grid-template-columns: 1fr auto;
 	}
 
 	&:hover {
@@ -219,6 +229,19 @@ li:has(> .tab) {
 		}
 	}
 
+	.delete-button {
+		height: 100%;
+		border-radius: 50rem;
+		border: none;
+		background-color: #b22f2f;
+		min-width: 2.5rem;
+		min-height: 2.5rem;
+		display: flex;
+		cursor: pointer;
+		align-items: center;
+		justify-content: center;
+	}
+
 	label {
 		padding: 10px;
 	}
@@ -298,15 +321,6 @@ li:has(> .tab) {
 		p {
 			margin: 0;
 		}
-
-		h2 {
-			position: sticky;
-			top: 0;
-			z-index: 1;
-			background: rgba(50, 50, 50, 0.9);
-			color: #F8E9A1;
-			margin: 0;
-		}
 	}
 
 	.specials-list {
@@ -351,6 +365,7 @@ li:has(> .tab) {
 
 		.unit-preview {
 			position: relative;
+			background-color: buttonface;
 		}
 
 		.banner {
@@ -429,7 +444,7 @@ li:has(> .homepage) {
 }
 
 .homepage {
-	background-color: #b22f2f;
+	background-color: buttonface;
 }
 
 @media screen and (max-width: 1500px) {
@@ -463,6 +478,14 @@ li:has(> .homepage) {
 			width: 40%;
 			margin: auto;
 		}
+	}
+
+	nav {
+		flex: 1;
+	}
+
+	.tab-name {
+		display: none;
 	}
 
 	div.hide .detail-list {
