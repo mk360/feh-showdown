@@ -8,6 +8,8 @@ const TeamContext = createContext<{
   teamPreview: StoredHero[];
   setTeamPreview: Dispatch<SetStateAction<StoredHero[]>>;
   tab: number;
+  errors: { [k: string]: string[] };
+  setErrors: Dispatch<SetStateAction<{ [k: string]: string[] }>>;
   setTab: Dispatch<SetStateAction<number>>;
 }>(null);
 
@@ -15,6 +17,7 @@ export const TeamProvider = ({ children }) => {
   const [teamPreview, setTeamPreview] = useState<StoredHero[]>(
     Array.from<StoredHero>({ length: 4 }).fill(EMPTY_CHARACTER)
   );
+  const [errors, setErrors] = useState<{ [k:string]: string[] }>({});
   const [tab, setTab] = useState(0);
 
   useEffect(() => {
@@ -47,7 +50,7 @@ export const TeamProvider = ({ children }) => {
   }, []);
 
   return (
-    <TeamContext.Provider value={{ teamPreview, setTeamPreview, tab, setTab }}>
+    <TeamContext.Provider value={{ teamPreview, setTeamPreview, tab, setTab, errors, setErrors }}>
       {children}
     </TeamContext.Provider>
   );

@@ -18,6 +18,8 @@ import Summary from "./summary";
 import TeamPreview from "./team-preview";
 import UnitList from "./unit-list";
 import DeleteIcon from "../icons/delete";
+import SaveButton from "./save-button";
+import ErrorSection from "./errors-section";
 
 interface SkillWithDescription {
   name: string;
@@ -32,6 +34,14 @@ interface SkillList {
   B: SkillWithDescription[];
   C: SkillWithDescription[];
   S: SkillWithDescription[];
+}
+
+interface ISupport {
+  summonerSupport: "" | "C" | "B" | "A" | "S";
+  allySupport: {
+    ally: string;
+    rank: "" | "C" | "B" | "A" | "S";
+  }
 }
 
 type StatChangeFields = {
@@ -52,7 +62,7 @@ export default function Tab() {
     setValue,
 
   } = useForm<{
-    [k in keyof (SkillList & { merges: number })]: string;
+    [k in keyof (SkillList & { merges: number } & ISupport)]: string;
   } & StatChangeFields>({
     mode: "onChange",
     defaultValues: {
@@ -63,6 +73,8 @@ export default function Tab() {
       B: "",
       C: "",
       S: "",
+      summonerSupport: "",
+      allySupport: "",
       merges: "0",
     },
   });
@@ -716,17 +728,25 @@ export default function Tab() {
           <TeamPreview />
         </div>
         <div class="support">
-          <h2>Summoner & Ally Supports</h2>
+          <h2>Summoner Supports</h2>
           <div class="support-table">
             <span>Summoner Support</span>
-            <span />
-            <select>
-              <option>None</option>
-              <option>C</option>
-              <option>B</option>
-              <option>A</option>
-              <option>S</option>
-            </select>
+
+            <div class="summoner-selector">
+              <input class="summoner-input" type="radio" {...registerMoveset("summonerSupport")} value=""  id="summoner-none" />
+              <label for="summoner-none" class="summoner-option">None</label>
+              <input class="summoner-input" type="radio" {...registerMoveset("summonerSupport")} value="C" id="summoner-C" />
+              <label for="summoner-C" class="summoner-option">C</label>
+
+              <input class="summoner-input" type="radio" {...registerMoveset("summonerSupport")} value="B" id="summoner-B" />
+              <label for="summoner-B" class="summoner-option">B</label>
+              <input class="summoner-input" type="radio" {...registerMoveset("summonerSupport")} value="A" id="summoner-A" />
+              <label for="summoner-A" class="summoner-option">A</label>
+              <input class="summoner-input" type="radio" {...registerMoveset("summonerSupport")} value="S" id="summoner-S" />
+              <label for="summoner-S" class="summoner-option">S</label>
+            </div>
+
+            <h2>Ally Supports</h2>
              
               {teamPreview.filter((i) => i.name).length >= 2 ? <><span>Ally Support</span>
               <select>
@@ -741,7 +761,7 @@ export default function Tab() {
                 <option>B</option>
                 <option>A</option>
                 <option>S</option>
-              </select></>: <p>You need at least 2 teammates to be able to set supports.</p>}
+              </select></>: <p>You need at least 1 more teammate to set ally supports.</p>}
           </div>
         </div> 
         <div class="moveset-summary">
@@ -749,6 +769,8 @@ export default function Tab() {
           <Summary data={teamPreview[tab]} />
         </div>
       </div>
+      <ErrorSection />
+      <SaveButton />
     </>
   );
 }

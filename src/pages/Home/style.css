@@ -468,6 +468,7 @@ li:has(> .homepage) {
 		.passive-b-list,
 		.passive-c-list,
 		.passive-s-list,
+		.support,
 		.stats {
 			grid-area: unset;
 		}
@@ -634,4 +635,31 @@ h3 {
 
 .flaw-stat {
 	color: #E99EAE;
+}
+
+.errors {
+	margin: 0.5rem 0;
+	padding: 0.5rem;
+	background-color: brown;
+	border-radius: 10px;
+}
+
+.summoner-input {
+	display: none;
+}
+
+.summoner-selector {
+	display: flex;
+	width: 90%;
+	margin: 1rem auto;
+}
+
+.summoner-option {
+	padding: 0.5rem;
+	margin-top: 0.5rem;
+	flex: 1;
+}
+
+.summoner-input:checked+label {
+	background-color: red;
 }
