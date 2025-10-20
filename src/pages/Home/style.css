@@ -365,7 +365,6 @@ li:has(> .tab) {
 
 		.unit-preview {
 			position: relative;
-			background-color: buttonface;
 		}
 
 		.banner {
@@ -661,5 +660,19 @@ h3 {
 }
 
 .summoner-input:checked+label {
-	background-color: red;
+	&[for="summoner-C"] {
+		background-color: #4D7969;
+	}
+
+	&[for="summoner-B"] {
+		background-color: #A16740;
+	}
+
+	&[for="summoner-A"] {
+		background-color: #869491;
+	}
+
+	&[for="summoner-S"] {
+		background-color: #A37C45;
+	}
 }

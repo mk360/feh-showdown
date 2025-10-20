@@ -5,7 +5,7 @@ import {
   useState
 } from "preact/hooks";
 import { Fragment } from "preact/jsx-runtime";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { getSkillUrl } from "../data/skill-icon-dex";
 import { CharacterMoveset } from "../interfaces/moveset";
 import STATS from "../stats";
@@ -468,6 +468,18 @@ export default function Tab() {
                     onClick={() => {
                       setValue("asset", "");
                       setValue("flaw", "");
+                      let preview = [...teamPreview]
+                      preview[tab] = {
+                        ...preview[tab],
+                        asset: "",
+                        flaw: "",
+                        stats: withMerges(getLevel40Stats({
+                          character: teamPreview[tab].name,
+                          asset: "",
+                          flaw: "",
+                        }), +getValues("merges"), "", "")
+                      }; 
+                      setTeamPreview(preview);
                     }}
                     value=""
                   />
@@ -478,17 +490,7 @@ export default function Tab() {
               </tr>
               <tr>
                 <td>Merges</td>
-                <td>{getValues("merges")}</td>
-                <td colSpan={3}>
-                  <input
-                    style={{ width: "100%" }}
-                    type="range"
-                    min={0}
-                    max={10}
-                    step={1}
-                    {...registerMoveset("merges")}
-                  />
-                </td>
+                <td><input type="number" min={0} step={1} max={10} style={{ width: "fit-content"}} {...registerMoveset("merges")} /></td>
               </tr>
             </tbody>
           </table>
@@ -730,8 +732,6 @@ export default function Tab() {
         <div class="support">
           <h2>Summoner Supports</h2>
           <div class="support-table">
-            <span>Summoner Support</span>
-
             <div class="summoner-selector">
               <input class="summoner-input" type="radio" {...registerMoveset("summonerSupport")} value=""  id="summoner-none" />
               <label for="summoner-none" class="summoner-option">None</label>
@@ -770,7 +770,6 @@ export default function Tab() {
         </div>
       </div>
       <ErrorSection />
-      <SaveButton />
     </>
   );
 }
