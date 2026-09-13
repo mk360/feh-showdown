@@ -5,8 +5,9 @@ import {
   useState
 } from "preact/hooks";
 import { Fragment } from "preact/jsx-runtime";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { getSkillUrl } from "../data/skill-icon-dex";
+import DeleteIcon from "../icons/delete";
 import { CharacterMoveset } from "../interfaces/moveset";
 import STATS from "../stats";
 import { getExtraStats, getLevel40Stats, withMerges } from "../stats/convert-to-level-40";
@@ -14,12 +15,9 @@ import TeamContext from "../team-context";
 import EMPTY_CHARACTER from "../utils/empty-character-slot";
 import fetchMovesets from "../utils/fetch-moveset";
 import { formatName } from "../utils/strings";
-import Summary from "./summary";
-import TeamPreview from "./team-preview";
-import UnitList from "./unit-list";
-import DeleteIcon from "../icons/delete";
-import SaveButton from "./save-button";
 import ErrorSection from "./errors-section";
+import Summary from "./summary";
+import UnitList from "./unit-list";
 
 interface SkillWithDescription {
   name: string;
@@ -51,6 +49,7 @@ type StatChangeFields = {
 
 export default function Tab() {
   const [temporaryChoice, setTemporaryChoice] = useState("");
+  const [selectedSlot, setSelectedSlot] = useState<keyof SkillList>();
   const [moveset, setMoveset] = useState<CharacterMoveset>(null);
   const { teamPreview, setTeamPreview, tab } = useContext(TeamContext);
   const [subTab, setSubTab] = useState<"list" | "detail">();
@@ -58,9 +57,7 @@ export default function Tab() {
     register: registerMoveset,
     handleSubmit: handleSubmitMoveset,
     getValues,
-    resetField,
     setValue,
-
   } = useForm<{
     [k in keyof (SkillList & { merges: number } & ISupport)]: string;
   } & StatChangeFields>({
@@ -300,202 +297,209 @@ export default function Tab() {
           (subTab === "list" ? "hide " : "") + "detail-list"
         }
       >
-        <div class="hero-portrait">
-          <h2>{teamPreview[tab].name} <button class="delete-button" onClick={(e) => {
-              e.stopPropagation();
-              const copy = [...teamPreview];
-              copy[tab] = EMPTY_CHARACTER;
-              setTeamPreview(copy);
-              setValue("asset", "");
-              setValue("flaw", "");
-              setSubTab("list");
-            }}><DeleteIcon /></button></h2>
-          <img src={`/teambuilder/portraits/${formatName(teamPreview[tab].name ?? "")}.webp`} />
-          <div />
-        </div>
-        <div class="stats">
-          <h2>Stats and Traits</h2>
-          <table>
-            <tbody>
-              <tr>
-                <td>HP</td>
-                <td>{!!temporaryChoice && statsWithMerges.hp}</td>
-                <td>
-                  <input
-                    class="stat-input"
-                    id={`flaw-hp`}
-                    type="radio"
-                    {...registerMoveset("flaw")}
-                    value="hp"
-                  />
-                  <label class="flaw" for={`flaw-hp`}>
-                    Flaw
-                  </label>
-                </td>
-                <td>
-                  <input
-                    class="stat-input"
-                    id={`asset-hp`}
-                    type="radio"
-                    {...registerMoveset("asset")}
-                    value="hp"
-                  />
-                  <label class="asset" for={`asset-hp`}>
-                    Asset
-                  </label>
-                </td>
-              </tr>
-              <tr>
-                <td>Atk</td>
-                <td>{!!temporaryChoice && statsWithMerges.atk}</td>
-                <td>
-                  <input
-                    class="stat-input"
-                    id={`flaw-atk`}
-                    type="radio"
-                    {...registerMoveset("flaw")}
-                    value="atk"
-                  />
-                  <label class="flaw" for={`flaw-atk`}>
-                    Flaw
-                  </label>
-                </td>
-                <td>
-                  <input
-                    class="stat-input"
-                    id={`asset-atk`}
-                    type="radio"
-                    {...registerMoveset("asset")}
-                    value="atk"
-                  />
-                  <label class="asset" for="asset-atk">
-                    Asset
-                  </label>
-                </td>
-              </tr>
-              <tr>
-                <td>Spd</td>
-                <td>{!!temporaryChoice && statsWithMerges.spd}</td>
-                <td>
-                  <input
-                    class="stat-input"
-                    id={`flaw-spd`}
-                    type="radio"
-                    {...registerMoveset("flaw")}
-                    value="spd"
-                  />
-                  <label class="flaw" for={`flaw-spd`}>
-                    Flaw
-                  </label>
-                </td>
-                <td>
-                  <input
-                    class="stat-input"
-                    id={`asset-spd`}
-                    type="radio"
-                    {...registerMoveset("asset")}
-                    value="spd"
-                  />
-                  <label class="asset" for={`asset-spd`}>
-                    Asset
-                  </label>
-                </td>
-              </tr>
-              <tr>
-                <td>Def</td>
-                <td>{!!temporaryChoice && statsWithMerges.def}</td>
-                <td>
-                  <input
-                    class="stat-input"
-                    id={`flaw-def`}
-                    type="radio"
-                    {...registerMoveset("flaw")}
-                    value="def"
-                  />
-                  <label class="flaw" for={`flaw-def`}>
-                    Flaw
-                  </label>
-                </td>
-                <td>
-                  <input
-                    class="stat-input"
-                    id={`asset-def`}
-                    type="radio"
-                    {...registerMoveset("asset")}
-                    value="def"
-                  />
-                  <label class="asset" for={`asset-def`}>
-                    Asset
-                  </label>
-                </td>
-              </tr>
-              <tr>
-                <td>Res</td>
-                <td>{!!temporaryChoice && statsWithMerges.res}</td>
-                <td>
-                  <input
-                    class="stat-input"
-                    id={`flaw-res`}
-                    type="radio"
-                    {...registerMoveset("flaw")}
-                    value="res"
-                  />
-                  <label class="flaw" for={`flaw-res`}>
-                    Flaw
-                  </label>
-                </td>
-                <td>
-                  <input
-                    class="stat-input"
-                    id={`asset-res`}
-                    type="radio"
-                    {...registerMoveset("asset")}
-                    value="res"
-                  />
-                  <label class="asset" for={`asset-res`}>
-                    Asset
-                  </label>
-                </td>
-              </tr>
-              <tr>
-                <td></td>
-                <td></td>
-                <td colSpan={2}>
-                   <input
-                    class="stat-input"
-                    id={`neutral`}
-                    type="radio"
-                    onClick={() => {
-                      setValue("asset", "");
-                      setValue("flaw", "");
-                      let preview = [...teamPreview]
-                      preview[tab] = {
-                        ...preview[tab],
-                        asset: "",
-                        flaw: "",
-                        stats: withMerges(getLevel40Stats({
-                          character: teamPreview[tab].name,
+        <div>
+          <div class="hero-portrait">
+            <h2>{teamPreview[tab].name} <button class="delete-button" onClick={(e) => {
+                e.stopPropagation();
+                const copy = [...teamPreview];
+                copy[tab] = EMPTY_CHARACTER;
+                setTeamPreview(copy);
+                setValue("asset", "");
+                setValue("flaw", "");
+                setSubTab("list");
+              }}><DeleteIcon /></button></h2>
+            <img src={`/teambuilder/portraits/${formatName(teamPreview[tab].name ?? "")}.webp`} />
+            <div />
+          </div>
+          <div class="stats">
+            <h2>Stats and Traits</h2>
+            <table>
+              <tbody>
+                <tr>
+                  <td>HP</td>
+                  <td>{!!temporaryChoice && statsWithMerges.hp}</td>
+                  <td>
+                    <input
+                      class="stat-input"
+                      id={`flaw-hp`}
+                      type="radio"
+                      {...registerMoveset("flaw")}
+                      value="hp"
+                    />
+                    <label class="flaw" for={`flaw-hp`}>
+                      Flaw
+                    </label>
+                  </td>
+                  <td>
+                    <input
+                      class="stat-input"
+                      id={`asset-hp`}
+                      type="radio"
+                      {...registerMoveset("asset")}
+                      value="hp"
+                    />
+                    <label class="asset" for={`asset-hp`}>
+                      Asset
+                    </label>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Atk</td>
+                  <td>{!!temporaryChoice && statsWithMerges.atk}</td>
+                  <td>
+                    <input
+                      class="stat-input"
+                      id={`flaw-atk`}
+                      type="radio"
+                      {...registerMoveset("flaw")}
+                      value="atk"
+                    />
+                    <label class="flaw" for={`flaw-atk`}>
+                      Flaw
+                    </label>
+                  </td>
+                  <td>
+                    <input
+                      class="stat-input"
+                      id={`asset-atk`}
+                      type="radio"
+                      {...registerMoveset("asset")}
+                      value="atk"
+                    />
+                    <label class="asset" for="asset-atk">
+                      Asset
+                    </label>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Spd</td>
+                  <td>{!!temporaryChoice && statsWithMerges.spd}</td>
+                  <td>
+                    <input
+                      class="stat-input"
+                      id={`flaw-spd`}
+                      type="radio"
+                      {...registerMoveset("flaw")}
+                      value="spd"
+                    />
+                    <label class="flaw" for={`flaw-spd`}>
+                      Flaw
+                    </label>
+                  </td>
+                  <td>
+                    <input
+                      class="stat-input"
+                      id={`asset-spd`}
+                      type="radio"
+                      {...registerMoveset("asset")}
+                      value="spd"
+                    />
+                    <label class="asset" for={`asset-spd`}>
+                      Asset
+                    </label>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Def</td>
+                  <td>{!!temporaryChoice && statsWithMerges.def}</td>
+                  <td>
+                    <input
+                      class="stat-input"
+                      id={`flaw-def`}
+                      type="radio"
+                      {...registerMoveset("flaw")}
+                      value="def"
+                    />
+                    <label class="flaw" for={`flaw-def`}>
+                      Flaw
+                    </label>
+                  </td>
+                  <td>
+                    <input
+                      class="stat-input"
+                      id={`asset-def`}
+                      type="radio"
+                      {...registerMoveset("asset")}
+                      value="def"
+                    />
+                    <label class="asset" for={`asset-def`}>
+                      Asset
+                    </label>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Res</td>
+                  <td>{!!temporaryChoice && statsWithMerges.res}</td>
+                  <td>
+                    <input
+                      class="stat-input"
+                      id={`flaw-res`}
+                      type="radio"
+                      {...registerMoveset("flaw")}
+                      value="res"
+                    />
+                    <label class="flaw" for={`flaw-res`}>
+                      Flaw
+                    </label>
+                  </td>
+                  <td>
+                    <input
+                      class="stat-input"
+                      id={`asset-res`}
+                      type="radio"
+                      {...registerMoveset("asset")}
+                      value="res"
+                    />
+                    <label class="asset" for={`asset-res`}>
+                      Asset
+                    </label>
+                  </td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td colSpan={2}>
+                    <input
+                      class="stat-input"
+                      id={`neutral`}
+                      type="radio"
+                      onClick={() => {
+                        setValue("asset", "");
+                        setValue("flaw", "");
+                        let preview = [...teamPreview]
+                        preview[tab] = {
+                          ...preview[tab],
                           asset: "",
                           flaw: "",
-                        }), +getValues("merges"), "", "")
-                      }; 
-                      setTeamPreview(preview);
-                    }}
-                    value=""
-                  />
-                  <label for={`neutral`}>
-                    Neutral
-                  </label>
-                </td>
-              </tr>
-              <tr>
-                <td>Merges</td>
-                <td><input type="number" min={0} step={1} max={10} style={{ width: "fit-content"}} {...registerMoveset("merges")} /></td>
-              </tr>
-            </tbody>
-          </table>
+                          stats: withMerges(getLevel40Stats({
+                            character: teamPreview[tab].name,
+                            asset: "",
+                            flaw: "",
+                          }), +getValues("merges"), "", "")
+                        }; 
+                        setTeamPreview(preview);
+                      }}
+                      value=""
+                    />
+                    <label for={`neutral`}>
+                      Neutral
+                    </label>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Merges</td>
+                  <td><input type="number" min={0} step={1} max={10} style={{ width: "fit-content"}} {...registerMoveset("merges")} /></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-        <div class="weapon-list">
+        <div>
+          <h2>Summary</h2>
+          <Summary data={teamPreview[tab]} />
+        </div>
+        <div>
+          <div class="weapon-list">
           <h2>
             <img class="game-asset" src="/teambuilder/weapon-icon.png" /> Weapons
           </h2>
@@ -726,47 +730,6 @@ export default function Tab() {
             );
           })}
         </div>
-        <div class="preview">
-          <TeamPreview />
-        </div>
-        <div class="support">
-          <h2>Summoner Supports</h2>
-          <div class="support-table">
-            <div class="summoner-selector">
-              <input class="summoner-input" type="radio" {...registerMoveset("summonerSupport")} value=""  id="summoner-none" />
-              <label for="summoner-none" class="summoner-option">None</label>
-              <input class="summoner-input" type="radio" {...registerMoveset("summonerSupport")} value="C" id="summoner-C" />
-              <label for="summoner-C" class="summoner-option">C</label>
-
-              <input class="summoner-input" type="radio" {...registerMoveset("summonerSupport")} value="B" id="summoner-B" />
-              <label for="summoner-B" class="summoner-option">B</label>
-              <input class="summoner-input" type="radio" {...registerMoveset("summonerSupport")} value="A" id="summoner-A" />
-              <label for="summoner-A" class="summoner-option">A</label>
-              <input class="summoner-input" type="radio" {...registerMoveset("summonerSupport")} value="S" id="summoner-S" />
-              <label for="summoner-S" class="summoner-option">S</label>
-            </div>
-
-            <h2>Ally Supports</h2>
-             
-              {teamPreview.filter((i) => i.name).length >= 2 ? <><span>Ally Support</span>
-              <select>
-                <option>None</option>
-                {teamPreview.filter((i) => i.name && i.name !== teamPreview[tab].name).map((choice) => (
-                  <option key={choice.name}>{choice.name}</option>
-                ))}
-              </select>
-              <select>
-                <option>None</option>
-                <option>C</option>
-                <option>B</option>
-                <option>A</option>
-                <option>S</option>
-              </select></>: <p>You need at least 1 more teammate to set ally supports.</p>}
-          </div>
-        </div> 
-        <div class="moveset-summary">
-          <h2>Summary</h2>
-          <Summary data={teamPreview[tab]} />
         </div>
       </div>
       <ErrorSection />

@@ -98,7 +98,7 @@ function UnitList({
   const sortingFunction = getSortingFunction(sorting);
 
   return (
-    <div>
+    <div class="search-grid">
       <form
         onSubmit={handleSubmit((data) => {
           setResults(getResultsFromFilters(data, teamPreview.map((i) => i.name).filter((i) => i)));
@@ -106,14 +106,6 @@ function UnitList({
       >
         <table>
           <tbody>
-            <tr>
-              <td
-                colSpan={4}
-                style="text-align: center; color: white; padding: 10px"
-              >
-                Weapon Type
-              </td>
-            </tr>
             <tr>
               <td>
                 <input
@@ -452,14 +444,6 @@ function UnitList({
               </td>
             </tr>
             <tr>
-              <td
-                colSpan={4}
-                style="text-align: center; color: white; padding: 10px"
-              >
-                Movement Type
-              </td>
-            </tr>
-            <tr>
               <td>
                 <input
                   type="checkbox"
@@ -525,7 +509,7 @@ function UnitList({
               <td colSpan={4}>
                 <input
                   type="submit"
-                  value="Search for Units"
+                  value="Find Units"
                   style="height: 100%; padding: 30px; width: 100%; background-color: #FF6A3D; border: none; cursor: pointer"
                 />
               </td>
@@ -548,7 +532,6 @@ function UnitList({
                   {sorting.name === "ascending" ? <img style={{ transform: "rotate(180deg)"}} src={DownArrow} /> : sorting.name === "descending" ? <img src={DownArrow} /> : null}
                 </div>
               </th>
-              <th colSpan={6}>5 Stars Level 40</th>
             </tr>
             <tr>
               <th
@@ -683,8 +666,10 @@ function UnitList({
                             .join("_")}.png`}
                         />
                       </div>
-                      {result}
-                      <div />
+                      <div class="char-name">
+                          <p>{result.substring(0, result.indexOf(":"))}</p>
+                          <p style={{ fontSize: 12 }}>{result.substring(result.indexOf(":") + 1, result.length)}</p>
+                      </div>
                     </td>
                     <td class="HP">{stats.hp}</td>
                     <td class="Atk">{stats.atk}</td>

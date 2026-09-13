@@ -11,8 +11,17 @@
 	-webkit-text-size-adjust: 100%;
 }
 
+@font-face {
+	font-family: "FEH";
+	src: url("/feh.woff2") format(woff2);
+}
+
 body {
 	margin: 0;
+}
+
+* {
+	font-family: "FEH";
 }
 
 #app {
@@ -46,7 +55,7 @@ header a:hover {
 }
 
 .pad {
-	margin: 0 10rem;
+
 }
 
 main {
