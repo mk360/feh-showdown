@@ -1,5 +1,6 @@
 import { JSX, memo } from "preact/compat";
 import { capitalize } from "../utils/strings";
+import getWeaponAsset from "../utils/get-weapon-asset";
 
 const ICON_CACHE: {
   [k: string]: JSX.Element;
@@ -11,7 +12,7 @@ function WeaponIcon({ color, type }: { color: string; type: string }) {
   const generatedIcon = (
     <img
       class="game-asset"
-      src={`https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_${urlified}.png`}
+      src={getWeaponAsset(color, type)}
     />
   );
   ICON_CACHE[urlified] = generatedIcon;

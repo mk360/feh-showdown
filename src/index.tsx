@@ -11,7 +11,7 @@ import "./style.css";
 export function App() {
   return (
     <LocationProvider>
-      <main class="pad">
+      <main>
         <Router>
           <Route path="/teambuilder/" component={Teambuilder} />
           <Route default component={Teambuilder} />

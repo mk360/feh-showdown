@@ -38,3 +38,8 @@ interface AllySupportMap {
         }
     }
 }
+
+interface SkillWithDescription {
+  name: string;
+  description: string;
+}

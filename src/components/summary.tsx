@@ -1,29 +1,51 @@
 import { getSkillUrl } from "../data/skill-icon-dex";
 import { SkillList } from "../interfaces/moveset";
 
-function Summary({ data, onSlotSelect }: { data: StoredHero, onSlotSelect(slot: keyof SkillList):void }) {
+interface SummaryProps {
+  data: StoredHero;
+  onSlotSelect(slot: keyof SkillList | ""): void;
+  selectedSlot: keyof SkillList | "";
+}
+
+function Summary({ data, onSlotSelect, selectedSlot }: SummaryProps) {
   return (
     <div class="summary-grid">
       <button onClick={() => {
-        onSlotSelect("weapons")
+        if (selectedSlot === "weapons") {
+          onSlotSelect("");
+        } else {
+          onSlotSelect("weapons")
+        }
       }}>
         <img class="game-asset" src="/teambuilder/weapon-icon.png" />
-        {data?.weapon}
+        {data?.weapon || "None"}
       </button>
       <button onClick={() => {
-        onSlotSelect("assists")
+         if (selectedSlot === "assists") {
+          onSlotSelect("");
+        } else {
+          onSlotSelect("assists")
+        }
       }}>
         <img class="game-asset" src="/teambuilder/assist-icon.png" />
-        {data?.assist}
+        {data?.assist || "None"}
       </button>
       <button onClick={() => {
-        onSlotSelect("specials")
+       if (selectedSlot === "specials") {
+          onSlotSelect("");
+        } else {
+          onSlotSelect("specials")
+        }
       }}>
         <img class="game-asset" src="/teambuilder/special-icon.png" />
-        {data?.special}
+        {data?.special || "None"}
       </button>
       <button onClick={() => {
-        onSlotSelect("A")
+        if (selectedSlot === "A") {
+          onSlotSelect("");
+        } else {
+          onSlotSelect("A")
+        }
       }}>
         <img
           loading="lazy"
@@ -34,10 +56,14 @@ function Summary({ data, onSlotSelect }: { data: StoredHero, onSlotSelect(slot: 
               : "/teambuilder/A.png"
           }
         />
-        {data?.A}
+        {data?.A || "None"}
       </button>
       <button onClick={() => {
-        onSlotSelect("B")
+         if (selectedSlot === "B") {
+          onSlotSelect("");
+        } else {
+          onSlotSelect("B")
+        }
       }}>
         <img
           loading="lazy"
@@ -48,10 +74,14 @@ function Summary({ data, onSlotSelect }: { data: StoredHero, onSlotSelect(slot: 
               : "/teambuilder/B.png"
           }
         />
-        {data?.B}
+        {data?.B || "None"}
       </button>
       <button onClick={() => {
-        onSlotSelect("C")
+        if (selectedSlot === "C") {
+          onSlotSelect("");
+        } else {
+          onSlotSelect("C")
+        }
       }}>
         <img
           loading="lazy"
@@ -62,10 +92,14 @@ function Summary({ data, onSlotSelect }: { data: StoredHero, onSlotSelect(slot: 
               : "/teambuilder/C.png"
           }
         />
-        {data?.C}
+        {data?.C || "None"}
       </button>
       <button onClick={() => {
-        onSlotSelect("S")
+         if (selectedSlot === "S") {
+          onSlotSelect("");
+        } else {
+          onSlotSelect("S")
+        }
       }}>
         <img
           loading="lazy"
@@ -76,7 +110,7 @@ function Summary({ data, onSlotSelect }: { data: StoredHero, onSlotSelect(slot: 
               : "/teambuilder/S.png"
           }
         />
-        {data?.S}
+        {data?.S || "None"}
       </button>
     </div>
   );

@@ -9,6 +9,7 @@ import { capitalize, formatName } from "../utils/strings";
 import WeaponCheckbox from "./weapon-checkbox";
 import WEAPON_TREE from "../weapon-tree";
 import DownArrow from "../../public/down-arrow.svg";
+import getWeaponAsset from "../utils/get-weapon-asset";
 
 interface HeroFilters {
   characterName: string;
@@ -253,7 +254,7 @@ function UnitList({
                 <label for={`${index}-green-axe`}>
                   <img
                     class="game-asset"
-                    src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Green_Axe.png"
+                    src={getWeaponAsset("green", "axe")}
                   />
                 </label>
               </td>
@@ -268,7 +269,7 @@ function UnitList({
                 <label for={`${index}-colorless-staff`}>
                   <img
                     class="game-asset"
-                    src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_Colorless_Staff.png"
+                    src={getWeaponAsset("colorless", "staff")}
                   />
                 </label>
               </td>
@@ -455,7 +456,7 @@ function UnitList({
                 <label for={`${index}-infantry`}>
                   <img
                     class="game-asset"
-                    src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Move_Infantry.png"
+                    src="/teambuilder/movement/infantry.webp"
                   />
                 </label>
               </td>
@@ -470,7 +471,7 @@ function UnitList({
                 <label for={`${index}-armored`}>
                   <img
                     class="game-asset"
-                    src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Move_Armored.png"
+                    src="/teambuilder/movement/armored.webp"
                   />
                 </label>
               </td>
@@ -485,7 +486,7 @@ function UnitList({
                 <label for={`${index}-cavalry`}>
                   <img
                     class="game-asset"
-                    src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Move_Cavalry.png"
+                    src="/teambuilder/movement/cavalry.webp"
                   />
                 </label>
               </td>
@@ -500,7 +501,7 @@ function UnitList({
                 <label for={`${index}-flier`}>
                   <img
                     class="game-asset"
-                    src="https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Move_Flier.png"
+                    src="/teambuilder/movement/flier.webp"
                   />
                 </label>
               </td>
@@ -652,18 +653,11 @@ function UnitList({
                         />
                         <img
                           class="movement-icon"
-                          src={`https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Move_${capitalize(
-                            movementType
-                          )}.png`}
+                          src={`/teambuilder/movement/${movementType}.webp`}
                         />
                         <img
                           class="weapon-icon"
-                          src={`https://feheroes.fandom.com/wiki/Special:Redirect/file/Icon_Class_${[
-                            color,
-                            weaponType,
-                          ]
-                            .map(capitalize)
-                            .join("_")}.png`}
+                          src={getWeaponAsset(color, weaponType)}
                         />
                       </div>
                       <div class="char-name">

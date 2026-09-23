@@ -19,11 +19,6 @@ import ErrorSection from "./errors-section";
 import Summary from "./summary";
 import UnitList from "./unit-list";
 
-interface SkillWithDescription {
-  name: string;
-  description: string;
-}
-
 interface SkillList {
   weapons: (SkillWithDescription & { might: number })[];
   assists: SkillWithDescription[];
@@ -49,7 +44,7 @@ type StatChangeFields = {
 
 export default function Tab() {
   const [temporaryChoice, setTemporaryChoice] = useState("");
-  const [selectedSlot, setSelectedSlot] = useState<keyof SkillList>();
+  const [selectedSlot, setSelectedSlot] = useState<keyof SkillList | "">("");
   const [moveset, setMoveset] = useState<CharacterMoveset>(null);
   const { teamPreview, setTeamPreview, tab } = useContext(TeamContext);
   const [subTab, setSubTab] = useState<"list" | "detail">();
@@ -199,7 +194,7 @@ export default function Tab() {
 
   return (
     <>
-      <div class={subTab === "detail" ? "hide" : ""}>
+      <div class={subTab === "detail" ? "hide" : "list"}>
         <UnitList
           onUnitClick={(e) => {
             let target = e.target as HTMLElement;
@@ -295,10 +290,8 @@ export default function Tab() {
         })}
         class={
           (subTab === "list" ? "hide " : "") + "detail-list"
-        }
-      >
+        }>
         <div>
-          <div class="hero-portrait">
             <h2>{teamPreview[tab].name} <button class="delete-button" onClick={(e) => {
                 e.stopPropagation();
                 const copy = [...teamPreview];
@@ -308,8 +301,12 @@ export default function Tab() {
                 setValue("flaw", "");
                 setSubTab("list");
               }}><DeleteIcon /></button></h2>
-            <img src={`/teambuilder/portraits/${formatName(teamPreview[tab].name ?? "")}.webp`} />
-            <div />
+            <img width="100%" src={`/teambuilder/portraits/${formatName(teamPreview[tab].name ?? "")}.webp`} />
+        </div>
+        <div>
+          <div>
+            <h2>Summary</h2>
+            <Summary onSlotSelect={setSelectedSlot} data={teamPreview[tab]} selectedSlot={selectedSlot} />
           </div>
           <div class="stats">
             <h2>Stats and Traits</h2>
@@ -494,181 +491,215 @@ export default function Tab() {
             </table>
           </div>
         </div>
+        <div class="skill-select">
         <div>
-          <h2>Summary</h2>
-          <Summary data={teamPreview[tab]} />
-        </div>
-        <div>
-          <div class="weapon-list">
-          <h2>
+          <h2 onClick={() => {
+            setSelectedSlot("weapons")
+          }}>
             <img class="game-asset" src="/teambuilder/weapon-icon.png" /> Weapons
           </h2>
-          {skillsData.weapons.map((weaponData, i) => {
-            return (
-              <Fragment key={weaponData.name}>
-                <input
-                  value={i === 0 ? "" : weaponData.name}
-                  id={`weapon-${weaponData.name}`}
-                  type="radio"
-                  class="hide"
-                  {...registerMoveset("weapons")}
-                />
-                <label
-                  class={`skill-label ${STATS[temporaryChoice].color}`}
-                  for={`weapon-${weaponData.name}`}
-                >
-                  <div>
-                    <h3>
-                      <img class="game-asset" src="/teambuilder/weapon-icon.png" />
-                      {weaponData.name}
-                    </h3>
-                    {!!weaponData.might && <h4>{weaponData.might}</h4>}
-                  </div>
-                  {!!weaponData.description && <p>{weaponData.description}</p>}
-                </label>
-              </Fragment>
-            );
-          })}
+          <div class={`skill-slot ${selectedSlot !== "weapons" ? "collapsed" : ""}`}>
+            {skillsData.weapons.map((weaponData, i) => {
+              return (
+                <Fragment key={weaponData.name}>
+                  <input
+                    value={i === 0 ? "" : weaponData.name}
+                    id={`weapon-${weaponData.name}`}
+                    type="radio"
+                    class="hide"
+                    {...registerMoveset("weapons")}
+                  />
+                  <label
+                    class={`skill-label ${STATS[temporaryChoice].color}`}
+                    for={`weapon-${weaponData.name}`}
+                  >
+                    <div>
+                      <h3>
+                        <img class="game-asset" src="/teambuilder/weapon-icon.png" />
+                        {weaponData.name}
+                      </h3>
+                      {!!weaponData.might && <h4>{weaponData.might}</h4>}
+                    </div>
+                    {!!weaponData.description && <p>{weaponData.description}</p>}
+                  </label>
+                </Fragment>
+              );
+            })}
+          </div>
         </div>
-        <div class="assist-list">
-          <h2>
+        <div>
+          <h2 onClick={() => {
+            if (selectedSlot !== "assists")
+              setSelectedSlot("assists");
+            else 
+              setSelectedSlot("");
+          }}>
             <img class="game-asset" src="/teambuilder/assist-icon.png" />
             Assists
           </h2>
-          {skillsData.assists.map((assistData, i) => {
-            return (
-              <Fragment key={assistData.name}>
-                <input
-                  value={i === 0 ? "" : assistData.name}
-                  id={`assists-${assistData.name}`}
-                  type="radio"
-                  class="hide"
-                  {...registerMoveset("assists")}
-                />
-                <label
-                  class={`skill-label ${STATS[temporaryChoice].color}`}
-                  for={`assists-${assistData.name}`}
-                >
-                  <h3>
-                    <img class="game-asset" src="/teambuilder/assist-icon.png" />
-                    {assistData.name}
-                  </h3>
-                  {!!assistData.description && <p>{assistData.description}</p>}
-                </label>
-              </Fragment>
-            );
-          })}
+          <div class={`skill-slot ${selectedSlot !== "assists" ? "collapsed" : ""}`}>
+            {skillsData.assists.map((assistData, i) => {
+              return (
+                <Fragment key={assistData.name}>
+                  <input
+                    value={i === 0 ? "" : assistData.name}
+                    id={`assists-${assistData.name}`}
+                    type="radio"
+                    class="hide"
+                    {...registerMoveset("assists")}
+                  />
+                  <label
+                    class={`skill-label ${STATS[temporaryChoice].color}`}
+                    for={`assists-${assistData.name}`}
+                  >
+                    <h3>
+                      <img class="game-asset" src="/teambuilder/assist-icon.png" />
+                      {assistData.name}
+                    </h3>
+                    {!!assistData.description && <p>{assistData.description}</p>}
+                  </label>
+                </Fragment>
+              );
+            })}
+          </div>
         </div>
-        <div class="specials-list">
-          <h2>
+        <div>
+          <h2 onClick={() => {
+            if (selectedSlot === "specials") 
+              setSelectedSlot("");
+            else 
+              setSelectedSlot("specials")
+          }}>
             <img class="game-asset" src="/teambuilder/special-icon.png" />
             Specials
           </h2>
-          {skillsData.specials.map((specialsData, i) => {
-            return (
-              <Fragment key={specialsData.name}>
-                <input
-                  value={i === 0 ? "" : specialsData.name}
-                  id={`special-${specialsData.name}`}
-                  type="radio"
-                  class="hide"
-                  {...registerMoveset("specials")}
-                />
-                <label
-                  class={`skill-label ${STATS[temporaryChoice].color}`}
-                  for={`special-${specialsData.name}`}
-                >
-                  <div>
-                    <h3>
-                    <img class="game-asset" src="/teambuilder/special-icon.png" />
-                    {specialsData.name}
-                  </h3>
-                  {!!specialsData.cooldown && <h4>{specialsData.cooldown}</h4>}
-                  </div>
-                  {!!specialsData.description && (
-                    <p>{specialsData.description}</p>
-                  )}
-                </label>
-              </Fragment>
-            );
-          })}
+          <div class={`skill-slot ${selectedSlot !== "specials" ? "collapsed" : ""}`}>
+            {skillsData.specials.map((specialsData, i) => {
+              return (
+                <Fragment key={specialsData.name}>
+                  <input
+                    value={i === 0 ? "" : specialsData.name}
+                    id={`special-${specialsData.name}`}
+                    type="radio"
+                    class="hide"
+                    {...registerMoveset("specials")}
+                  />
+                  <label
+                    class={`skill-label ${STATS[temporaryChoice].color}`}
+                    for={`special-${specialsData.name}`}
+                  >
+                    <div>
+                      <h3>
+                      <img class="game-asset" src="/teambuilder/special-icon.png" />
+                      {specialsData.name}
+                    </h3>
+                    {!!specialsData.cooldown && <h4>{specialsData.cooldown}</h4>}
+                    </div>
+                    {!!specialsData.description && (
+                      <p>{specialsData.description}</p>
+                    )}
+                  </label>
+                </Fragment>
+              );
+            })}
+          </div>
         </div>
-        <div class="passive-a-list">
-          <h2>
+        <div>
+          <h2 onClick={() => {
+            if (selectedSlot !== "A")
+              setSelectedSlot("A");
+            else 
+              setSelectedSlot("");
+          }}>
             <img class="game-asset" src="/teambuilder/A.png" />
             Skill
           </h2>
-          {skillsData.A.map((passive, i) => {
-            return (
-              <Fragment key={passive.name}>
-                <input
-                  value={i === 0 ? "" : passive.name}
-                  id={`A-${passive.name}`}
-                  type="radio"
-                  class="hide"
-                  {...registerMoveset("A")}
-                />
-                <label
-                  class={`skill-label ${STATS[temporaryChoice].color}`}
-                  for={`A-${passive.name}`}
-                >
-                  <h3>
-                    {passive.name !== "No A" && (
-                      <img
-                        loading="lazy"
-                        class="game-asset"
-                        src={getSkillUrl(passive.name)}
-                      />
-                    )}
-                    {passive.name}
-                  </h3>
-                  {!!passive.description && <p>{passive.description}</p>}
-                </label>
-              </Fragment>
-            );
-          })}
+          <div class={`skill-slot ${selectedSlot !== "A" ? "collapsed" : ""}`}>
+            {skillsData.A.map((passive, i) => {
+              return (
+                <Fragment key={passive.name}>
+                  <input
+                    value={i === 0 ? "" : passive.name}
+                    id={`A-${passive.name}`}
+                    type="radio"
+                    class="hide"
+                    {...registerMoveset("A")}
+                  />
+                  <label
+                    class={`skill-label ${STATS[temporaryChoice].color}`}
+                    for={`A-${passive.name}`}
+                  >
+                    <h3>
+                      {passive.name !== "No A" && (
+                        <img
+                          loading="lazy"
+                          class="game-asset"
+                          src={getSkillUrl(passive.name)}
+                        />
+                      )}
+                      {passive.name}
+                    </h3>
+                    {!!passive.description && <p>{passive.description}</p>}
+                  </label>
+                </Fragment>
+              );
+            })}
+          </div>
         </div>
-        <div class="passive-b-list">
-          <h2>
+        <div>
+          <h2 onClick={() => {
+            if (selectedSlot !== "B")
+              setSelectedSlot("B");
+            else 
+              setSelectedSlot("");
+          }}>
             <img class="game-asset" src="/teambuilder/B.png" />
             Skill
           </h2>
-          {skillsData.B.map((passive, i) => {
-            return (
-              <Fragment key={passive.name}>
-                <input
-                  type="radio"
-                  class="hide"
-                  value={i === 0 ? "" : passive.name}
-                  id={`B-${passive.name}`}
-                  {...registerMoveset("B")}
-                />
-                <label
-                  class={`skill-label ${STATS[temporaryChoice].color}`}
-                  for={`B-${passive.name}`}
-                >
-                  <h3>
-                    {passive.name !== "No B" && (
-                      <img
-                        loading="lazy"
-                        class="game-asset"
-                        src={getSkillUrl(passive.name)}
-                      />
-                    )}
-                    {passive.name}
-                  </h3>
-                  {!!passive.description && <p>{passive.description}</p>}
-                </label>
-              </Fragment>
-            );
-          })}
+          <div class={`skill-slot ${selectedSlot !== "B" ? "collapsed" : ""}`}>
+            {skillsData.B.map((passive, i) => {
+              return (
+                <Fragment key={passive.name}>
+                  <input
+                    type="radio"
+                    class="hide"
+                    value={i === 0 ? "" : passive.name}
+                    id={`B-${passive.name}`}
+                    {...registerMoveset("B")}
+                  />
+                  <label
+                    class={`skill-label ${STATS[temporaryChoice].color}`}
+                    for={`B-${passive.name}`}
+                  >
+                    <h3>
+                      {passive.name !== "No B" && (
+                        <img
+                          loading="lazy"
+                          class="game-asset"
+                          src={getSkillUrl(passive.name)}
+                        />
+                      )}
+                      {passive.name}
+                    </h3>
+                    {!!passive.description && <p>{passive.description}</p>}
+                  </label>
+                </Fragment>
+              );
+            })}
+          </div>
         </div>
-        <div class="passive-c-list">
-          <h2>
+        <div>
+          <h2 onClick={() => {
+            if (selectedSlot !== "C")
+              setSelectedSlot("C");
+            else 
+              setSelectedSlot("");
+          }}>
             <img class="game-asset" src="/teambuilder/C.png" />
             Skill
           </h2>
-          {skillsData.C.map((passive, i) => {
+          <div class={`skill-slot ${selectedSlot !== "C" ? "collapsed" : ""}`}>
+            {skillsData.C.map((passive, i) => {
             return (
               <Fragment key={passive.name}>
                 <input
@@ -696,39 +727,47 @@ export default function Tab() {
                 </label>
               </Fragment>
             );
-          })}
+            })}
+          </div>
         </div>
-        <div class="passive-s-list">
-          <h2>Sacred Seal</h2>
-          {skillsData.S.map((passive, i) => {
-            return (
-              <Fragment key={passive.name}>
-                <input
-                  value={i === 0 ? "" : passive.name}
-                  id={`S-${passive.name}`}
-                  type="radio"
-                  class="hide"
-                  {...registerMoveset("S")}
-                />
-                <label
-                  class={`skill-label ${STATS[temporaryChoice].color}`}
-                  for={`S-${passive.name}`}
-                >
-                  <h3>
-                    {passive.name !== "No S" && (
-                      <img
-                        loading="lazy"
-                        class="game-asset"
-                        src={getSkillUrl(passive.name)}
-                      />
-                    )}
-                    {passive.name}
-                  </h3>
-                  {!!passive.description && <p>{passive.description}</p>}
-                </label>
-              </Fragment>
-            );
-          })}
+        <div>
+          <h2 onClick={() => {
+            if (selectedSlot !== "S")
+              setSelectedSlot("S");
+            else 
+              setSelectedSlot("");
+          }}>Sacred Seal</h2>
+          <div class={`skill-slot ${selectedSlot !== "S" ? "collapsed" : ""}`}>
+            {skillsData.S.map((passive, i) => {
+              return (
+                <Fragment key={passive.name}>
+                  <input
+                    value={i === 0 ? "" : passive.name}
+                    id={`S-${passive.name}`}
+                    type="radio"
+                    class="hide"
+                    {...registerMoveset("S")}
+                  />
+                  <label
+                    class={`skill-label ${STATS[temporaryChoice].color}`}
+                    for={`S-${passive.name}`}
+                  >
+                    <h3>
+                      {passive.name !== "No S" && (
+                        <img
+                          loading="lazy"
+                          class="game-asset"
+                          src={getSkillUrl(passive.name)}
+                        />
+                      )}
+                      {passive.name}
+                    </h3>
+                    {!!passive.description && <p>{passive.description}</p>}
+                  </label>
+                </Fragment>
+              );
+            })}
+          </div>
         </div>
         </div>
       </div>
